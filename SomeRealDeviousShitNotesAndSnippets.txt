@@ -1,0 +1,280 @@
+#TODOLIST bc my dumbass has 1mb of working memory ----------------------------------------------------------------------------------------------------------------
+
+#TODO Redo defaultInfo csv file, storage, retrevial, and interpetation system. Now need to ad gender column too
+#TODO Create save system for preferential stuff that you dont want to type in repeatedly but cant be in defaultInfo, will have to maeke csv readers & converters tho
+#TODO Finish getting all the time and special events listed
+#TODO Create master task list (just add some stuff some like 80% there)
+#TODO Preferences system
+#TODO Time system, how work? its input blocks or time date, or give options. also make smart function to calc distance btwn two numbers to get duration, will have to maeke csv readers & converters too tho
+#TODO Importance system
+#TODO Multi-timeblock system
+#TODO Merge all input data into master roster for algorithm
+#TODO Actually devlop algorithm - will be a pain in the ass week long affair probbably
+    #TODO Probability system
+    #TODO Sort system and arrange data for selectioin
+    #TODO Anti Overlap System
+    #TODO A bunch of other algorithim stuff
+    #TODO Error Log, Exceptions, & Final Error Report System
+    #TODO prob a bunch of other shit I forgot
+#TODO Format Console Output (Potentially scrapped)
+#TODO Format CSV / Excel Output --> Core Feature
+#TODO Decide if format for google sheets or app plugin (Somewhat likely)
+#TODO Decide if format for web application deployment via Flask and Google Cloud (Highly Likely)
+#TODO Potentially make gui to make input easier??? DO AFTER Decide on output format
+#TODO Final review of entire system for user friendly-ness changes and bugs
+#TODO Review to ensure scalability
+#TODO Documentation
+#TODO Bug Reporting and Diagnostic Mechanism - maybe make an internal log that saves each time you use and had a toon of data so if there is a glitch, or at the end fo the program it asks the user any glitches, if yess then saves to log which i can look at later and user can also make comments on messsup.
+#TODO Clean up comments and consolidate learning experience and examples maybe at the end to show what learned?
+#TODO Cry
+#TODO Get user feedback, incoperate feedback & iterate
+#TODO Finalize & Deploy
+
+#PROGRAM OVERVIEW --------------------------------------------------
+#load in default info, employee gender info & nickname, basic tasks & stand duration, timeslots, & nightchore
+#Ask for special tasks for the day and relevant info, also determine based on date user inputs what are some routinly occuring speical events that need to be accounted for.
+#Generate Total Tasks
+#People Avialable for day (Check for exceptions), *also find out partial avialibilites*
+#Timeslot
+#Tasks due in timeslot & number of people per task
+#Rank tasks in importance
+#See how many ppl avail in timeslot, then check if enough people  to complete tasks for that timeslot -> throw exception if isnt list shortage amount, 
+#then base on importance list find how many task you can fill and then state what tasks cannot be filled, maybe in final log
+#then take that list and save it in new variable to be used in the assignment loop for that slot???? idk, that way dont have to re calc in loop. (Could hurt multi timeslot assignments maybe??)
+#(Req people task preferences???)
+# MAKE THIS A LOOP, Assign tasks  until all needed tasks are assigned or no room / people to complete all task in slot (make sure (idk when in program) to define when task need done by / deadlines  
+    #How to implement the assignment loop? 
+    #Take list of tasks that we determined earlier can be filled, then start with most important task, but first check if it is a mulit hour / timeslot task if it is then (Nested loop?) take the pool of avialible employees and randomly select one, 
+    #this probbaility can be modifyied by a pref variable which can make it more liely for certain employees to get certain tasks if they prefer them, this information would be stored somewhere in the program and could be modified by the user.
+    #See if the selected employee is avialiable for next time slots or as long as needed for the long task, if not then cycle to next until find one? If it is not a long task then just randomly select from the available employee pool and employee, 
+    #Also some tasks are gender dependent: but really only matters for specific special events that happen at a routine time every week: men-womans sessions & nightchores such as clenaing men or womens bathroom etc.
+    #Randomly select person (Based on "people power" (lol) pool calc probbability of person recieving each task) #loop by person or task? does it matter??? -Person bc assigning it to a person
+    #Then if can't assign all tasks in timeslot give error and add to final report what couldnt be assigned what was moved and why, and if able to fit into the schudle someowhere else maybe dont notify in final report?
+#Print final scheudle output and error logs in console, also write resutls to CSV so can be the formatted or manually modified in excel or google sheets. Maybe if adapated as a google workspace add in it could directly output the information into the sheet then user made final adjsutments.
+
+
+
+
+
+
+""""
+OBSELETE?, until later when need to update stuff?
+# Assigns names from names list to the availableEmployeesList
+employeeNamesListTempModded = list(employeeNamesList)  # so it doesnt jack up the og values list in case i need to use it. The for loop fucks up the list so its not reusable
+for employeeNamesListTempModded, new_name in zip(availableEmployees,employeeNamesListTempModded):  # wut is zip? BEWARE MAY BRAKE IF UNEVEN?
+    employeeNamesListTempModded['Name'] = new_name
+
+# Assigns genders from genders list to the availableEmployeesList
+employeeGenderListTemp = list(employeeGenderList)  # so it doesnt jack up the og values list in case i need to use it. The for loop fucks up the list so its not reusable
+for employeeGenderListTemp, new_name in zip(availableEmployees, employeeGenderListTemp):  # wut is zip? BEWARE MAY BRAKE IF UNEVEN?
+    employeeGenderListTemp['Gender'] = new_name
+"""
+
+
+"""DIDNT WORK, NEED TO UNDERSTAND BETTER --> gpt output bleow it better
+print("TEST | availableEmployeesList INDV VER: \n")
+y = 1
+for i in availableEmployees:
+    print(availableEmployees[y],"\n")
+    y = y + 1"""
+
+""""#TEST | availableEmployees print each persons name and number
+for i, employee in enumerate(availableEmployees, start=0):  # start=1 if you want indexing to start at 1
+    name = employee['Name'] #is retrieving the value associated with the key 'Name' from the dictionary employee and storing it in the variable name.
+    print(name, "#", i, "\n")"""
+
+#TEST | availableEmployees print all of each persons information
+"""for i, employee in enumerate(availableEmployees, start=0):
+    print(availableEmployees[i],"\n")"""
+
+"""
+
+Some examples on how to use lists in dics and dics in lists and so forth.
+# Update Alice's age
+people[0]["age"] = 31
+# Add a new hobby to Bob
+people[1]["hobbies"].append("cycling")
+print(people)
+
+Y/N Confirmation & Continuing Input Loop Cycle Template
+Basic Y/N confirmation & input cycle loop I find I keep using, so I am going to make a template for it
+
+ogVariableTF = input("Are there any additionally tasks you want to add for the day? Y or N?\n\nUser: ")
+if ogVariableTF in yesAnswers:
+    inputTF == True
+    ix = 0
+    while inputTF == True
+        descriptionVariable1 = input("description: ") #however many inputs and variables you need
+        dictName.update({NameOfKeyThing:[var that replaces value]}) #add var to list or whatever
+        descriptionVariable2 = input("description: ")
+        additionalTasks[ix]["TaskName"] = userTask #or replace dict in list value
+        #add them into something if you want like a dict or list below
+        tasks: {'TaskName': 'Clean Windows', 'Duration': 2, 'NumPeopleNeeded': 1, 'Importance': 5, 'GenderSpecific': None}
+        inputTF = input("Are there any additionally tasks you want to add for the day? Y or N?\n\nUser: ")
+        if inputTF in yesAnswers:
+            inputTF == True
+            ix+=1
+        else:
+            inputTF == False
+            break 
+if ogVariableTF in noAnswers:
+    pass
+    #something else happens
+#they way i have the while loop done makes it a little harder to understand with the var names, but is more efficnet code wise than repeating stuff
+
+
+GPT SUGGESTION:
+Tasks:
+Each task could be represented as a dictionary with its properties.
+tasks: {'TaskName': 'Clean Windows', 'Duration': 2, 'NumPeopleNeeded': 1, 'Importance': 5, 'GenderSpecific': None}
+Employees:
+A list where each employee is a dictionary with their details and availability.
+Example: {'Name': 'Alice', 'Gender': 'F', 'Preferences': ['Task1', 'Task2'], 'PartialAvailability': {'Morning': True, 'Afternoon': False}}
+Timeslots:
+You could use a list if timeslots are fixed and ordered or a dictionary for more flexibility.
+Example: [{'Timeslot': '08:00-10:00', 'AvailableEmployees': ['Alice', 'Bob']}] or {'Morning': {'StartTime': '08:00', 'EndTime': '12:00', 'AvailableEmployees': ['Alice', 'Bob']}}
+Task Assignments:
+A dictionary to hold which tasks are assigned in which timeslots and to whom.
+Example: {'08:00-10:00': {'Task1': ['Alice'], 'Task2': ['Bob']}}
+
+
+#ADDITONAL IDEAS
+#idea to make more user friendly, make a final program that takes the csv file and converts it to an excel file that can be modified & styled by the user. Idk maybe even get it able to format the excel file - prob to complicated tho.
+#resources for conversion and then formatting excel file: 
+#***https://blog.devgenius.io/how-to-produce-beautiful-well-formatted-excel-reports-using-python-fd87146a1e0e
+#https://www.geeksforgeeks.org/convert-csv-to-excel-using-pandas-in-python/
+#**https://www.cybrosys.com/blog/how-to-convert-csv-to-excel-using-pandas-in-python#:~:text=In%20python%2C%20we%20convert%20CSV,labeled”%20information%20handy%20and%20intuitive.
+
+
+
+#PROBLEMS ------------------------------:
+#problems how to do multi hour tasks, pre assign peopl stuff or intentionally leaving part of the scheudle blank. Other concerns: efficency, and overcomplication, how easy would it be to modify and make user friendly? Also how easy to port to google workspace addon to google sheets
+"""
+
+#LEARNING SHIT AND OTHER STUFF ------------------------------:
+
+
+#LEARNING CONCEPT & CODE snippet efficency
+#easier way to return t/f values in a function
+
+"""
+Concise way:
+return response in yesAnswers #if not then false is returned
+
+Verbose way:
+if response in yesAnswers:
+    response = True
+    return response
+else: 
+    response = False
+    return response
+    """
+
+#LEARNING CONCEPT if getting "dict_keys" at beginning of list, cus trying to get the keys, then call list() on the dictionary instead:
+#LEARNING - I keep accidentally doing == evaluator operator # instead of = assignment operator when I use T/F for loops and then I wonder why the loop doesn't work
+#LEARNING CONCEPT - strings are immutable so have to specifically assign shit to them
+#LEARNING CONCEPT - can use (string name).replace("thing to replace", "thing to replace with") to replace stuff in a string
+#LEARNING CONCEPT -
+#LEARNING CONCEPT GPT4- python treats empty strings ("") as False and non-empty strings as True when evaluated in a Boolean context.
+#LEARNING CONCEPT: GPT-4 Assigning data to obj.attr (obj.attr = userData) doesn't actually change the attribute named attr. To set an attribute on an object dynamically, use setattr(obj, attr_name, value) instead of obj.attr = value.
+#LEARNING CONCEPT: dir() function to get a list of all the attributes (including methods) of an object.
+#LEARNING CONCEPT: use the getattr(obj,attr) function to retrieve the value of each attribute.
+#LEARNING CONCEPT: You'll want to filter out methods and focus on attributes, which you can do by using the callable() function or checking attribute types, 
+#LEARING CONCEPT - range (timeAPeriod,timeBPeriod+1) why +1, because the range funciton is sort of like a list where it starts at 0, so to have it include the end digit you have to give it+1
+#LEARNING CONCEPT: If not - The if not statement in Python checks for the opposite of the condition specified, is used to execute a block of code if a condition evaluates to False.
+#LEANRING CONCEPT: Not operator is a logical operator that inverts the truth value of the condition that follows it
+#LEARNING CONCEPT: In operator is used to check if a value exists within a sequence or collection, such as a list, tuple, string, dictionary, or set. 
+#LEARNING CONCEPT: The error message you're seeing, TypeError: 'str' object is not callable, suggests that somewhere in your code, you're treating a string like a function—trying to "call" it with parentheses as if it were a method or function, but it's actually a string object. A common cause for this type of error is shadowing built-in functions with variables. For example, if at some point in your code before this input() call, you've assigned a string to a variable named input, you'd be shadowing the built-in input() function. Here's an example of how this might happen: To resolve this issue, check your code for any variable named input and rename it to something else that doesn't collide with Python's built-in functions. This kind of issue can occur with any built-in function (like str, list, dict, etc.), not just input, so it's a good practice to avoid using names of built-in functions for your variables.
+#LEANRING CONCEPT: Formate datetime parser to be without leading zeros with "-","%-I:%M %p"
+#LEARNING CONCEPT: dont do this('exit'.lower()), its redundant. use: if userData is None or userData.lower() == 'exit':
+#LEARNING CONCEPT: Can access class variables outside of class by directly via the class name from outside the class. aka Classname.varAcessing then blah blah blah
+#LEARNING CONCEPT, .cls is similar to .self
+#LEANRING CONCEPT: Using TODO in VS Code. Mark with a '+' marks as complete. Can also use #FIXME and #NOTE, also see how to guid for exstension I installed.
+"""
+ChatGPT
+The use of enumerate in a for loop is a common Python idiom for iterating over a sequence when you need both the index and the value of each item in the sequence. 
+The function enumerate takes an iterable (like a list, tuple, or string) as an input and returns an iterator that produces pairs of indexes and values from the iterable.
+
+enumerate(timeListToSortAlgo): This call to enumerate takes the list timeListToSortAlgo as an argument. 
+timeListToSortAlgo is assumed to be a list of strings, where each string represents a time (e.g., "12:30", "09:45").
+enumerate Functionality: For each item in timeListToSortAlgo, enumerate generates a pair consisting of an index (starting from 0) and the value at that index in the list. 
+So, if timeListToSortAlgo is ["12:30", "09:45", "23:59"], enumerate(timeListToSortAlgo) would produce (0, "12:30"), (1, "09:45"), and (2, "23:59") in successive iterations.
+for index, timeStr in enumerate(timeListToSortAlgo): This unpacks each pair generated by enumerate into index and timeStr. In the first iteration, index would be 0 and timeStr would be "12:30", in the second iteration, index would be 1 and timeStr would be "09:45", and so on. 
+This allows you to use both the index of each item (to access or modify items in the list by their position) and the value of each item (to work with the content directly) within the loop.
+"""
+#BIG LEARNING CONCEPT: (Or statements) if dateValue == 7 or 6: This condition does not check if dateValue is either 7 or 6. Instead, it checks if dateValue is 7, or if 6 is true. Since non-zero integers are considered truthy in Python, 6 is always true, making the condition always evaluate to true. if dateValue == 7 or dateValue == 6: is the proper way to implement a comparing "or" type argument
+
+
+
+#Good learning example, but may be outdated now that am using classes
+"""def sum_duration_values(data):
+    total_duration = 0
+    def search(data):
+        tempDuration = 0
+        tempFreq = 0
+        testOutput("TEST | data in search(data): ", data)
+        nonlocal total_duration #LEARNING CONCPET: nonlocal, allows use of outerscope variable in functions
+        if isinstance(data,dict):
+            for key, value in data.items():
+                #testOutput("TEST | for key, value in data.items(): ", data.items())
+                if key == "Duration":
+                    tempDuration +=(value)
+                if key == "Frequency":
+                    tempFreq =+ (value)
+                elif key in defaultTaskDurationsDict: #IF ERROR, check this. to handle and count the basic task csv file dict
+                    #TODO maybe standardize all taks formats even ones imported from CSV
+                    total_duration +=(value)
+                search(value)
+        elif isinstance(data, list):
+            for item in data: #NOT for item in list
+                search(item) #recursive call search function so goes thru every item in list, of every list
+        elif data == 0: #item neither dict or list, so prob integer or basic value which means no task (prob), so set to 0
+            total_duration += 0 #IF ERROR, check this
+        testOutput("TEST | total duration in search(data): ", total_duration)
+
+    search(data)
+    return total_duration
+sum_Day_Duration_Values = sum_duration_values(daysTasks)
+testOutput("TEST | numOfTasksForDay: ", sum_Day_Duration_Values)"""
+
+
+
+
+
+defaultInfo = {} #DICTIONARIES A dictionary is a collection which is ordered (in pyhton 3.7+), changeable and does not allow duplicates. Dictionaries are written with curly brackets, and have keys and values:
+"""#Is it even nessecary anymore??
+with open('SWATBasicSavedInfoForScheduler.csv', newline='') as csvfile:
+
+    # Create a csv.reader object
+    csvreader = csv.reader(csvfile, dialect='excel')
+    
+    # Extract the first row to use as dictionary keys
+    headers = next(csvreader)
+    
+    # Initialize a list for each header in columns
+    for header in headers:
+        defaultInfo[header] = []
+    
+    # Iterate over the rest of the rows and fill the dictionary lists
+    for row in csvreader:
+        for header, value in zip(headers, row):
+            defaultInfo[header].append(value)
+testOutput("test to print dicitionary"), print(defaultInfo)
+"""
+
+
+
+
+
+
+EXAMPLES:
+
+use of auto complete with prompt toolkit:
+from prompt_toolkit import prompt
+from prompt_toolkit.completion import WordCompleter
+
+# Define a list of autocomplete words.
+employee_Name_Completer = WordCompleter(employeeNamesList)
+# Use the completer in the prompt.
+user_input = prompt('Enter Employee Name: ', completer=employee_Name_Completer)
+print('You entered:', user_input)
