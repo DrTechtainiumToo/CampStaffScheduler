@@ -1,0 +1,42 @@
+By GPT4
+
+PEP 8:
+
+General Naming Guidelines
+Use clear, descriptive names; avoid single-letter variables except for counters or iterators in small loops.
+Avoid names that are too general or too wordy. Strike a balance between the two.
+
+Variables
+Use lowercase single letters, words, or words separated by underscores.
+Example: counter, employee_name
+
+Functions and Methods
+Use lowercase words separated by underscores as necessary to improve readability.
+Example: calculate_salary, send_message
+
+Constants
+Use uppercase letters with underscores separating words.
+Example: MAX_OVERFLOW, TOTAL_EMPLOYEES
+
+Classes
+Use the CapWords convention, also known as CamelCase. Each word starts with a capital letter with no underscores between them.
+Example: BankAccount, EmployeeRecord
+
+Modules and Packages
+Use short, lowercase names, and if improved readability requires it, use underscores.
+Modules: calculator.py, db_utils.py
+Packages: Avoid using underscores if possible.
+
+Special Names
+Double leading and trailing underscores (__) are reserved for special methods and variables, known as "dunder" methods, like __init__ for constructors or __str__ for string representations.
+
+Private or "Internal" Use
+Use a single leading underscore (_) to indicate a non-public method or attribute.
+Example: _internal_helper, _cache
+
+Avoiding Conflicts with Python Keywords
+Append a single trailing underscore to avoid naming conflicts with Python keywords.
+Example: class_, from_
+
+Type Variables (PEP 484)
+Use CapWords preferring short names: T, AnyStr, Num. It's often better to add suffixes _co or _contra to the variables used to declare covariant or contravariant behavior correspondingly.
