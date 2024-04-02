@@ -1,0 +1,33 @@
+
+#had gpt code the basics for me bc im burnt out, but mainly bc dont want to do webdesign.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scheduling Application</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Scheduling Application</h1>
+    <div id="unavailabilityForm">
+        <h2>Add Employee Unavailability</h2>
+        <form id="addUnavailability">
+            <label for="employeeName">Employee Name:</label>
+            <input type="text" id="employeeName" name="employeeName" required>
+            
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required>
+            
+            <label for="startTime">Start Time:</label>
+            <input type="time" id="startTime" name="startTime" required>
+            
+            <label for="endTime">End Time:</label>
+            <input type="time" id="endTime" name="endTime" required>
+            
+            <button type="submit">Add Unavailability</button>
+        </form>
+    </div>
+    <div id="schedule"></div>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -4,7 +4,7 @@ KSWAT2,KSWAT2,1,KSWAT,4,1,3,,No,,No,,,,10:00am,,,,,,,No,,,,Yes,No,Yes,Yes,Yes,Ye
 KSWAT3,KSWAT3,1,KSWAT,4,1,3,,No,,No,,,,2:45am,,,,,,,No,,,,Yes,Maybe,Yes,Yes,No,Yes,Yes,No,auto,No,,,3,
 PLAYTIME/OFF,PLAYTIME/OFF,1,PLAYTIME/OFF,1,sum of timeslots btwn breakfast and lunch or lunch and dinner,"number of employees / (num sum of timeslots btwn breakfast and lunch or lunch and dinner) (unless a counsler, then include night off, but more complicated cus vilbo and other stuff)",,No,,Yes,,,,calc,calc,calc,calc,calc,calc,,No,,IDK maybe del this features,,No,No,Yes,Yes,Yes,Yes,Yes,No,auto,No,,,0,
 DISH,DISH,2,DISH,1,3,6,,No,,No,,,,,,,,,,,No,,,,No,ChangeFreq,Yes,Yes,ChangeFreq,Yes,Yes,No,auto,No,,,0,
-SERVE,SERVE,2,SERVE,1,3,7,,No,,No,,,,,,,,,,,No,,,,No,ChangeFreq,Yes,Yes,ChangeFreq,Yes,Yes,No,auto,No,,,0,
+SERVE,SERVE,2,SERVE,1,3,7,,No,,No,,,,7:45am,11:45am,Idk,,,,,No,,,,No,ChangeFreq,Yes,Yes,ChangeFreq,Yes,Yes,No,auto,No,,,0,
 CAMP STORE,CAMP STORE,1,CAMP STORE,1,3,4,,No,,No,,,,,,,,,,,No,,,,No,No,Yes,Yes,Yes,Yes,Yes,Change Freq & MinNumPeople,auto,No,,,0,
 BALLOONS,BALLOONS,3,BALLOONS,1,userInput,userInput,,No,,No,,,,,,,,,,,No,,,,No,No,Yes,Yes,Yes,Yes,No,No,auto,No,,,0,
 FLAG DOWN,FLAG DOWN,4,FLAG DOWN,1,1,unassigned_employees,,No,,No,,,,,,,,,,,No,,,,No,Idk,Yes,Yes,Yes,Yes,Yes,No,auto,No,,,0,
