@@ -1,18 +1,18 @@
 ﻿NightChore, GenderReq, MinNumPeopleNeeded
-OFFICE, None
-GIRLS GROTTO, Female
-BARRET, None
-PAC, None
-OFFICE, None
-GIRLS BATH, Female
-TRASH WATER, None
-PAC, None
-CLODGE, None
-CHAPEL, None
-POOL, Male
-SLOUNGE, None
-PAV, None
-HC, None
-BOYS BATH, Male
-BOYS GROTTO, Male
-POOL, None
+OFFICE, None,1
+GIRLS GROTTO, Female,1
+BARRET, None,1
+PAC, None,1
+OFFICE, None,1
+GIRLS BATH, Female,1
+TRASH WATER, None,3
+PAC, None,1
+CLODGE, None,1
+CHAPEL, None,1
+POOL,None,1
+SLOUNGE, None,1
+PAV, None,1
+HC, None,1
+BOYS BATH, Male,1
+BOYS GROTTO, Male,1
+POOL, None,1

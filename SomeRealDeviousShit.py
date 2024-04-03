@@ -1,8 +1,18 @@
 
 #region--------------------------- FILE HEADER COMMENTS
 
-#LEARNING - If broken check to make sure dont have something twice, like an input or variable if it is broken via search / find like Issac did
-#WHEN DEBUGGING remeber that everyhting is imported from csv so might need to use int()
+#Dunders
+__author__ = "Andrew Dybala"
+__copyright__ = "Copyright Restricted"
+__credits__ = ["Andrew Dybala", "GPT4 as assistant"]
+__license__ = "License Name and Info"
+__version__ = "1.2.1"
+__maintainer__ = "Andrew Dybala"
+__email__ = "andrew@dybala.com"
+__status__ = "status of the file"
+
+#https://docs.python.org/3/c-api/intro.html
+
 
 #TODO When developing, leave all gui stuff for after complete main program. Bc might have app take care ofall of that and the program just take the final type and ver of data and use it.
 #So keep in mind when making inputs or conversion sequences that it has a clear final form and document it. That way can plug into api requests easy and stuff.
@@ -73,6 +83,7 @@ import re #pattern matching module, regualr exspression
 from contextlib import contextmanager
 from scipy import stats
 import random
+
 #endregion
 
 #region---------------- SWAT CLASS???
@@ -398,7 +409,7 @@ testOutput("TEST |  dateValue", dateValue)
 
 #NOTE ONLY USE PURE TIMES, NO TIMES WITH LETTERS, can make label times for printing later
 #VERY IMPORTANT OTHERWISE MULTI UNAVAILABILITY AUTO DURATION PARSING WONT WORK
-normalDayTimeSlots = [{'7:00am': True, '7:45am': True, '9:15am': True, '9:50am': True, '10:00am': True, '11:00am': True, '11:45am': True, '1:45pm': True, '2:45pm': True, '3:45pm': True, '4:45pm': True, '5:20pm': True, '6:30pm': True, '7:00pm': False, '8:00pm': False, '9:00pm': False}] #'7ishpm': False, '8ishpm': False, '9ish': False #'7ish': 'NG', '8ish': 'Sweeting', '9ish': 'NightChore' #what do when have too special events at the same time??? such as NG and Playtime
+normalDayTimeSlots = [{'7:00am': True, '7:45am': True, '9:15am': True, '9:50am': True, '10:00am': True, '11:00am': True, '11:45am': True, '1:45pm': True, '2:45pm': True, '3:45pm': True, '4:45pm': True, '5:30pm': True, '6:30pm': True, '7:00pm': False, '8:00pm': False, '9:00pm': False}] #'7ishpm': False, '8ishpm': False, '9ish': False #'7ish': 'NG', '8ish': 'Sweeting', '9ish': 'NightChore' #what do when have too special events at the same time??? such as NG and Playtime
 wenSpecialTimeslots = ['7:00', '7:45', '9:15', '9:50', '10:00', '11:00', '11:45', '1:45', '2:45', '3:45', '4:45', '5:20', 'TIME DOES NOT EXIST', 'TIME DOES NOT EXIST',  'TIME DOES NOT EXIST', '9is MAYBE'] #'TIME DOES NOT EXIST', 'TIME DOES NOT EXIST',  'TIME DOES NOT EXIST', '9is MAYBE' #can merge TIME DOES NOT EXIST and fromatting later, this is mainly all just formatted so the ;ogram can interpret it, will format for export seperatley
 tuesSpecialTimeslots = ['7:00', '7:45', '9:15', '9:50', '10:00', '11:00', '11:45', '1:45', '2:45', '3:45', '4:45', '5:30', '6:30', '7:15',  '8ish', '9:00']
 friSpecialTimeslots = []
@@ -414,53 +425,22 @@ datesTimeSlots = {
     6:satSpecialTimeslots,
     7:sunSpecialTimeslots
     }
+
 dayTimeSlots = datesTimeSlots[dateValue]
+#dayTimeSlots_lenght #so can be more memory efficent
 #endregion
 
-@timer 
-def timeSlotStandardizer(time_slots_of_the_day):
-    """ Standardizes timeslots values and makes ref dictionaries. Takes the "dayTimeSlots" var. 
-    Args:
-        time_slots_of_the_day (Type: List): Input should be a list with dictionaries. Example: normalDayTimeSlots = [{'7:00': True, '7:45': True, '9:15': True, '9:50': True, '10:00': True, '11:00': True, '11:45': True, '1:45': True, '2:45': True, '3:45': True, '4:45': True, '5:20': True, '6:30': True, '7ish': 'NG', '8ish': 'Sweeting', '9ish': 'NightChore'}] #what do when have too special events at the same time??? such as NG and Playtime
-    """
-    #first have to make a ref book to convert the stuff into in, Makes a list of the times / keys of dayTimeSlots
-    lengthDayTimeSlots = len(dayTimeSlots[0])-1 #LEARNING CONCEPT,, & KEY POINT - len gives me one more than index number, so keep in mind when using len to go thru indexs
-    testOutput("TEST | lengthdayTimeSlots: ", lengthDayTimeSlots)
-    iterDayTimeSlotsStandardizer = 0
-    while iterDayTimeSlotsStandardizer <= lengthDayTimeSlots:
-        tempKeyListForDayTimeSlotsStandardizer = list(dayTimeSlots[0])
-        iterDayTimeSlotsStandardizer += 1
-    testOutput("TEST | 1 tempKeyListForDayTimeSlotsStandardizer: ", tempKeyListForDayTimeSlotsStandardizer)
-
-    # put times as values, and ascending number as key (NtS)- Numbers to Strings
-    dayTimeSlotsStandardizedNtSLocal = {}
-    iterDayTimeSlotsStandardizerA = 0
-    while iterDayTimeSlotsStandardizerA <= lengthDayTimeSlots:
-        dayTimeSlotsStandardizedNtSLocal.update({iterDayTimeSlotsStandardizerA:tempKeyListForDayTimeSlotsStandardizer[iterDayTimeSlotsStandardizerA]})
-        iterDayTimeSlotsStandardizerA+=1
-        testOutput("[TEST | 2.1, IN LOOP] new dict dayTimeSlotsStandardizedNtSLocal: ", dayTimeSlotsStandardizedNtSLocal)
-    testOutput("[TEST | 3.1, OUT OF LOOP] new dict dayTimeSlotsStandardizedNtSLocal: ", dayTimeSlotsStandardizedNtSLocal)
-
-    #TODO #ALSO INCLUDE IN MASTER CONVERTER
-    # put numbers as values, and times as key (StN)- Strings to Numbers
-    dayTimeSlotsStandardizedStNLocal = {}
-    iterDayTimeSlotsStandardizerB = 0
-    while iterDayTimeSlotsStandardizerB <= lengthDayTimeSlots:
-        dayTimeSlotsStandardizedStNLocal.update({tempKeyListForDayTimeSlotsStandardizer[iterDayTimeSlotsStandardizerB]:iterDayTimeSlotsStandardizerB})
-        iterDayTimeSlotsStandardizerB+=1
-        testOutput("[TEST | 2.2, IN LOOP] new dict dayTimeSlotsStandardizedStNLocal: ", dayTimeSlotsStandardizedStNLocal)
-    testOutput("[TEST | 3.2, OUT OF LOOP] new dict dayTimeSlotsStandardizedStNLocal: ", dayTimeSlotsStandardizedStNLocal)
-    return dayTimeSlotsStandardizedNtSLocal,dayTimeSlotsStandardizedStNLocal 
 # ------------ Confirm if timeslots for the day are acceptable to user and allow modification
 
-#DONE maybe make so display here the times for today (and include their period/standarized number" and say this all good and allow to can edit times for day and add or subtract any if needed, then would need to use the dynamic script
 
 #region---------------------------------- Time Schedule Modificaiton 
 
 print("----------------------------------------------------------------------------\n")
-    
+
+
+
 @timer
-def display_schedule_times(day_time_slots):
+def display_schedule_times(dayTimeSlots):
     """takes the days time slots dict and displays the times to the user. (since dict, only displays time keys and not values: t/f)
     Asks if times for schedule are acceptable, returns the user response as either True or False. Then the false would be used to activate the modify_time_slots func
     Args:
@@ -468,12 +448,11 @@ def display_schedule_times(day_time_slots):
     """
     
     print("Time periods for today's schedule:")
-    print(list(day_time_slots[0].keys())) #WHY - use list to get rid of dict_keys( at the beginning of print out. the [0] for day timesltos is because the dicitonary of the time slots and thier t/f value is stored in a list for some reason and I dont want to change it now.
+    print(list(dayTimeSlots[0]))
     print("\nDo you want to change any? (y/n):")
-    #TODO RENABLE LATER: DIABLED FOR DEBUG
-    response = False
+    response = False #TODO RENABLE LATER: DIABLED FOR DEBUG
     #response = input("User: ").strip() #TODO RENABLE LATER: DIABLED FOR DEBUG
-    return response # #TODO RENABLE LATER: DIABLED FOR DEBUG in yesAnswers #returns as TRUE if yesAnswer, else FALSE cus then is a negative answer
+    return response # #TODO RENABLE LATER: #TODO look at this again, makes no sense, Disabled FOR DEBUG in yesAnswers #returns as TRUE if yesAnswer, else FALSE cus then is a negative answer
 
 @timer
 def insert_time_slot_at_position(day_time_slots, new_time, reference_time, position='after'): #TODO should i remove 'after', do i need keyword args???
@@ -565,12 +544,45 @@ def modify_schedule_times(day_time_slots):
     
 if display_schedule_times(dayTimeSlots):
     dayTimeSlots = modify_schedule_times(dayTimeSlots)
-print("Post function test day time slots", dayTimeSlots)
 
 # -------- standardize the timeslots
-dayTimeSlotsStandardizedNtS, dayTimeSlotsStandardizedStN = timeSlotStandardizer(dayTimeSlots)
+@timer
+def timeSlotStandardizer(dayTimeSlotsKeysList):
+    """ Standardizes timeslots values and makes ref dictionaries. Takes the "dayTimeSlots" var. 
+    Args:
+        time_slots_of_the_day (Type: List): Input should be a list with dictionaries. Example: normalDayTimeSlots = [{'7:00': True, '7:45': True, '9:15': True, '9:50': True, '10:00': True, '11:00': True, '11:45': True, '1:45': True, '2:45': True, '3:45': True, '4:45': True, '5:20': True, '6:30': True, '7ish': 'NG', '8ish': 'Sweeting', '9ish': 'NightChore'}] #what do when have too special events at the same time??? such as NG and Playtime
+    """
+    
+    #first have to make a ref book to convert the stuff into in, Makes a list of the times / keys of dayTimeSlots
+    lengthDayTimeSlots = len(dayTimeSlotsKeysList)-1 #WHY -1 len gives me one more than index number, so keep in mind when using len to go thru indexs
+    testOutput("TEST | lengthdayTimeSlots: ", lengthDayTimeSlots)
+    iterDayTimeSlotsStandardizer = 0
+    while iterDayTimeSlotsStandardizer <= lengthDayTimeSlots:
+        iterDayTimeSlotsStandardizer += 1
+    testOutput("TEST | 1 time_slot_keys: ", dayTimeSlotsKeysList)
+
+    # put times as values, and ascending number as key (NtS)- Numbers to Strings
+    dayTimeSlotsStandardizedNtSLocal = {}
+    iterDayTimeSlotsStandardizerA = 0
+    while iterDayTimeSlotsStandardizerA <= lengthDayTimeSlots:
+        dayTimeSlotsStandardizedNtSLocal.update({iterDayTimeSlotsStandardizerA:dayTimeSlotsKeysList[iterDayTimeSlotsStandardizerA]})
+        iterDayTimeSlotsStandardizerA+=1
+        testOutput("[TEST | 2.1, IN LOOP] new dict dayTimeSlotsStandardizedNtSLocal: ", dayTimeSlotsStandardizedNtSLocal)
+    testOutput("[TEST | 3.1, OUT OF LOOP] new dict dayTimeSlotsStandardizedNtSLocal: ", dayTimeSlotsStandardizedNtSLocal)
+
+    #TODO #ALSO INCLUDE IN MASTER CONVERTER - wut
+    # put numbers as values, and times as key (StN)- Strings to Numbers
+    dayTimeSlotsStandardizedStNLocal = {}
+    iterDayTimeSlotsStandardizerB = 0
+    while iterDayTimeSlotsStandardizerB <= lengthDayTimeSlots:
+        dayTimeSlotsStandardizedStNLocal.update({dayTimeSlotsKeysList[iterDayTimeSlotsStandardizerB]:iterDayTimeSlotsStandardizerB})
+        iterDayTimeSlotsStandardizerB+=1
+        testOutput("[TEST | 2.2, IN LOOP] new dict dayTimeSlotsStandardizedStNLocal: ", dayTimeSlotsStandardizedStNLocal)
+    testOutput("[TEST | 3.2, OUT OF LOOP] new dict dayTimeSlotsStandardizedStNLocal: ", dayTimeSlotsStandardizedStNLocal)
+    return dayTimeSlotsStandardizedNtSLocal,dayTimeSlotsStandardizedStNLocal 
+
 dayTimeSlotsKeysList = list(dayTimeSlots[0].keys())  #for when i just want to diplay the keys / dates. will make easier to change stuff later too. BEWARE: Is static tho and does not updates with the acutaly DICT
-#otherwise have to do this list(dayTimeSlots[0].keys()), everyTime
+dayTimeSlotsStandardizedNtS, dayTimeSlotsStandardizedStN = timeSlotStandardizer(dayTimeSlotsKeysList)
 
 #endregion
 #endregion
@@ -587,9 +599,10 @@ class EmployeeManager:
     def __init__(self):
         self.employees = {} #stores name & instances of employee class
 
+    #setsup everythign else, thing of as instantiator for employee objs
     @timer
     def add_employee(self, employee_name, employee_inst,dayTimeSlotsKeysList): #employee instance, also idk if most efficent way to create these instances
-        self.employees[employee_name] = employee_inst #WUT makes no sense
+        self.employees[employee_name] = employee_inst
         self.employees[employee_name].set_default_availability(dayTimeSlotsKeysList)
         #also make set default availability!!
         
@@ -614,7 +627,7 @@ class EmployeeManager:
         return sum(employee.sum_available_time_slots() for employee in self.employees) 
 
     @timer
-    def get_available_employees(self, time_slot): #TODO maybe need to try 2 methods of doing, one this way and the other thru the pre-compiled dicgt - need to include dict compiling in it
+    def get_available_employees(self, time_slot):
         available_at_time = {}
         for employee in self.employees:
             if self.employees[employee].is_available(time_slot):
@@ -626,7 +639,7 @@ class EmployeeManager:
         #TODO need to understand better
         eligible_employees = {
             employee for employee in self.employees
-            if all(getattr(employee, trait, None) == value for trait, value in traits.items()) #none prevents attr error if employee doesnt have that trait
+            if all(getattr(employee, trait, None) == value for trait, value in traits.items()) #WHY - none prevents attr error if employee doesnt have that trait
         }  # WHY ok so if no reqs traits = one how to include employees that may meet the traits, wait no do that seperatley this should only be if the task has cert reqs
         return eligible_employees
     
@@ -739,8 +752,8 @@ class AvailabilityManager:  #IDK, pointless for now until I make frontend???. Fu
                         if not successful_parse:
                             print(f"\n\n{Fore.RED}{Style.BRIGHT}Your time input:'{time_str}', does not match any known format.{Style.RESET_ALL}\n\n")
                         
-                        print("TEST time. val : ", time_val)
-                        print("TEST time_to_minutes final result: ", time_val.hour * 60 + time_val.minute)
+                        #print("TEST time. val : ", time_val)
+                        #print("TEST time_to_minutes final result: ", time_val.hour * 60 + time_val.minute)
                         return time_val.hour * 60 + time_val.minute
                     
                     @timer
@@ -750,7 +763,7 @@ class AvailabilityManager:  #IDK, pointless for now until I make frontend???. Fu
                         hours, minutes = divmod(minutes, 60)
                         time_val = datetime.datetime(year=1, month=1, day=1, hour=hours, minute=minutes)
                         # Note the use of %I for hour, %M for minutes, and %p for AM/PM
-                        print("TEST | minutes_to_time final [time_val]: ", time_val.strftime("%I:%M %p").lower())
+                        #print("TEST | minutes_to_time final [time_val]: ", time_val.strftime("%I:%M %p").lower())
                         return time_val.strftime("%-I:%M%-p").lower() # WHY Format the time without leading zeros, spaces between time and am/pm, and lowercase am/pm, bc in master ref list its "9:25am" not "09:25 AM" and the time will later be checked against it at some point, plus good to keep uniformity.
 
                 
@@ -769,8 +782,8 @@ class AvailabilityManager:  #IDK, pointless for now until I make frontend???. Fu
                         time_list_minutes
                     """
                     
-                    print("TEST | input_time_minutes: ",input_time_minutes)
-                    print("TEST | time_list_minutes: ",time_list_minutes)
+                    #print("TEST | input_time_minutes: ",input_time_minutes)
+                    #print("TEST | time_list_minutes: ",time_list_minutes)
                     
                     # Binary search for the next time greater than or equal to the input time
                     left, right = 0, len(time_list_minutes) - 1
@@ -814,11 +827,11 @@ class AvailabilityManager:  #IDK, pointless for now until I make frontend???. Fu
                     if not timePair[0] in dayTimeSlots[0]: #Time1
                         problematic_time_input_warning(timePair[0],dayTimeSlotsKeysList)
                         timePair[0] = find_valid_time_slot(timePair[0],times_list)
-                        print("TEST | find_valid_time_slot(timePair[0],times_list) -> timePair[0]", timePair[0])
+                        #print("TEST | find_valid_time_slot(timePair[0],times_list) -> timePair[0]", timePair[0])
                     if not timePair[1] in dayTimeSlots[0]: #Time2 
                         problematic_time_input_warning(timePair[1],dayTimeSlotsKeysList)
                         timePair[1] = find_valid_time_slot(timePair[1],times_list)
-                        print("TEST | find_valid_time_slot(timePair[1],times_list) -> timePair[1]", timePair[1])
+                        #print("TEST | find_valid_time_slot(timePair[1],times_list) -> timePair[1]", timePair[1])
 
                     #now have valid timeslot refs, I can find all the values betwen the two and can mark all the times inbetween unavailable for the employee
                     inbetween_slots_list_inclusive = fill_time_slots_inbetween_A_and_B(timePair[0],timePair[1])
@@ -826,24 +839,25 @@ class AvailabilityManager:  #IDK, pointless for now until I make frontend???. Fu
                 
                 #Actual logic process --------------------
                 
+                #TODO make clearer??? also expand on this later to include if they put "and" in etc
                 SecondListExpandedValues = [] #BEWARE this is to prevent runaway loops, bc im paranoid that ill wind up with a loop if it goes through and keeps expanding as it append in a for loop
                 if "," in input_str: #so can input stuff as 6am, 7pm, 4:45am then split into indvs in list
-                    print("TEST TIRGGERED MAIN IF")
-                    inputList = input_str.split(",") #string.split(separator, maxsplit) default = -1 is as many as occur
-                    print("TEST post "," split - og input_str list ", inputList)
-                    for item in inputList:
+                    #print("TEST TIRGGERED MAIN IF")
+                    split_times_list = input_str.split(",") #string.split(separator, maxsplit) default = -1 is as many as occur
+                    #print("TEST post "," split - og input_str list ", split_times_list)
+                    for item in split_times_list:
                         item.strip().lower() #Remove trailing whitespace
                         if "-" in item:
                             SecondListExpandedValues.extend(time_range_handler(item))
-                            print("TEST TIRGGERED main if, for, if")
+                            #print("TEST TIRGGERED main if, for, if")
                         else: #Incase value isnt "-" but ","
                             if not item in dayTimeSlots[0]: #incase not a valid time.
                                 SecondListExpandedValues.append(find_valid_time_slot(item,times_list))
                                 problematic_time_input_warning(item,dayTimeSlotsKeysList)
-                                print("TEST TIRGGERED main if, for, if,else->if ")
+                                #print("TEST TIRGGERED main if, for, if,else->if ")
                             else: 
                                 SecondListExpandedValues.append(item)
-                                print("TEST TIRGGERED main if, for, if,else,if-> else")
+                                #print("TEST TIRGGERED main if, for, if,else,if-> else")
                         #put "-" in here so can make multiple multi values if put in list form
                     #IDK see if needs this:
                 else: #WHY - bc maybe user input 7-8am, 10-11am. if put "-" then would trigger, but wouldnt realize is part of larger list
@@ -920,7 +934,6 @@ class Employee:
     
     #default times for taks assigned to - based on previous user input. #rename var later???? idk
     default_assigned_to_times = {time_slot: None for time_slot in dayTimeSlotsKeysList}
-    #LEARNING CONCEPT - Basic dicitonary comprehension {key_expression: value_expression for item in iterable}
  
     def __init__(self, name, gender, preferences=None, certifications=None, position=None, off_week=None):
         self.name = name
@@ -929,10 +942,7 @@ class Employee:
         self.availability = {} #time_slot: True for time_slot in get_all_time_slots(), i think benifit of making timeSlots a dicitonary is that dont have to iterate and assign true to each one, but then have to use all those funcitons on it which complicates things. hmmmmmmmm
         self.assigned_to = Employee.default_assigned_to_times.copy() #Time: Task. #WHY set times ahead of time, timeslots for day are already set at this point, so if a employee doesn't get assgined a task for a slot it will report as none, that way it doesn't mess up the output order (by having a gap) when printed to excel or such. Tasks can still be assigned as needed. Better way to implement?
         #TODO review this later #WHY -  .copy() This creates a shallow copy of default_assigned_to_times and assigns it to self.assigned_to, ensuring that changes to self.assigned_to do not affect the class variable default_assigned_to_times or those in other instances. - GPT Reccomendaition 
-       
-        #HOW SHOULD I DO THIS, SO IMPLEMENT EFFICENTLY
-        self.availabile_time_list = None #IDK if need or fast? #so can ref this list once rather than having to figure out available times via loop over and over again.
-        #TODO review if use this, and if nessecary
+        self.availabile_time_list = None #so can ref this list once rather than having to figure out available times via loop over and over again.
         
         #will have to make a way to easily insert these from other sources
         self.developerbonus = None #will actuallly need to be an if statement in the main code, #prob unethical to include this but lol, i can set my task pref to have maybe 10% more weight
@@ -943,15 +953,16 @@ class Employee:
         self.co = None #for later
 
     def set_default_availability(self, time_slots):
-        for time_slot in time_slots: #Think need to use enumerate
+        for time_slot in time_slots:
             self.availability[time_slot] = True
             
     def set_unavailability(self, unavailable_times):
+        
         for time_slot in unavailable_times:
             if time_slot in self.availability: #adds some time to program, plus dont know if really nessecary with accoutning for it in multi times func
                 self.availability[time_slot] = False
-        else:
-            print(f"Time slot {time_slot} not recognized.")
+            else:
+                print(f"Time slot {time_slot} not recognized.")
 
     def is_available(self, time_slot):
         return self.availability.get(time_slot, False) #WAIT IS THIS RIGHT? need to initalize first, maybe upoun creation, butthen order dependent. #NEED A CHECK BEFORE ALGO THAT ALL THINGS ARE INITALIZED???
@@ -988,7 +999,7 @@ for name, gender in zip(employeeNamesList, employeeGenderList): #can add any num
     employee_instance = Employee(
         name,
         gender
-            ) #wierd dict dup thing gonna be a prob?
+        ) #wierd dict dup thing gonna be a prob?
     employee_manager.add_employee(name, employee_instance,dayTimeSlotsKeysList)
 
 
@@ -1093,7 +1104,7 @@ class TaskManager:
         def __init__(self, task_name, task_frequency, start_time, duration, min_num_people_needed, importance, task_cost, preassigned_to=None, reccomended=None, chosen=None, task_tier=None, gender_specific=None, gender_required=None, preassigned=None, overlap_problem_task_cost_offsetter=None, pref_time=None, time_preferred=None, not_before_time=None, not_after_time=None, start_time2=None, start_time3=None, start_time4=None, start_time5=None, start_time6=None, scheduledoccurance=None, occurs_every_n_days=None, spawn_sunday=None, spawn_monday=None, spawn_tuesday=None, spawn_wensday=None, spawn_thursday=None, spawn_friday=None, spawn_saturday=None, task_variable_name=None, certs_required=None, requires_certs=None):
             
             #-2
-            
+            #WUT?????
             #ALL NEGATIVES IN CSV NEED TO CHANGE
             #1.1 = userInput
             #1.21 = allMales
@@ -1293,7 +1304,7 @@ def defaultTasksListCSVToDictConverter(): #consider renaming this later
             row['TaskVariableName2'] #Made a 2nd column in the csv file and TaskVariableName2 bc i think since i made the key TaskVariableName, i cant use that column again when defining var names in the class because it would have duplicate names and values and duplicates aren't allowed in dicitonaries.
             )
             #TODO this will probbably be a problem later
-            #duration = row['TaskDuration'].strip() #LEARNING CONCEPT: strip(), Return a copy of the string with leading and trailing whitespace removed.
+            #duration = row['TaskDuration'].strip() 
             #converted_duration = try_convert_to_int(duration)
             #defaultTasksDictionary[task] = converted_duration
     testOutput("TEST | new func csv task converter", defaultTasksDictionary)
@@ -1675,18 +1686,17 @@ class Schedule:
     
     def generate_schedule(self): #would having lenght of day be predefined actually give notacible improv???? no 
         schedule.generate_dynamic_time_slot_qeues_for_day(dayTimeSlotsStandardizedStN,dayTimeSlotsStandardizedNtS,dayTimeSlotsKeysList,daysTasks)
-        for slots in dayTimeSlotsKeysList:
-            testOutput("test main for loop | slot: ", slots)
-            schedule.dynamicTimeSlotQueuesDict[slots].populate_queue()
-            schedule.dynamicTimeSlotQueuesDict[slots].assign_tasks()    
+        for qeue in self.dynamicTimeSlotQueuesDict:
+            testOutput("test main for loop | slot: ", qeue)
+            schedule.dynamicTimeSlotQueuesDict[qeue].populate_queue()
+            schedule.dynamicTimeSlotQueuesDict[qeue].assign_tasks()    
         #run all the queues until finished
 
     def generate_dynamic_time_slot_qeues_for_day(self,timeSlotsStandardizedDictStn,timeSlotsStandardizedDictNtS,dayTimeSlotsKeysList,daysTasks):
         #original generation of timeslots and assign to dict, #INITALIZATION OF VALUES
-        #dynamicTimeSlotQueuesDict = {}
-        for key in dayTimeSlotsKeysList:
+        for time_slot in dayTimeSlotsKeysList:
             #print("TEST (for key) |", key)
-            self.dynamicTimeSlotQueuesDict[key] = Schedule.dynamicTimeSlotQueue(timeSlotsStandardizedDictStn,timeSlotsStandardizedDictNtS,dayTimeSlotsKeysList,key)
+            self.dynamicTimeSlotQueuesDict[time_slot] = Schedule.dynamicTimeSlotQueue(timeSlotsStandardizedDictStn,timeSlotsStandardizedDictNtS,dayTimeSlotsKeysList,time_slot)
         #print("\n\nTEST| dynamicTimeSlotQueuesDict[item]",self.dynamicTimeSlotQueuesDict.items())    
         #print("\n\nTEST| 2", self.dynamicTimeSlotQueuesDict["7:00am"])
         #print("\nTEST| dayTimeSlotsStandardizedNtS: ", dayTimeSlotsStandardizedNtS)
@@ -1723,7 +1733,6 @@ class Schedule:
                             if hasattr(instance, 'start_time') and hasattr(instance, 'start_time_iter'):
                             # Assuming each value has a 'start_time' list and a 'start_time_iter' attribute
                                 
-                                #searchVal = dayTimeSlotsStandardizedStN[searchVal] #turn searchVal arg's date format into a a corresponding number for comparison
                                 if instance.start_time and  0 <= instance.start_time_iter < len(instance.start_time): #WUT??? #to account for the fact that there may be multiple start tiems and are comparing to the right startime.
                                     # Compare searchVal with the current start_time value
                                     #print("TEST searchVal", searchVal)
@@ -1734,21 +1743,20 @@ class Schedule:
                                         activitesThatMeetCriteria.append(key)
                                         #print("TEST| activitesThatMeetCriteria.append(key)", activitesThatMeetCriteria)
                                         #print("\n\nTEST internal 0", instance.start_time,"\n\n")
-                                    else:
-                                        print("ERROR | time not in activity, IDK ")
-                                else:
-                                    print("ERROR | len instance.start_time_iter: ", instance.start_time_iter)
-                                    print("ERROR | prob an empty list or startime is out of bounds")
+                                    #else:
+                                        #print("ERROR | time not in activity, IDK ")
+                                #else:
+                                    #print("ERROR | len instance.start_time_iter: ", instance.start_time_iter)
+                                    #print("ERROR | prob an empty list or startime is out of bounds")
                                     
                             #print("TEST | INTERNAL", dataGrouping.items())
-                    else: 
-                        print("ERROR | datagrouping in daysTaskList not a dict")
+                    #else: 
+                        #print("ERROR | datagrouping in daysTaskList not a dict")
                 return activitesThatMeetCriteria
             tasks_that_meet_start_time_criteria = searchStartTimePeriodTasks(daysTasks,self.time_slot)
             
             #PROBLEM, what if the duration or num of people is dynamically generated at assignment bc it depends on what other things have been added. in part what tier is for too
             @timer
-            #BUG PROBLEM WITH THE DH and SERVE IS HERE
             def searchQuereDurationPeriodTasks(tasks_meet_prev_criteria):
                 tasks_sorted_by_duration = []
                 refDurationList = []
@@ -1778,7 +1786,7 @@ class Schedule:
                         #4. If so then add to the tasks sorted by duration list, then move on and search for the object that equals the 2nd value
                         # in the sorted durations list and so on until all tasks have been added in the order of their values Min to 
                         # max(aka the order of the tasks duration list).
-                        tasks_sorted_by_duration.append(taskName) #BUG is here, something to do with the list
+                        tasks_sorted_by_duration.append(taskName)
                         #print("TEST IN FOR LOOP tasks_sorted_by_duration", tasks_sorted_by_duration)
                 #5. then return the tasks_sorted_by_duration list for use by the next function / to be assigned to the variable
                 return tasks_sorted_by_duration
@@ -1810,7 +1818,7 @@ class Schedule:
             
             #TODO consider making match-reorder-reassign function for above 2 function, idk if will help with readability tho   
             self.queue = tasks_final_sorted
-            print("TEST | dynamicSlotQueue | tasks for time Period/Slot:" , tasks_final_sorted)
+            #print("TEST | dynamicSlotQueue | tasks for time Period/Slot:" , tasks_final_sorted)
                     
         def assign_tasks(self,employee_info=None):
             avail_employees_in_period = employee_manager.get_available_employees(self.time_slot)
@@ -1851,7 +1859,7 @@ class Schedule:
                     #for multi duration tasks - rethink how to efficently implement this later.
                     employee_manager.set_employee_availability(name, time_slot) #IMPORTANT fix this and incorperate multi time assignment relevant_time_slots. #LEARNING CONCEPT - Issue was iteration over characters in value / str,list(self.time_slot) how to prevent#TODO INSPECT THIS, think this has to be a list??? TODO CHECK HTIS LATER, need better type checkers and descs in program
                     employee_manager.assign_task_to_employee(name, task_name, time_slot) #TODO see if can take list like for employee availability, for multi duration args
-                    task_manager.tasks[task_name].assign_employee_to_task(time_slot, name) #TODO, multi time??? is this even needed???
+                    task_manager.tasks[task_name].assign_employee_to_task(time_slot, name) 
                     del avail_employees_in_period[name]
                     if employees_with_req_traits: #bc otherwise will delete an empty dict and cause an error
                         del employees_with_req_traits[name]
@@ -1929,7 +1937,7 @@ class Schedule:
                     #then do the normal
                     #check if in avail employees for period, would slow down if didnt have to but dict means fast look up.
                     #temp prinout to see if assigning to tasks:
-                    print(f"{task_name} is assigned to: {assigned_people}.") #still not working???
+                    #print(f"{task_name} is assigned to: {assigned_people}.") #still not working???
                 employees_with_req_traits = generate_list_of_eligible_employees()
                 assign_employees_to_task(employees_with_req_traits, task_name, time_slot)
                 
@@ -1945,7 +1953,7 @@ schedule.generate_schedule()
 schedule.describe_dynamic_time_slot_qeues()
 
 end_mainAlgo_time = time.time()
-elapsed_mainAlgo_time = end_mainAlgo_time - start_mainAlgo_time
+elapsed_mainAlgo_time = round(end_mainAlgo_time - start_mainAlgo_time, 5)
 print("Elapsed time for main algorithim:", elapsed_mainAlgo_time, "Seconds")
 
 #endregion
@@ -1978,7 +1986,8 @@ class OutputSchedule():
         assigned = {"7:00am": "KSWAT1", "7:45am": "KSWAT1", "9:15am": "KSWAT1", "9:50am": "KSWAT1", "10:00am": "HALFSTAFF", "11:00am": None, "11:45am": "Something", '1:45pm': 'Something'}
         task_durs = {"KSWAT1": 4, "HALFSTAFF": 1, "Something": 2}
         employee_list = ["Huey", "Granddad", "Wuncler"]
-
+    
+    @timer
     def excel(self):
         import xlsxwriter
         
@@ -2055,13 +2064,85 @@ class OutputSchedule():
             'bold': True,
             #'border': 1
         })
-        KSWAT_format = workbook.add_format({
+        #make a .CSV and autoconver values, also find work around for KSWAT and such.
+        
+        task_format = {
+        'SERVE': workbook.add_format({
+            'bg_color': '#FFFFCC'
+        }),
+        'HALF STAFF': workbook.add_format({
+            'bg_color': '#C6EFCE'
+        }),
+        'SEE R00SKI': workbook.add_format({
+            'bg_color': '#FFD9B3'
+        }),
+        'SEE JESUS': workbook.add_format({
+            'bg_color': '#FFF2CC'
+        }),
+        'MAIL': workbook.add_format({
+            'bg_color': '#DDEBF7'
+        }),
+        'DISH': workbook.add_format({
+            'bg_color': '#FFEB9C'
+        }),
+        'PLAYTIME': workbook.add_format({
+            'bg_color': '#B6D7A8'
+        }),
+        'SEE SLIPS': workbook.add_format({
+            'bg_color': '#D9D9D9'
+        }),
+        'BALLOONS': workbook.add_format({
+            'bg_color': '#EAD1DC'
+        }),
+        'PHONES': workbook.add_format({
+            'bg_color': '#DBDBDB'
+        }),
+        'CAMP STORE': workbook.add_format({
+            'bg_color': '#C9DAF8'
+        }),
+        'PIZZA': workbook.add_format({
+            'bg_color': '#F4CCCC'
+        }),
+        'DH': workbook.add_format({
+            'bg_color': '#F4CCCC'
+        }),
+        'WATER RUN': workbook.add_format({
+            'bg_color': '#F4CCCC'
+        }),
+        'BALLOONS': workbook.add_format({
+            'bg_color': '#F4CCCC'
+        }),
+        'FLAG UP': workbook.add_format({
+            'bg_color': '#F4CCCC'
+        }),
+        'SEE EAGLE': workbook.add_format({
+            'bg_color': '#F4CCCC'
+        }),
+        'FLAG UP': workbook.add_format({
+            'bg_color': '#F4CCCC'
+        }),
+        'KSWAT1' : workbook.add_format({
             'align': 'center',
             'valign': 'vcenter',
             'fg_color': '#FFB6C1',
             'font_color': '#333333',
             'border': 1
+        }),
+        'KSWAT2' : workbook.add_format({
+        'align': 'center',
+        'valign': 'vcenter',
+        'fg_color': '#FFB6C1',
+        'font_color': '#333333',
+        'border': 1
+        }),
+        'KSWAT3' : workbook.add_format({
+        'align': 'center',
+        'valign': 'vcenter',
+        'fg_color': '#FFB6C1',
+        'font_color': '#333333',
+        'border': 1
         })
+        }
 
         #Write Date Label - Always in the top left corner
         worksheet.write(0, 0, formatted_date_month_day_weekday.upper(), date_label_format)
@@ -2104,11 +2185,11 @@ class OutputSchedule():
                         multi_period_task_name_counter += 1
                         if multi_period_task_name_counter == duration:
                             start_col = column - (duration-1) #minus one bc duration count is inclusive, we have to account for timeslot we are in as part of it
-                            worksheet.merge_range(row, start_col, row, column, task, KSWAT_format)
+                            worksheet.merge_range(row, start_col, row, column, task, task_format[task])
                             multi_period_task_name_counter = 0
                         column += 1
                     else:
-                        worksheet.write(row, column, task)
+                        worksheet.write(row, column, task, task_format[task])
                         column += 1
                 else:
                     worksheet.write(row, column, task)
@@ -2135,8 +2216,8 @@ output_schedule.excel()
 #endregion
 
 end_program_time = time.time()
-elapsed_time = (end_program_time - start_program_time)/60
-print("Elapsed time:", elapsed_time, "minutes")
+elapsed_time1 = round(end_program_time - start_program_time, 2)
+print("Elapsed time for program:", elapsed_time1, "sec")
 
 #GUI - API - SERVER STUFF
 '''
@@ -2162,7 +2243,7 @@ if __name__ == "__main__":
 GET = retreive
 PUT or PATCH to update existing data
 DELETE to remove data"""
-'''
+
 
 myDict = {}
 x = len(myDict)
@@ -2170,4 +2251,4 @@ if x > 7:
     print("okay")
 else:
     print("small")
-    
+'''
