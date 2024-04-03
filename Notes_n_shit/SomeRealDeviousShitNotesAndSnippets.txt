@@ -190,6 +190,10 @@ else:
 #LEARNING CONCEPT: Can access class variables outside of class by directly via the class name from outside the class. aka Classname.varAcessing then blah blah blah
 #LEARNING CONCEPT, .cls is similar to .self
 #LEANRING CONCEPT: Using TODO in VS Code. Mark with a '+' marks as complete. Can also use #FIXME and #NOTE, also see how to guid for exstension I installed.
+#LEARNING CONCEPT - can put if & else statments all one line: weekday = 1 if weekday == 7 else weekday + 1. "(x if condition else y) The ternary operator is used for selecting between two values based on a condition, not for executing statements."
+
+
+
 """
 ChatGPT
 The use of enumerate in a for loop is a common Python idiom for iterating over a sequence when you need both the index and the value of each item in the sequence. 

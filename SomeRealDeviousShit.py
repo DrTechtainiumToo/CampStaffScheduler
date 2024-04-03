@@ -1,8 +1,8 @@
-"""Moved some stuff into folders, set up basic stuff to think about a web app. Most importantly fixed that bug with the table output task offset, not accounting to print blanks when there are no tasks."""
 
 #region--------------------------- FILE HEADER COMMENTS
 
 #LEARNING - If broken check to make sure dont have something twice, like an input or variable if it is broken via search / find like Issac did
+#WHEN DEBUGGING remeber that everyhting is imported from csv so might need to use int()
 
 #TODO When developing, leave all gui stuff for after complete main program. Bc might have app take care ofall of that and the program just take the final type and ver of data and use it.
 #So keep in mind when making inputs or conversion sequences that it has a clear final form and document it. That way can plug into api requests easy and stuff.
@@ -60,23 +60,19 @@ https://www.youtube.com/watch?v=9oaqCMwcoQ4
 
 import time
 import datetime
+from datetime import timezone
 start_program_time = time.time()
 
 import csv
-import openpyxl 
 #import prompt_toolkit CONFUSION why instead of jsut impoting whole library do i have to specify to import certain funcitons? otherwise wont work
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
-
 #from flask import Flask, jsonify
 from colorama import init, Fore, Style
-from copy import deepcopy
 import re #pattern matching module, regualr exspression
-import datetime
 from contextlib import contextmanager
 from scipy import stats
 import random
-
 #endregion
 
 #region---------------- SWAT CLASS???
@@ -103,7 +99,9 @@ class SWATScheduler:
 
 """LEARNING CONCEPT: If you find yourself repeatedly needing to time blocks of code, you can encapsulate this pattern in a context manager:
 This approach allows you to easily measure the runtime of any block of code by simply wrapping it in a with time_block("Description"): statement, making your code cleaner and more readable."""
-@contextmanager
+
+#Time any block of code with time_block()
+@contextmanager #NOTE allow to time ANY block of code, not just functions. I was learning about ocntext managers, still need to learn more.
 def time_block(label):
     start = time.perf_counter()
     try:
@@ -271,25 +269,23 @@ def xyz_input_auto_completer(promptstring, refList): #TODO this might mess up mu
 
 #LOAD DATA CLASS, or encapsulation??? really need for information on
 def intialCSVToDataStructures():
-
     #take names and put into list
     employeeNamesList = []
-    with open('SWATBasicSavedInfoForScheduler.csv', newline='') as csvfile:
+    with open('CSV Data Folder/SWATEmployeeInfo.csv', encoding='utf-8-sig', newline='') as csvfile:
         # Create a csv.reader object
         csvreader = csv.DictReader(csvfile, dialect='excel')
         for row in csvreader:
             # Use the names in the '\ufeffEmployee' column as values
-            name = row['\ufeffEmployee']
+            name = row['Employee'] #TODO LEARNING CONCEPT - SOLVED (looked at another csv without \ufeff) Its because I needed to give a encoding parameter to the open() func. why is \ufeff a thing.
             employeeNamesList.append(name) #add names to list
-    #testOutput("TEST | employeeNamesList:", employeeNamesList)
+    #testOutput("TEST | employeeNamesList:", employeeNamesList) #\ufeff
 
     #take gender and put into lsit
     employeeGenderList = []
-    with open('SWATBasicSavedInfoForScheduler.csv', newline='') as csvfile:
+    with open('CSV Data Folder/SWATEmployeeInfo.csv', newline='') as csvfile:
         # Create a csv.reader object
         csvreader = csv.DictReader(csvfile, dialect='excel')
         for row in csvreader:
-            # Use the names in the '\ufeffEmployee' column as values
             gender = row['Gender']
             employeeGenderList.append(gender) #add names to list
     testOutput("TEST | employeeGenderList:", employeeGenderList)
@@ -332,54 +328,67 @@ class ScheduleTime:
         pass
     pass
 
-
-def getUserEnteredDate():
-    #Get date and stores it, will eventually use to see if need to schedule fixed event adn which ones (dance, bondfire, etc)
-    wLoopBVar = 1
-    while wLoopBVar < 4:
-        if wLoopBVar == 3:
-            import webbrowser
-            print("\n----------------------------------------FINAL ERROR------------------------------------------------------")
-            print("\nTROUBLESHOOT: Just go ask Andrew for help at this point. OR RESTART PROGRAM\n\n")
-            print("For real man, you must be high as balls if you're struggling to type in a day of the week. Speaking about being high, that reminds me of this song I heard once.....")
-            print("\n\nHey, lemme open up youtube real quick so you can sing along!!!")
-            webbrowser.open("https://www.youtube.com/watch?v=WeYsTmIzjkw") #LEARNING CONCEPT hwo to use webbrowser module
-            time.sleep(4)
-            print("\nALMOST LOADED!!!, 25% there\n")
-            print("\nALMOST LOADED!!!, 50% there\n")
-            time.sleep(10)
-            print("\nALMOST LOADED!!!, 70% there\n")
-            time.sleep(10)
-            print("\nJK! I'm just making you wait!\n")
-            time.sleep(1) 
-            print("") #LEARNING CONCEPT - HOW TO MAKE PYHTON WAIT BEFORE EXECUTING SOMETHING, import time, then time.sleep(x)
-            print(dumbAndrewMemes1)
-            wLoopBVar = 8
-            testOutput("IF ONE: ",wLoopBVar)
-            print("\n\nPROGRAM TERMINATING, its all your fault. Don't you have any sense of shame?")
-            exit()
-        dateUserEntered = "m"
-        dateUserEntered = input("\nGenerate a schedule for which day of the week: ")
-        if dateUserEntered.lower() in days: # "==" didn't work so used "in" recommended by stack overflow
-            #dateUserEnteredInterpreted:
-            print(f"Will generate a schedule for {daysKeyValueInverse[days[dateUserEntered.lower()]]}.\n")
-            testOutput("IF TWO: ",wLoopBVar)
-            wLoopBVar = 8
-            testOutput("IF for user entered, AFTER ADD: ",wLoopBVar)
-            break
+@timer
+def program_auto_get_date(get_next_day = False):
+    """Returns a string with a full weekday's name. Dependecies: Uses datetime and timezone modules"""
+    weekday = datetime.datetime.now(timezone.utc).astimezone().isoweekday() #WHY isoweekday() - returns weekday int mon =1 sun = 7, this aligns with pre hardcoded date code i put in 'days' dict, that way this func gives same output as the manual one and there is no need to adjust any other outputs
+    if get_next_day: #WHY if get_next_day - if you want to make the schedule the night before, it knows to generate a schedule for the next day. Since the day values are int you just add +1 to get the next day
+        #WHY - if, else statment, check incase its sunday so knows to set weekday equal to 1 for monday. Bc sun = 7 and Mon = 1, otherwise you'd get 8. 8 = undefined
+        if weekday == 7:
+            weekday = 1 
         else:
-            print("\n-----------------------------------------------------------------------------------------------\nERROR!\n\nMispellling or not a valid day, try again.\n-----------------------------------------------------------------------------------------------\n")
-            testOutput("getUserEnteredDate ForLoop If (dateUserEntered input) ELSE check TEST |", "SUCESS")
-            testOutput("ERROR Else: ",wLoopBVar)
-        wLoopBVar = wLoopBVar + 1
-    testOutput ("wLoopBVar out of loop ",wLoopBVar)
-    #check which day to format schedule like sat or sunday and to for account for special events
-    dateValue = days[dateUserEntered.lower()]
-    return dateValue
+            weekday + 1 
+    return weekday
+    
+def user_enter_date():
+    """Allows the user to manually enter a day of the week, and returns the integer representationl
+    Returns: int : date value"""
+    attempts = 0
+    while attempts < 3:
+        dateUserEntered = input("\nGenerate a schedule for which day of the week: ")
+        if dateUserEntered.lower() in days: #Why - account for non-numeric input
+            dateUserEntered = days[dateUserEntered] #convert any string input into int
+            return dateUserEntered
+        elif dateUserEntered in daysKeyValueInverse.keys(): #Why - if numeric input, check if valid
+            return int(dateUserEntered)
+        else:
+            print("\n-----------\nERROR!\n\nMispellling or not a valid day, try again.\n-----------------\n")
+            attempts +=1    
+    import webbrowser
+    print("\n---> To many invalid attempts, exiting... <----\n")
+    time.sleep(2.5)
+    print("For real man, you must be high as balls if you're struggling to type in a day of the week. Speaking about being high, that reminds me of this song I heard once.....")
+    print("\n\nHey, lemme open up youtube real quick so you can sing along!!!")
+    webbrowser.open("https://www.youtube.com/watch?v=WeYsTmIzjkw") #LEARNING CONCEPT how to use webbrowser module
+    time.sleep(4)
+    print("\nALMOST LOADED!!!, 25% there\n")
+    print("\nALMOST LOADED!!!, 50% there\n")
+    time.sleep(10)
+    print("\nALMOST LOADED!!!, 70% there\n")
+    time.sleep(10)
+    print("\nJK! I'm just making you wait!\n")
+    time.sleep(1) 
+    print("") #LEARNING CONCEPT - HOW TO MAKE PYHTON WAIT BEFORE EXECUTING SOMETHING, import time, then time.sleep(x)
+    print(dumbAndrewMemes1)
+    print("\n\nPROGRAM TERMINATING, its all your fault.")
+    exit()
 
-#dateValue = getUserEnteredDate() #Global Var
-dateValue = 1 #TODO DISABLE ONCE DONE DEBUGGING
+@timer
+def get_date(get_date_auto = False, get_next_day = False):
+    """Gets the date value either from computer or by user input. Returns: (int) representing the weekday"""
+    if get_date_auto:
+        return program_auto_get_date(get_next_day=get_next_day)
+    else:
+       return user_enter_date()
+        
+#TODO settings-ize this if want manual or auto-also see how end user does it. Have a setup mode.
+get_date_auto = True
+get_next_day = False
+dateValue = get_date(get_date_auto = get_date_auto, get_next_day = get_next_day) 
+dateValue = 1 #TODO DISABLE ONCE DONE DEBUGGING #NOTE Global vars
 dayName = daysKeyValueInverse[dateValue]
+print(f"Will generate a schedule for {dayName}.\n")
+
 testOutput("TEST |  dateValue", dateValue)
 
 #region-------------------------- SAVED TIME DATA & GlobalVars
@@ -622,7 +631,7 @@ class EmployeeManager:
         return eligible_employees
     
     def assign_task_to_employee(self,employee_name, task, time_slot): 
-        self.employees[employee_name].assign_task(time_slot,task)           
+        self.employees[employee_name].assign_task(time_slot, task)           
     
 
 class AvailabilityManager:  #IDK, pointless for now until I make frontend???. Fuck idk
@@ -960,8 +969,12 @@ class Employee:
             time_slot (str): 7:00am etc
             task (str): TaskVarName
         """
-        #TODO fix later for multiple for times assign to timeslot
-        self.assigned_to[time_slot] = task
+        #TODO DONE fix later for multiple for times assign to timeslot
+        if isinstance(time_slot, list):
+            for slot in time_slot:
+                self.assigned_to.update({slot: task})  #LEARNING CONCEPT update() is like the dictionary equivlent of the list extend() method, dont forget curly braces {}! self.assigned_to.update({time_slot: task})
+        else:
+            self.assigned_to[time_slot] = task
     
 
 #instantiate employees
@@ -1008,6 +1021,7 @@ user_Input_Employee_Unavailbilites()
 
 print("\n---------------------------------------------------------------------------------------------------------------\n") 
 
+#endregion
 
 #region----------------------------------------------- TASKS
 
@@ -1041,7 +1055,7 @@ class TaskManager:
     def assign_to(self,time_slot,employee_name):
         pass
         #TODO SOLVE THIS FIRST, PROBLEM I HAVE MULTIPLE TASK DICTIONARIES HOW WILL I FIX THIS?? WTF???
-        
+        #I think just how to mkae all the naming things non confucing has discuraged me from doing this.
     
     class Task:
         task_attribute_guide = {
@@ -1184,12 +1198,16 @@ class TaskManager:
                 req_dict["gender"] = self.gender_required #or gender specific #WHY - so the keys should be the attr names of the mpoyees bc it will use the key name to see it employee has that attr then compares the .self val to the employee val to see if match
             if self.certs_required is not None and self.certs_required != "No": #change No(s) later
                 req_dict["certifications"] = self.certs_required
-                 #may have to figure out to include how many eventually and make that work with the serch algo, also may have to use an "OR"
+                #may have to figure out to include how many eventually and make that work with the serch algo, also may have to use an "OR"
                 #FUTURE, evantually maybe make this a dict comprehension??? so can jsut edit the names / reqs in a list?
             return req_dict
         
         def assign_employee_to_task(self,time_slot,employee_name):
-            self.assigned_to[time_slot].append(employee_name) #IDK if will work
+            if isinstance(time_slot, list): #TODO maybe at some point make these to take ditionaries so would be smaller adn more efficent??
+                for slot in time_slot:
+                    self.assigned_to[slot].append(employee_name)
+            else:
+                self.assigned_to[time_slot].append(employee_name) #IDK if will work #QUESTION - should be extend or append idk what if not pre exisitng lists
             #TODO make sure doesnt override and stuff, figure out later           
                         
 def try_convert_to_int(value):
@@ -1206,7 +1224,7 @@ defaultTasksVarNamesList = []
 
 @timer
 def defaultTasksListCSVToDictConverter(): #consider renaming this later
-    with open('SWATBasicTasksListForScheduler.csv', newline='', encoding='utf-8-sig') as csvfile:
+    with open('CSV Data Folder/SWATBasicTasksListForScheduler.csv', newline='', encoding='utf-8-sig') as csvfile:
         # Create a csv.reader object
         csvreader = csv.DictReader(csvfile, dialect='excel')
         #for row in csvreader:
@@ -1274,7 +1292,6 @@ def defaultTasksListCSVToDictConverter(): #consider renaming this later
             row['SpawnSaturday'],
             row['TaskVariableName2'] #Made a 2nd column in the csv file and TaskVariableName2 bc i think since i made the key TaskVariableName, i cant use that column again when defining var names in the class because it would have duplicate names and values and duplicates aren't allowed in dicitonaries.
             )
-
             #TODO this will probbably be a problem later
             #duration = row['TaskDuration'].strip() #LEARNING CONCEPT: strip(), Return a copy of the string with leading and trailing whitespace removed.
             #converted_duration = try_convert_to_int(duration)
@@ -1282,10 +1299,9 @@ def defaultTasksListCSVToDictConverter(): #consider renaming this later
     testOutput("TEST | new func csv task converter", defaultTasksDictionary)
     #defaultTasksDictionary['DH'].describe_verbose()
 
-            #testOutput("TEST | converted duration type", type(converted_duration))
+    #testOutput("TEST | converted duration type", type(converted_duration))
     #testOutput("\n Task durations:\n",defaultTasksDictionary, "\n")
-    #CUSTOM VAR NAMES task_name = userTaskVariableName  # This could be any user-defined string
-                #taskDictLocal[task_name] = Task( # Create a new Task instance and store it with the user-defined name as the key
+    
 defaultTasksListCSVToDictConverter()
 #endregion
 
@@ -1346,7 +1362,7 @@ selected_default_basic_tasks__var_names_list = []
 @timer
 def default_selected_tasks_recommendation_algorithm(defaultTasksDictionary,dayName,selected_default_basic_tasks__var_names_list,selected_default_basic_tasks_dict):
     #first get the day,  then actual day/time for repeating tasks.
-    #TODO - far futurewould be good if could pre compile which occcur on what day. That way could just load in, all this looping through cant be good for efficency
+    #TODO - far future - would be good if could pre compile which occcur on what day. That way could just load in, all this looping through cant be good for efficency
     
     attribute_name = 'spawn_'+dayName.lower() #WHY .lower to create name value? It refs dateValue num to corresponding dictionary values which are day names, and the day names are capitalized. However the obj attribute daynames are not, so we lowercase this name.
     for task_name, instance in defaultTasksDictionary.items(): 
@@ -1358,7 +1374,7 @@ def default_selected_tasks_recommendation_algorithm(defaultTasksDictionary,dayNa
             selected_default_basic_tasks_dict[task_name]=instance
             #print("TEST| selected_default_basic_tasks_dict IN IF",selected_default_basic_tasks_dict)      
     #TODO SIMPLE, GOOD, IDEA!!! CHECK IF ERROR, in future update may later change from "yes" to True, will be faster too?
-     #- 2nd reminder, add in reoccuring scheduled tasks later
+     #- 2nd reminder, add in reoccuring scheduled tasks later (like ones that occur every x days ex: Water flowers)
 
 default_selected_tasks_recommendation_algorithm(defaultTasksDictionary,dayName,selected_default_basic_tasks__var_names_list,selected_default_basic_tasks_dict)
 #print("TEST| selected_default_basic_tasks__var_names_list POST IF",selected_default_basic_tasks__var_names_list)
@@ -1505,16 +1521,13 @@ def check_for_user_input(obj,taskName):
                                         break
                                 value[index] = userData
                                 print(f"TEST | Result for {attr}[{index}]: ", value[index])
+
 #NOTE from a UI perspective this part is terribly confusing but will leave it as is bc IDGAF. I dont want ohave to write 250 more lines of code that wont probbaly be used in the final GUI.
 for tasks, instance in selected_default_basic_tasks_dict.items():
     check_for_user_input(instance,tasks)
     
 
-
-
-
 # --------------------- Additional Tasks
-
 def user_PromptXY_YesOrNo_If_So_PromptABC_Template(variable,stringprompt):
     pass 
 def user_Adds_Additonal_Tasks():
@@ -1619,22 +1632,15 @@ testOutput("TEST |  NEW additionalTasks List ", additionalTasks)
 #-----------------------------------------------------------------
 
 
-
 # ------------------------------ Master Task List
-
 daysTasks = [additionalTasks, defaultTasksDictionary, nightChores]
 #TODO maybe at some point - maybe also make a days tasks dict, that way for algo only have to use that. would allow speeration of night chore and special dict, but speical dict honestly is kidna, well eh never mind idk about performance improvement
 #TaskRank1, TaskRank2,TaskRank3 can add other lists into them??
 
-
-
-#tasks per timeslot etc
-#tasks # of ppl needed
 #TODO give total tasks loaded for day, so they can see if they are satisfied. Make and option to delete or add more tasks (ugg more coding).
 #TODO for a (special) task day need to know the tasks, then for a task the day, the time the tasks take place+duration, how many ppl on tasks (aka # of certain task).
 #TODO Tasks due in timeslot & number of people per task
 #TODO IMPORTANCE SYSTEM - Rank tasks in importance, HOW DO I RANK IMPORTANCE???
-
 
 #endregion
 #endregion
@@ -1642,8 +1648,9 @@ daysTasks = [additionalTasks, defaultTasksDictionary, nightChores]
 #region---------------------------------------------------------- Start of algorithm / assignment sequence 
 
 start_mainAlgo_time = time.time()
-#--------------------------------------------------- Check if solution is possible
-
+#--------------------------------------------------- Check if solution is possible 
+#TODO reimplement?????? to check if solution possible???????? DO LATER after i get algorithm completely finished???
+#IDEA! - can ask if they want to calc, it will speed up time(time how long it tasks and if shorter than their decision), but if alot of tasks risks not finding a solution until after calc
 
 print("\n--------------------------------------------------------")
 
@@ -1658,10 +1665,22 @@ print("\n--------------------------------------------------------")
 #min_num_of_people_equal_remaining_times
 
 #FK really need to go over how classes work again and global var overshadowing
+
+#TODO make update so that can do generate in between times a min num of people, also if have some reqs but want remaining stuff like all females idl
+#TODO develop this out more when decde what to do with nightchores
+
 class Schedule:
     def __init__(self,timeSlotsStandardizedDictStn,timeSlotsStandardizedDictNtS,dayTimeSlotsKeysList,daysTasks) -> None:
         self.dynamicTimeSlotQueuesDict = {}
     
+    def generate_schedule(self): #would having lenght of day be predefined actually give notacible improv???? no 
+        schedule.generate_dynamic_time_slot_qeues_for_day(dayTimeSlotsStandardizedStN,dayTimeSlotsStandardizedNtS,dayTimeSlotsKeysList,daysTasks)
+        for slots in dayTimeSlotsKeysList:
+            testOutput("test main for loop | slot: ", slots)
+            schedule.dynamicTimeSlotQueuesDict[slots].populate_queue()
+            schedule.dynamicTimeSlotQueuesDict[slots].assign_tasks()    
+        #run all the queues until finished
+
     def generate_dynamic_time_slot_qeues_for_day(self,timeSlotsStandardizedDictStn,timeSlotsStandardizedDictNtS,dayTimeSlotsKeysList,daysTasks):
         #original generation of timeslots and assign to dict, #INITALIZATION OF VALUES
         #dynamicTimeSlotQueuesDict = {}
@@ -1672,14 +1691,6 @@ class Schedule:
         #print("\n\nTEST| 2", self.dynamicTimeSlotQueuesDict["7:00am"])
         #print("\nTEST| dayTimeSlotsStandardizedNtS: ", dayTimeSlotsStandardizedNtS)
     
-    def generate_schedule(self): #would having lenght of day be predefined actually give notacible improv???? no 
-        pass
-        #Schedule.dynamicTimeSlotQueue.populate_queue
-        
-        #run all the queues until finished
-        #plus assign outputs to shit, eventually do export formatting. WHAT AND HOW TO ASSIGN????
-        #SHOULD THIS BE AGGREGATING THE DATA FROM TASKS AND EMPLOYEES TO SEE SHCEDULE FOR THAT DAY???
-    
     def describe_dynamic_time_slot_qeues(self):
         print("\nA list of dynamic time slot qeues and their associated tasks:\n")
         for queue in self.dynamicTimeSlotQueuesDict.keys():
@@ -1689,7 +1700,6 @@ class Schedule:
     
     class dynamicTimeSlotQueue:
         def __init__(self,timeSlotsStandardizedDictStn,timeSlotsStandardizedDictNtS,dayTimeSlotsKeysList,time_slot_name):
-            #super().__init__(timeSlotsStandardizedDictStn,timeSlotsStandardizedDictNtS,dayTimeSlotsKeysList) #inherit parent method parameters and values
             self.queue = []
             self.daysTasks = daysTasks #TODO QUESTION, WILL THIS CAUSE PROBLEMS BC SHADOW GLOBALS VARS???
             self.time_slot = time_slot_name #maybe for later so instead of ref slot can just use this?????????
@@ -1698,15 +1708,14 @@ class Schedule:
             print(self.queue)
             
         @timer
-        def populate_queue(self): #maybe change to generate later idk, semantics
-            #then start searching for relevant tasks, make a list of relevant tasks. will add to dynamic queue later after all filtering has been done.....
+        def populate_queue(self): #maybe change to generate later idk, semantics            
             
             @timer
             def searchStartTimePeriodTasks(daysTasks,searchVal):
                 activitesThatMeetCriteria = []
                 for dataGrouping in daysTasks:
                     if isinstance(dataGrouping, dict):
-                        print("TEST -2 what datagrouping", dataGrouping)
+                        #print("TEST -2 what datagrouping", dataGrouping)
                         for key, instance in dataGrouping.items():
                             #print("TEST| Instance: ", instance)
                             #print("TEST| instance.start_time_iter += 1: ", instance.start_time_iter)
@@ -1715,7 +1724,7 @@ class Schedule:
                             # Assuming each value has a 'start_time' list and a 'start_time_iter' attribute
                                 
                                 #searchVal = dayTimeSlotsStandardizedStN[searchVal] #turn searchVal arg's date format into a a corresponding number for comparison
-                                if instance.start_time and  0 <= instance.start_time_iter < len(instance.start_time): #WUT???
+                                if instance.start_time and  0 <= instance.start_time_iter < len(instance.start_time): #WUT??? #to account for the fact that there may be multiple start tiems and are comparing to the right startime.
                                     # Compare searchVal with the current start_time value
                                     #print("TEST searchVal", searchVal)
                                     #print("INSTANCE test: start_time", instance.start_time)
@@ -1734,14 +1743,12 @@ class Schedule:
                             #print("TEST | INTERNAL", dataGrouping.items())
                     else: 
                         print("ERROR | datagrouping in daysTaskList not a dict")
-                        #TODO develop this out more when decde what to do with nightchores
                 return activitesThatMeetCriteria
             tasks_that_meet_start_time_criteria = searchStartTimePeriodTasks(daysTasks,self.time_slot)
-            #print("DONE searchStartTimePeriodTasks -------------------")
-            #print("TEST | tasks_that_meet_start_time_criteria", tasks_that_meet_start_time_criteria)
             
             #PROBLEM, what if the duration or num of people is dynamically generated at assignment bc it depends on what other things have been added. in part what tier is for too
             @timer
+            #BUG PROBLEM WITH THE DH and SERVE IS HERE
             def searchQuereDurationPeriodTasks(tasks_meet_prev_criteria):
                 tasks_sorted_by_duration = []
                 refDurationList = []
@@ -1758,6 +1765,9 @@ class Schedule:
                 selectionSort(refDurationList,len(refDurationList), setting = 'descending') #WHY (setting=ascending)? - because we want the tasks with the largest durations to be first
                 #print("test refDurationList", refDurationList)
                 
+                    #TODO maybe make selection sort work with funcitons so don't have to do this recombine thing???
+                    #idk if this is faster, tho prob in long hall rather than having to do loops
+                
                 #3. Then loop through the tasks list plus get the duration attribute value for each task, then compare using an if statment that
                 # if first duratin value in the sorted duration list is equal to that objects duration value. 
                 
@@ -1768,7 +1778,7 @@ class Schedule:
                         #4. If so then add to the tasks sorted by duration list, then move on and search for the object that equals the 2nd value
                         # in the sorted durations list and so on until all tasks have been added in the order of their values Min to 
                         # max(aka the order of the tasks duration list).
-                        tasks_sorted_by_duration.append(taskName)
+                        tasks_sorted_by_duration.append(taskName) #BUG is here, something to do with the list
                         #print("TEST IN FOR LOOP tasks_sorted_by_duration", tasks_sorted_by_duration)
                 #5. then return the tasks_sorted_by_duration list for use by the next function / to be assigned to the variable
                 return tasks_sorted_by_duration
@@ -1797,25 +1807,22 @@ class Schedule:
             tasks_final_sorted = sortTierPeriodTasks(tasks_stage2_now_sorted_by_duration)
             #print("TEST | tasks_final_sorted: ", tasks_final_sorted)
             #print("DONE sortTierPeriodTasks -------------------")
+            
             #TODO consider making match-reorder-reassign function for above 2 function, idk if will help with readability tho   
             self.queue = tasks_final_sorted
             print("TEST | dynamicSlotQueue | tasks for time Period/Slot:" , tasks_final_sorted)
-            
-            #wait shoudlnt this bee under employee manager or scheduler???
-        
+                    
         def assign_tasks(self,employee_info=None):
-            #def generate_list_of_available_employees(): #would be faster to pregen, then del as go. But more readable if creat evertime???
-            avail_employees_in_period = employee_manager.get_available_employees(self.time_slot) #NOT WORKING?????
+            avail_employees_in_period = employee_manager.get_available_employees(self.time_slot)
             #maybe make an inverse for checking??????
-            
             #maybe use duplication to get rid of ones that are already deleted
             #pointless if go to class to get attributes??
             #PART 2 - now for part 2 of the algo sequence which is assigning tasks to an employee
             
             def assign_task(task_name):
                 #TODO if leave stuff blank have it assume none or "", esp for tasks and stuff
-                #maybe make a class for this??? assignment probbabilites?
-                #TOOD evantually redo this and figure out how to implement how many certs you need. Also maybe make a table with prelisted number of people with certs, might be faster       
+                #TODO evantually redo this and figure out how to implement how many certs you need. Also maybe make a table with prelisted number of people with certs, might be faster       
+                
                 assigned_people = {}
                 def generate_list_of_eligible_employees(): #need to rename this
                     task_reqs = task_manager.tasks[task_name].get_task_requirements() #should be *task employee req
@@ -1839,23 +1846,51 @@ class Schedule:
                     #lower probbs if certs in other things and tasks with those certs are needed in the period
                     return removeLater
                 
-                def update_data(name):
-                    #assigned_people[name] = None #hmm is this working right? so doesn't assing same people twice?? #ok if do this first, but then do total unavail. Proab could optimize here
+                def update_data(name, time_slot):
+                    #assigned_people[name] = None #TODO fix #POTENTIAL TO  CAUSE BUG hmm is this working right? so doesn't assing same people twice?? #ok if do this first, but then do total unavail. Proab could optimize here
                     #for multi duration tasks - rethink how to efficently implement this later.
-                    employee_manager.set_employee_availability(name, self.time_slot) #IMPORTANT fix this and incorperate multi time assignment relevant_time_slots. #LEARNING CONCEPT - Issue was iteration over characters in value / str,list(self.time_slot) how to prevent#TODO INSPECT THIS, think this has to be a list??? TODO CHECK HTIS LATER, need better type checkers and descs in program
-                    employee_manager.assign_task_to_employee(name, task_name, self.time_slot) #TODO see if can take list like for employee availability, for multi duration args
-                    task_manager.tasks[task_name].assign_employee_to_task(self.time_slot, name) #TODO, multi time??? is this even needed???
+                    employee_manager.set_employee_availability(name, time_slot) #IMPORTANT fix this and incorperate multi time assignment relevant_time_slots. #LEARNING CONCEPT - Issue was iteration over characters in value / str,list(self.time_slot) how to prevent#TODO INSPECT THIS, think this has to be a list??? TODO CHECK HTIS LATER, need better type checkers and descs in program
+                    employee_manager.assign_task_to_employee(name, task_name, time_slot) #TODO see if can take list like for employee availability, for multi duration args
+                    task_manager.tasks[task_name].assign_employee_to_task(time_slot, name) #TODO, multi time??? is this even needed???
                     del avail_employees_in_period[name]
                     if employees_with_req_traits: #bc otherwise will delete an empty dict and cause an error
                         del employees_with_req_traits[name]
-                    print("UPADTE FUNCTION OUTPUT | +1")
-                        
-                def assign_employees_to_task(employees_with_req_traits_local,task_name):
-                    #TODO write logic for TASKS THAT ARE DEPENDENT ON NUMBER OF EMPLOYEES BASED ON OTHER TASKS
+                    #print("UPADTE FUNCTION OUTPUT | +1")
+                     
+                #Put outside update funciton so onyl have to calculate once, and not everytime need to assign task to someone
+                def calculate_time_slots_for_duration(task_name):
+                    # Get the task object (assuming you have a way to access it via task_name)
+
+                    #thanks chatGPT, bc i was to lazy / tired, its 8:42pm to write this out myself, easier to just describe, well I actually did end up have to make a decent amount of changes
                     
+                    duration = int(task_manager.tasks[task_name].duration) # WHY int - Ensure duration is an integer bc dictionary to convert value will onyl take integer
+                    
+                    if duration > 1:
+                    # Check the duration of the task
+                        
+                        #FORGET FOR NOW - think unessecary WHY - subtract one, subtracting 1 from the task's duration accounts for including the starting time slot as part of the duration. This adjustment helps to ensure the task is scheduled for the correct number of time slots, starting from the initial slot.
+                        #duration -= 1
+                        
+                        # Get the numeric value for the current time slot
+                        current_slot_numeric = dayTimeSlotsStandardizedStN[self.time_slot]
+
+                        # Calculate numeric values for the duration of the task
+                        duration_slots_numeric = [current_slot_numeric + i for i in range(duration)] #good list comprehension
+
+                        # Convert numeric values back to string representations
+                        duration_slots_strings = [dayTimeSlotsStandardizedNtS[num] for num in duration_slots_numeric if num in dayTimeSlotsStandardizedNtS]
+
+                        return duration_slots_strings
+                    else:
+                        # If duration is 1, return the current time slot in a list
+                        return [self.time_slot]
+                time_slot = calculate_time_slots_for_duration(task_name)
+                    
+                def assign_employees_to_task(employees_with_req_traits_local, task_name, time_slot):
+                    #TODO write logic for TASKS THAT ARE DEPENDENT ON NUMBER OF EMPLOYEES BASED ON OTHER TASKS
+                    #TODO once get code for how many certs to assign, then make it count until it has fulfilled it.
                     
                     #first assign special trait employees first
-                    #TODO once get code for how many certs to assign, then make it count until it has fulfilled it.
                     employees_with_req_traits = employees_with_req_traits_local
                     
                     def choose1():
@@ -1870,10 +1905,9 @@ class Schedule:
                         while True:
                             chosen_name = choose1()  #find someone who isn't been assigned or unavailable
                             if chosen_name not in assigned_people and chosen_name not in avail_employees_in_period: #use all??
-                                break #Break the loop if a suitable employee is found
-                        update_data(chosen_name)
+                                break #Break the loop if a suitable / available employee is found, #TODO implent find someone with right reqs???
+                        update_data(chosen_name, time_slot)
                         
-                    #TODO make update so that can do generate in between times a min num of people, also if have some reqs but want remaining stuff like all females idl
                     else:
                         attribute = getattr(task_manager.tasks[task_name], 'min_num_people_needed') #IMPORTANT, #COULD SET THIS TO STAND VAR, THEN HAVE FUNCTION NEAR IMPORTS THAT GETS A LIST OF CODE WORDS AND CONVERTS THEM TO STAND VALUE
                         #WHY - convert if input string / csv data is anything but a number tha can convert to int.
@@ -1882,14 +1916,13 @@ class Schedule:
                         ppl_needed = int(attribute) # need to check if an if or not
                         while ppl_needed > 0: #faster maybe? # WHY: not For loop bc cannot iterate over integers
                             while True:
-                                chosen_name = random.choice(list(avail_employees_in_period.keys())) #would be faster to have seperate list once, and del values in it to instead of remaking it each time.
+                                chosen_name = random.choice(list(avail_employees_in_period.keys())) #IMPLEMENT prob #would be faster to have seperate list once, and del values in it to instead of remaking it each time.
                                 if chosen_name not in assigned_people:
                                     break
-                            update_data(chosen_name)
+                            update_data(chosen_name, time_slot)
                             ppl_needed -= 1
-                            
-                            
-                        #HMM this is also an interesting implementation:             available_candidates = set(avail_employees_in_period.keys()) - set(assigned_people.keys())
+                               
+                        #HMM this is also an interesting implementation: available_candidates = set(avail_employees_in_period.keys()) - set(assigned_people.keys())
                         #check if already assigned or unavailable
                         #update with anti-cert-use-up code later
                         #normal random assignment
@@ -1898,235 +1931,212 @@ class Schedule:
                     #temp prinout to see if assigning to tasks:
                     print(f"{task_name} is assigned to: {assigned_people}.") #still not working???
                 employees_with_req_traits = generate_list_of_eligible_employees()
-                assign_employees_to_task(employees_with_req_traits,task_name)
+                assign_employees_to_task(employees_with_req_traits, task_name, time_slot)
                 
             for task in self.queue:
                 assign_task(task)
 
-                #need to then reorder selected tasks by TIER and duration, how to make sure stuff does not get overwritten twice????????
-
-                #Then go to next criteria or assign to people and set durations. once done set all other durations to blank???? idk
-
-                #recursive function to look through all the lists and shit in the daysTasks and find those that start at time, next duration, then do by tiers
-    
-        
-                #task_manager.
-                #employee
-                
-                #idk #how does this work in terms of encapsulaiton????? should i hand off to task manager
-                break
-            print("TEST persons assigned to tasks") #FOR TESTING
-            
-        #def next_task_in_queue(self):
-            #pass 
+#need to then reorder selected tasks by TIER and duration, how to make sure stuff does not get overwritten twice???????
+#Then go to next criteria or assign to people and set durations. once done set all other durations to blank???? idk
+#recursive function to look through all the lists and shit in the daysTasks and find those that start at time, next duration, then do by tiers            
         
 schedule = Schedule(dayTimeSlotsStandardizedStN,dayTimeSlotsStandardizedNtS,dayTimeSlotsKeysList,daysTasks)
-schedule.generate_dynamic_time_slot_qeues_for_day(dayTimeSlotsStandardizedStN,dayTimeSlotsStandardizedNtS,dayTimeSlotsKeysList,daysTasks)
-for slots in dayTimeSlotsKeysList:
-    print("test main for loop | slot: ", slots)
-    schedule.dynamicTimeSlotQueuesDict[slots].populate_queue()
-    schedule.dynamicTimeSlotQueuesDict[slots].assign_tasks()
+schedule.generate_schedule()
 schedule.describe_dynamic_time_slot_qeues()
-#quick describe assignments:
-
-
-#print("TEST| daysTasks", daysTasks)
-#print("TEST| timePeriodNumericKeys",timePeriodNumericKeys)
-#will just filter the list down to the task that meet criteria and the order that they are in for each timePeriod, then will scheudle 
-
-
-
-
-#make seperte class method bc once create queu then just deleting as you go an invoking this assigmnet on each one
-
-
-    
-    #print results to table
-#TEMP SCHEDULE THING TO HOlD WHAT GOES ON AND WHEN
 
 end_mainAlgo_time = time.time()
 elapsed_mainAlgo_time = end_mainAlgo_time - start_mainAlgo_time
 print("Elapsed time for main algorithim:", elapsed_mainAlgo_time, "Seconds")
 
+#endregion
 
-
-
-#TODO make a list of all task (var names)
-    
-#print("Task var names list", defaultTasksVarNamesList)
-
+#region -------------------------------- Schedule Output
 # ------------------ output stuff
 class OutputSchedule():
     
-    #FIGURE OUT LATER
+    #TODO FIGURE OUT LATER
     
     output_settings_var = {}
     excel_formatting_settings = {}
-    from openpyxl.styles import PatternFill, Font, Alignment
-    #axis_labels_color_and_fill 
-    white_font = Font(color='FFFFFF')
-    large_white_font = Font(color='FFFFFF', size = 40)
-    dark_grey_fill = PatternFill(start_color='404040',
-                             end_color='404040',
-                             fill_type='solid')
-    center_aligned_text = Alignment(horizontal='center', vertical='center')
-    
+
     def update_settings(self, new_settings):
         # Modifying the class variable
         OutputSchedule.output_settings_var = new_settings
         # Or equivalently, but less commonly used
         # self.__class__.output_settings_var = new_setting
-
-    #how to do class vars again?
+        
     def __init__(self, day_time_slots_list, employee_list, employee_instances) -> None: #employee_list may be unessecarybut want to make sure in order same time, everytime.
         self.day_time_slots_list = day_time_slots_list
         self.length_time_slots = len(self.day_time_slots_list)
         self.employee_list = employee_list
         self.length_employee_list = len(employee_list)
         self.employee_instance = employee_instances
-        #self.employees_dict = 
-        pass
     
     def csv():
         pass
     
-    def excel(self, dayName): #via openpyxl
-        #https://openpyxl.readthedocs.io/en/stable/usage.html
-        from openpyxl import Workbook
-        from openpyxl.worksheet.properties import WorksheetProperties, PageSetupProperties
-        from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
-        from openpyxl import worksheet
-        excel_workbook = Workbook()
-        formatted_date_Month_Day = datetime.datetime.now().strftime("%b %d, %A, %m:%s")
-        file_title = f"OUPUT xslx TEST - SWAT Schedule for {formatted_date_Month_Day}" #maybe then week and day?
-        worksheet1 = excel_workbook.active #get default worksheet
-        alt_date_format = datetime.datetime.now().strftime("%d, %A")
-        worksheet1.title = f"SWAT Schedule {alt_date_format}" #BROKEN - vars in title not working
-        #IDK how to get properties to work??
-        worksheet1.page_setup = PageSetupProperties(fitToPage=True, autoPageBreaks=False)
+        assigned = {"7:00am": "KSWAT1", "7:45am": "KSWAT1", "9:15am": "KSWAT1", "9:50am": "KSWAT1", "10:00am": "HALFSTAFF", "11:00am": None, "11:45am": "Something", '1:45pm': 'Something'}
+        task_durs = {"KSWAT1": 4, "HALFSTAFF": 1, "Something": 2}
+        employee_list = ["Huey", "Granddad", "Wuncler"]
 
+    def excel(self):
+        import xlsxwriter
+        
+        #TODO MEDIUM - PRIORITY !! make system which able to input week, or starting week and will put what week it is, also let it choose between week or formal date         
+        #TODO HARD - FOR FUTURE make formate setting system # FOURTH PRIORITY, for now just code into csv value - could do a bunch of pre made styles and have choose from them - hmm, but include a system that allows to make new styles easily
+        #TODO MEDIUM HARD - figure out how to do up down stuff and diff style things SECOND PRIORITY
+        #TODO make a standard font size and style for all tasks, make auto size and fit #THIRD PRIORITY
+        #TODO make times_slot cubes a lil bigger, find out hwo sheets print and let that determine
+        #TODO make quote autosize and fit
+        #TODO make standard color fill for the borders and stuff
+        #TODO MEDIUM - HARD (2-3horus) figure out prinitng paramteres and let it adjust box size based on that FIRST PRORITY
+        #TODO make quote of the day prompt before all of this, and be able to turn on or off etc - make larger part of settings
+        
+        #NOTE REMEMBER to print it has to be assigned to each period and have the proper duration, will help with #Debuging
+       
+        #formatted_date_Month_Day = str(datetime.datetime.now(timezone.utc).astimezone().strftime("%b %d, %A, %m:%s")) #TODO LEARNING CONCEPT memorize reg-ex and the date-time exspressions
+        formatted_date_month_day_weekday = datetime.datetime.now(timezone.utc).astimezone().strftime("%b %d, %A") #WHY - Str(), because the xlsxwriter cannot take anyhting but a string or float, so cant assign to a cell. So make sure it is a str.
+        file_title = f"SWAT Schedule {formatted_date_month_day_weekday}.xlsx" #%b - abrv month, %d -num date in month, %a - weekday abr name (depedns on region)
+        title = 'SCHEDULE'
+        quote_of_day = "Quote of the day"
+        
+        # Create a workbook and add a worksheet.
+        workbook = xlsxwriter.Workbook(file_title)
+        worksheet = workbook.add_worksheet(f"SWAT Schedule {formatted_date_month_day_weekday}")
+        
+        # Define formats
+        schedule_axis_fill_color ='#404040'
+        schedule_axis_label_color ='#FFFFFF'
+        tasks_and_employee_cell_height = ''
+        #task_default_font_color ='#333333'
+        
+        date_label_format = workbook.add_format({ #CASE text is set to capital by .upper() at the write function
+            'bold': True, 
+            'align': 'left',
+            'valign': 'vcenter',
+            #'fg_color': '#FFD3D3D3',
+            'font_size': 10,
+            'border': 1
+        })
+        #colors are specified using a Html style #RRGGBB value.
+        title_format = workbook.add_format({ #TODO UPDATE
+            'bold': True, 
+            'align': 'center',
+            'valign': 'vcenter',
+            'font_color': schedule_axis_label_color,
+            'fg_color': schedule_axis_fill_color,
+            'font_size': 30,
+            #'border': 1
+        })
+        time_slot_format = workbook.add_format({
+            'bold': True, 
+            'align': 'center',
+            'valign': 'vcenter',
+            'fg_color': '#D3D3D3',
+            'font_size': 12,
+            'border': 1
+        })
+        employee_format = workbook.add_format({
+            'align': 'center',
+            'valign': 'vcenter',
+            'fg_color': schedule_axis_fill_color,
+            'font_color': schedule_axis_label_color
+            #TODO make it shrink the text to auto fit
+        })
+        corner_gap_fill_format = workbook.add_format({
+            'fg_color': schedule_axis_fill_color
+        })
+        quote_format = workbook.add_format({ #TODO UPDATE??
+            'align': 'center',
+            'valign': 'vcenter',
+            'fg_color': schedule_axis_fill_color,  # Background color
+            'font_color': schedule_axis_label_color,  # Font color
+            'font_size': 30,
+            'bold': True,
+            #'border': 1
+        })
+        KSWAT_format = workbook.add_format({
+            'align': 'center',
+            'valign': 'vcenter',
+            'fg_color': '#FFB6C1',
+            'font_color': '#333333',
+            'border': 1
+        })
 
-        from openpyxl.styles import Border, Side
-        thin_border = Border(left=Side(style='thin'),
-                     right=Side(style='thin'),
-                     top=Side(style='thin'),
-                     bottom=Side(style='thin'))
+        #Write Date Label - Always in the top left corner
+        worksheet.write(0, 0, formatted_date_month_day_weekday.upper(), date_label_format)
         
-        #Row and Column Labels
-        #Time Labels
-        column_index = 2
-        for i, time_slot in enumerate(self.day_time_slots_list): #would enumerate be faster??
-            # +1 offset from employee table
-            time_label = worksheet1.cell(row=3, column=column_index, value=time_slot) #2 bc whitspce/date and title go first, 2nd column bc need to be past employee labels
-            time_label.fill = PatternFill(start_color='FFD3D3D3',
-                             end_color='FFD3D3D3',
-                             fill_type='solid')
-            time_label.alignment = Alignment(horizontal='center', vertical='center')
-            time_label.font = Font(color='000000', bold=True)
-            time_label.border = thin_border
-            column_index +=1
-            
-        #Employee Labels
-        row_index = 4 #WHY +3 White space, title, time labels go first
-        for employee in self.employee_list:
-            emp_cell = worksheet1.cell(row=row_index, column=1, value=employee)
-            emp_cell.fill = PatternFill(start_color='404040',
-                             end_color='404040',
-                             fill_type='solid')
-            emp_cell.alignment = Alignment(horizontal='center', vertical='center')
-            emp_cell.font = Font(color='FFFFFF')
-            row_index += 1
-        
-        #Fill in data
-        #Does it by employee / going across
-        row_start = 4
-        for employee in employee_manager.employees:
-            column_start = 2
-            for time_slot, task in employee_manager.employees[employee].assigned_to.items():
-                if task is None: #TODO future settings here??? #LEARNING CONCETP - Also "is" is the most accurate check to use for none. EXPAND ON WHY
-                    task = ""
-                #EASY TO IMPLEMENT UNAVAILBILITY HERE, IDK IF MOST EFFICENT THO. CHECK IF UNAVAILABLE AT TIMESLOT, MAYBE MAKE AN ATTR WITH UNAVAILABILITES
-                data_cell = worksheet1.cell(row=row_start, column=column_start, value=task) 
-                data_cell.border = thin_border
-                #TODO INSERT CONDITIONAL FORMATTING HERE
-                column_start +=1
-                 # +1 offset from employee labels
-            row_start += 1
-        #TODO HARD need to make sure boundary boxes r a thing? Need to make sure boxes are wide enought for msot words (while staying within A4 paper bounf (hard part))
-        
-        
-        #TODO maybe make vars, or settings system so can easily shift stuff around?? IDK
-        
-        #Date
-        worksheet1.insert_rows(1) #whitespace / day label area
-        date_label = worksheet1.cell(row=1, column=1, value=formatted_date_Month_Day)
-        
-        #Title
-        #worksheet1.insert_rows(2) #Titlebar
-        worksheet1.merge_cells(start_row=2, start_column=2, end_row=3, end_column=self.length_time_slots+1)
-        title_label = worksheet1.cell(row = 2, column=2, value= 'SWAT SCHEDULE') #WHY+3, one for dte.whitespace, one for titel, one for time labels
-        title_label.alignment = Alignment(horizontal='center', vertical='center')
-        title_label.fill = PatternFill(start_color='404040',
-                             end_color='404040',
-                             fill_type='solid')
-        title_label.font = Font(color='FFFFFF', size = '30')
-        
-        #Quote
-        #SOLUTION? merge all cells in row and then put stuff in the center???????????
-        #worksheet1.insert_rows(self.length_employee_list+3) #Quote bar
-        quote_of_day = "Quote of the day" #LEARNING CONCEPT how does lenght do with strings?? - ANSWER retruns number of characters, also learn paramaters and document. also get definitive on how list() works, esp with single values
-        #WORKS ONCE REMOVED, think have to assign it on creation worksheet1.cell(row=self.length_employee_list+5, column=2, value = quote_of_day) #TODO need to have it ask for a wuote, make optional in the settings. Dunno how to auto adjust for lenght
-        worksheet1.merge_cells(start_row=self.length_employee_list+5, start_column=1, end_row=self.length_employee_list+5, end_column=self.length_time_slots+1) #NEEDED?
-        quote_label = worksheet1.cell(row = self.length_employee_list+5, column = 1, value = 'Schedule Quote')
-        quote_label.alignment = Alignment(horizontal='center', vertical='center')
-        quote_label.fill = PatternFill(start_color='404040',
-                             end_color='404040',
-                             fill_type='solid')
-        quote_label.font = Font(color='FFFFFF', size = '30') #IDK if .font is right
-        #((len(self.day_time_slots_list)+1)/2)-len(quote_of_day),  #WHY - should lead to title being relativley centered halfway between the timeslots (plus 1 for the names column), then minus half the title so that the title is splitting the center of the page. NO DUMB BC IF ITTLE REALLY LONG CHARACTER COULD BE LONGER THAN AMOUNT OF TIMESLOTS NEEDS A DIFF WAY.
-        
-        #Fill in left corner gap with solid grey
-        corner_to_fill0 = worksheet1['A2']
-        corner_to_fill1 = worksheet1['A3']
-        corner_to_fill2 = worksheet1['A4']
-        solid_grey_fill = PatternFill(start_color='404040',
-                             end_color='404040',
-                             fill_type='solid')
-        corner_to_fill0.fill = solid_grey_fill
-        corner_to_fill1.fill = solid_grey_fill
-        corner_to_fill2.fill = solid_grey_fill
-        #Alt? worksheet1['A3'].fill = solid_grey_fill
-        
-        #Print settings
-        worksheet1.page_setup.orientation = worksheet1.ORIENTATION_LANDSCAPE
-        worksheet1.page_setup.paperSize = worksheet1.PAPERSIZE_A5
-        
-        #Save
-        #file_title += .xlsx #LEARNING CONEPT - hmm how does string concatenating work????
-        excel_workbook.save(file_title + '.xlsx')
-        
-        
-        def print_to_console():
-            pass
-        #TODO if repeating then format as one function. - if current & next in queue, for as many in qeue unbroken back to back same assignment, write out on excel as one block
+        # Column and Row indexes ----------------
+        #NOTE - REMEMBER: Excel Rows/Columns are Zero based
+        column_index = 1 #first column beyond the employee label column, aka the first column to put stuff into
+        row_index = 4 #first row beyond the time slots label
+
+        #Fill in corner gap between employees and title & time
+        worksheet.write(1, 0, None, corner_gap_fill_format,)
+        worksheet.write(2, 0, None, corner_gap_fill_format,)
+        worksheet.write(3, 0, None, corner_gap_fill_format,)
     
+        # Write time headers
+        time_slot_column_index = column_index
+        for time_slot in self.day_time_slots_list:
+            worksheet.write(row_index-1, time_slot_column_index, time_slot, time_slot_format)
+            worksheet.set_column(time_slot_column_index-1, 70) #NOTE #TODO adjs height, find way to make consistent for all cells, read docs
+            time_slot_column_index += 1
+        
+        # Write employee names
+        emp_row_index = row_index
+        for employee in self.employee_list:
+            worksheet.write(emp_row_index, 0, employee, employee_format)
+            emp_row_index += 1
+        
+        # Fill in the data
+        row = row_index
+        for employee in self.employee_list:
+            column = 1
+            multi_period_task_name_counter = 0
+            for time_slot, task in employee_manager.employees[employee].assigned_to.items(): #NOTE if error check here, lol that rhymes. maybe give these props to output class, make simpler??[] 
+                if task:
+                    duration = int(task_manager.tasks[task].duration) #why int = attr is assigned from csv sheet so need to convert it from string to int. #LEARNING use get get attr?? learn more. need to update my learning google doc. 
+                    #TODO error gaurding - WHAT if task doesn't have a duration, how should i guard against this error, what would ouput look like?
+                    
+                    # If task spans multiple columns
+                    if duration > 1:
+                        multi_period_task_name_counter += 1
+                        if multi_period_task_name_counter == duration:
+                            start_col = column - (duration-1) #minus one bc duration count is inclusive, we have to account for timeslot we are in as part of it
+                            worksheet.merge_range(row, start_col, row, column, task, KSWAT_format)
+                            multi_period_task_name_counter = 0
+                        column += 1
+                    else:
+                        worksheet.write(row, column, task)
+                        column += 1
+                else:
+                    worksheet.write(row, column, task)
+                    column += 1  # Skip if no task
+            row += 1
+        
+        #Write Title    #merge_range(first_row, first_col, last_row, last_col, data[, cell_format])
+        worksheet.merge_range(row_index-3, column_index,row_index-2,self.length_time_slots, title)
+        worksheet.write(row_index-3, column_index, title, title_format)
+        
+        #Write Quote
+        # Calculate the row to insert the quote based on the number of employees
+        quote_row = self.length_employee_list + row_index # WHY +row_index, row_index = the amount of gaps / rows between the first employee and top of the page. #Accounts for the rows that the date label, title, and timeslots take up so that the quote can be correctly positioned at the bottom of the page
+        worksheet.merge_range(quote_row, 0, quote_row, self.length_time_slots, quote_of_day)
+        # Apply the format to the merged cells with the quote
+        worksheet.write(quote_row, 0, quote_of_day, quote_format)
+        workbook.close()
+            
     def console():
         pass
     
 output_schedule = OutputSchedule(dayTimeSlotsKeysList,employeeNamesList,employee_manager.employees)
-
-output_schedule.excel(dayName)
-
-        
-    
-
+output_schedule.excel()
+#endregion
 
 end_program_time = time.time()
 elapsed_time = (end_program_time - start_program_time)/60
 print("Elapsed time:", elapsed_time, "minutes")
-
-#endregion
-
 
 #GUI - API - SERVER STUFF
 '''
@@ -2153,7 +2163,6 @@ GET = retreive
 PUT or PATCH to update existing data
 DELETE to remove data"""
 '''
-
 
 myDict = {}
 x = len(myDict)
