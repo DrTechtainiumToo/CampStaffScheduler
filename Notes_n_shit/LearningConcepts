@@ -28,7 +28,7 @@
 #LEARNING CONCEPT: strip(), Return a copy of the string with leading and trailing whitespace removed.
 #LEARNING - If broken check to make sure dont have something twice, like an input or variable if it is broken via search / find like Issac did
 #WHEN DEBUGGING remeber that everyhting is imported from csv so might need to use int()
-
+#LEARNING CONCEPT - HOW TO MAKE PYHTON WAIT BEFORE EXECUTING SOMETHING, import time, then time.sleep(x)
 
 #LEARNING CONCEPT & CODE snippet efficency
 #easier way to return t/f values in a function

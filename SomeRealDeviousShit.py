@@ -164,7 +164,6 @@ def printIntroSequence():
     print("\n\n         ---> [[[Hit enter to start the program!]]] <---")
     print("\nDedication:\nThis program is dedicated to my SWAT Coordinator: Slips (Abby Lucksinger),\nand all the SWATTIES of the summer of 2023 who I am glad to call my friends\n\nDeveloped by Yacht (Andrew Dybala)\nS.W.A.T. Session 1 and Session 2, Summer of 2023.\nBLHS & University of Colorado Boulder")
     print("\n-----------------------------------------------------------------------------------------------")
-    #input() #DELAYS PROGRAM SO CAN SEE START SCREEN
     #time.sleep(0.5) #alt way to wait
 printIntroSequence()
 #endregion
@@ -272,7 +271,6 @@ def xyz_input_auto_completer(promptstring, refList): #TODO this might mess up mu
     xCompleter = WordCompleter(refList,ignore_case=True) #WHY ignore_care=True, allowing case-insensitive input bc some ref list entries may be capitalized, but dont want to make user have to capitalize input to get auto suggestion    
     user_input = prompt(promptstring, completer=xCompleter)
     return user_input
-    #print('You entered:', user_input)
 #endregion  
 
 #region -------------------- Internal Mechanisms and Data Structures [Data Collection, Preparation and Formatting] (Plus some gobal functions)
@@ -286,10 +284,9 @@ def intialCSVToDataStructures():
         # Create a csv.reader object
         csvreader = csv.DictReader(csvfile, dialect='excel')
         for row in csvreader:
-            # Use the names in the '\ufeffEmployee' column as values
+            # Use the names in the 'Employee' column as values
             name = row['Employee'] #TODO LEARNING CONCEPT - SOLVED (looked at another csv without \ufeff) Its because I needed to give a encoding parameter to the open() func. why is \ufeff a thing.
             employeeNamesList.append(name) #add names to list
-    #testOutput("TEST | employeeNamesList:", employeeNamesList) #\ufeff
 
     #take gender and put into lsit
     employeeGenderList = []
@@ -379,7 +376,7 @@ def user_enter_date():
     time.sleep(10)
     print("\nJK! I'm just making you wait!\n")
     time.sleep(1) 
-    print("") #LEARNING CONCEPT - HOW TO MAKE PYHTON WAIT BEFORE EXECUTING SOMETHING, import time, then time.sleep(x)
+    print("")
     print(dumbAndrewMemes1)
     print("\n\nPROGRAM TERMINATING, its all your fault.")
     exit()
@@ -520,11 +517,8 @@ def modify_schedule_times(day_time_slots):
                             break
                     
                     datesTimeSlots = insert_time_slot_at_position(day_time_slots[0],NewTime,RefTime,Position)
-                    #print("1.1 pre updated slots", datesTimeSlots)
                     datesTimeSlots = [datesTimeSlots] #turn it back into orignal format as a dict within a one item list
-                    #print("1.2 pre updated slots", datesTimeSlots)
-                    #print("\n\n1.3 UPDATED SLOmTS: ", list(datesTimeSlots[0].keys()),"\n\n")
-                    
+
                     print("\nUpdated times:\n", list(datesTimeSlots[0].keys()))
                     
                 elif userCommand ==  'remove': #if not 'add' then must be 'remove'
@@ -614,7 +608,6 @@ class EmployeeManager:
             employee_name (string): _description_
             unavailable_time_slots (list): List of unavailable timeslots 
         """
-        #employee = self.find_employee_by_name(employee_name) #finds employee instance, but honestly no need to iterate thru can just give name to find.
         employee = self.employees[employee_name]
         if employee:
             employee.set_unavailability(unavailable_time_slots) #Employee??????? 
@@ -708,14 +701,8 @@ class AvailabilityManager:  #IDK, pointless for now until I make frontend???. Fu
                             print("COMPILER: Not compiled yet")
                         print("COMPILER: Sucessfully excuted compile checker thingy")
 
-                    
-                    #nonlocal time_list_minutes
-                    #nonlocal time_list_minutes_compiled
-                    
                     @timer
                     def time_to_minutes(time_str): #for intial conversion into min for comparison
-                        #nonlocal time_list_minutes
-                        #nonlocal time_list_minutes_compiled
                         
                         print("TEST | indv time string:", time_str)
                         """Convert a hh:mm AM/PM time string to minutes since midnight."""
@@ -751,9 +738,6 @@ class AvailabilityManager:  #IDK, pointless for now until I make frontend???. Fu
                         # If no format matched, handle the failure:
                         if not successful_parse:
                             print(f"\n\n{Fore.RED}{Style.BRIGHT}Your time input:'{time_str}', does not match any known format.{Style.RESET_ALL}\n\n")
-                        
-                        #print("TEST time. val : ", time_val)
-                        #print("TEST time_to_minutes final result: ", time_val.hour * 60 + time_val.minute)
                         return time_val.hour * 60 + time_val.minute
                     
                     @timer
@@ -763,10 +747,8 @@ class AvailabilityManager:  #IDK, pointless for now until I make frontend???. Fu
                         hours, minutes = divmod(minutes, 60)
                         time_val = datetime.datetime(year=1, month=1, day=1, hour=hours, minute=minutes)
                         # Note the use of %I for hour, %M for minutes, and %p for AM/PM
-                        #print("TEST | minutes_to_time final [time_val]: ", time_val.strftime("%I:%M %p").lower())
                         return time_val.strftime("%-I:%M%-p").lower() # WHY Format the time without leading zeros, spaces between time and am/pm, and lowercase am/pm, bc in master ref list its "9:25am" not "09:25 AM" and the time will later be checked against it at some point, plus good to keep uniformity.
 
-                
                     # Converts both the input time and the master ref list of times to minutes since midnight
                     input_time_minutes = time_to_minutes(input_time_str)
                     compile_time_list_minutes()
@@ -781,10 +763,7 @@ class AvailabilityManager:  #IDK, pointless for now until I make frontend???. Fu
                     else:
                         time_list_minutes
                     """
-                    
-                    #print("TEST | input_time_minutes: ",input_time_minutes)
-                    #print("TEST | time_list_minutes: ",time_list_minutes)
-                    
+
                     # Binary search for the next time greater than or equal to the input time
                     left, right = 0, len(time_list_minutes) - 1
                     while left <= right:
@@ -827,11 +806,9 @@ class AvailabilityManager:  #IDK, pointless for now until I make frontend???. Fu
                     if not timePair[0] in dayTimeSlots[0]: #Time1
                         problematic_time_input_warning(timePair[0],dayTimeSlotsKeysList)
                         timePair[0] = find_valid_time_slot(timePair[0],times_list)
-                        #print("TEST | find_valid_time_slot(timePair[0],times_list) -> timePair[0]", timePair[0])
                     if not timePair[1] in dayTimeSlots[0]: #Time2 
                         problematic_time_input_warning(timePair[1],dayTimeSlotsKeysList)
                         timePair[1] = find_valid_time_slot(timePair[1],times_list)
-                        #print("TEST | find_valid_time_slot(timePair[1],times_list) -> timePair[1]", timePair[1])
 
                     #now have valid timeslot refs, I can find all the values betwen the two and can mark all the times inbetween unavailable for the employee
                     inbetween_slots_list_inclusive = fill_time_slots_inbetween_A_and_B(timePair[0],timePair[1])
@@ -842,24 +819,22 @@ class AvailabilityManager:  #IDK, pointless for now until I make frontend???. Fu
                 #TODO make clearer??? also expand on this later to include if they put "and" in etc
                 SecondListExpandedValues = [] #BEWARE this is to prevent runaway loops, bc im paranoid that ill wind up with a loop if it goes through and keeps expanding as it append in a for loop
                 if "," in input_str: #so can input stuff as 6am, 7pm, 4:45am then split into indvs in list
-                    #print("TEST TIRGGERED MAIN IF")
                     split_times_list = input_str.split(",") #string.split(separator, maxsplit) default = -1 is as many as occur
-                    #print("TEST post "," split - og input_str list ", split_times_list)
+                    
                     for item in split_times_list:
                         item.strip().lower() #Remove trailing whitespace
+                        
                         if "-" in item:
                             SecondListExpandedValues.extend(time_range_handler(item))
-                            #print("TEST TIRGGERED main if, for, if")
+                        
                         else: #Incase value isnt "-" but ","
                             if not item in dayTimeSlots[0]: #incase not a valid time.
                                 SecondListExpandedValues.append(find_valid_time_slot(item,times_list))
                                 problematic_time_input_warning(item,dayTimeSlotsKeysList)
-                                #print("TEST TIRGGERED main if, for, if,else->if ")
                             else: 
                                 SecondListExpandedValues.append(item)
-                                #print("TEST TIRGGERED main if, for, if,else,if-> else")
                         #put "-" in here so can make multiple multi values if put in list form
-                    #IDK see if needs this:
+
                 else: #WHY - bc maybe user input 7-8am, 10-11am. if put "-" then would trigger, but wouldnt realize is part of larger list
                     print("TEST TIRGGERED BASE ELSE")
                     if "-" in input_str:
@@ -868,9 +843,8 @@ class AvailabilityManager:  #IDK, pointless for now until I make frontend???. Fu
                 return SecondListExpandedValues
                 #WHY should return a list, then at the place called i can decide how it will be joined / added to other vars based on circumstance.
                 
-                #make handle inputs such as 7am-9:15am, 7-9:15am, give an error if 7am-AnyNumberWithout AM/PM, raise and exception if impossible calc such as TimeB starts before A, make cycle if invalid time. Make a exit emergency statement to exit the loop?????
-                
                 """
+                #make handle inputs such as 7am-9:15am, 7-9:15am, give an error if 7am-AnyNumberWithout AM/PM, raise and exception if impossible calc such as TimeB starts before A, make cycle if invalid time. Make a exit emergency statement to exit the loop?????
                 #TODO do that calcs gap or goes to nearest one, then calcs difference and inputs it.
                 #iterates up and down until it reaches closest value. well checks if has :, and not 00, or
                 # maybe then iterates thru and finds the cloest one. Could at :00 to 8am then iterate until match see which takes list iteraiton. then find lengths idk
@@ -1078,13 +1052,11 @@ class TaskManager:
         "importance": "The importance level of the task, which might affect scheduling priority.",
         "task_cost": "Calculated based on various factors such as frequency and duration. Represents the 'cost' or effort of the task, is mainly for the algorithim to figure out how to priortize things and see if a solution is possible",
         "preassigned_to": "The person or group preassigned to the task. Optional, may be decided during task scheduling.",
-        "reccomended": "Indicates if the task is recommended based on certain criteria. Can be True/False.",
         "chosen": "Indicates if the task has been chosen to be performed. Can be True/False.",
         "task_tier": "The tier or level of the task, which might categorize its priority or type.",
         "gender_specific": "Indicates if the task is gender-specific, requiring a specific gender to perform.",
         "gender_required": "Specifies the gender required for gender-specific tasks.",
         "preassigned": "Indicates if the task is pre-assigned to someone specific.",
-        "overlap_problem_task_cost_offsetter": "Used to offset the cost of tasks that overlap, ensuring efficient scheduling.",
         "pref_time": "The preferred time for the task to start. This is considered during scheduling to optimize task assignments.",
         "time_preferred": "Alternative or additional preferred start times for the task.",
         "not_before_time": "The earliest time the task should start.",
@@ -1101,7 +1073,7 @@ class TaskManager:
             info = cls.task_attribute_guide.get(topic, "Help topic not found.")
             print(f"\n{topic}:\n {info}\n")
         
-        def __init__(self, task_name, task_frequency, start_time, duration, min_num_people_needed, importance, task_cost, preassigned_to=None, reccomended=None, chosen=None, task_tier=None, gender_specific=None, gender_required=None, preassigned=None, overlap_problem_task_cost_offsetter=None, pref_time=None, time_preferred=None, not_before_time=None, not_after_time=None, start_time2=None, start_time3=None, start_time4=None, start_time5=None, start_time6=None, scheduledoccurance=None, occurs_every_n_days=None, spawn_sunday=None, spawn_monday=None, spawn_tuesday=None, spawn_wensday=None, spawn_thursday=None, spawn_friday=None, spawn_saturday=None, task_variable_name=None, certs_required=None, requires_certs=None):
+        def __init__(self, task_name, task_frequency, start_time, duration, min_num_people_needed, importance, task_cost, preassigned_to=None, chosen=None, task_tier=None, gender_specific=None, gender_required=None, preassigned=None, pref_time=None, time_preferred=None, not_before_time=None, not_after_time=None, start_time2=None, start_time3=None, start_time4=None, start_time5=None, start_time6=None, scheduledoccurance=None, occurs_every_n_days=None, spawn_sunday=None, spawn_monday=None, spawn_tuesday=None, spawn_wensday=None, spawn_thursday=None, spawn_friday=None, spawn_saturday=None, task_variable_name=None, certs_required=None, requires_certs=None):
             
             #-2
             #WUT?????
@@ -1137,7 +1109,6 @@ class TaskManager:
             self.start_time5 = start_time5
             self.start_time6 = start_time6
             self.start_time = [time for time in [start_time, start_time2, start_time3, start_time4, start_time5, start_time6] if time.strip()] #Thanks GPT4            
-            #DONE find way to get rid of unsed timeslot whitespace
             self.scheduledoccurance = scheduledoccurance
             self.occurs_every_n_days = occurs_every_n_days
             self.spawn_sunday = spawn_sunday
@@ -1148,9 +1119,7 @@ class TaskManager:
             self.spawn_friday = spawn_friday
             self.spawn_saturday = spawn_saturday
             self.chosen = chosen
-            self.reccomended = reccomended
             self.task_cost = "To be caculated at assignment time in algorith with calc_task_cost()"
-            self.overlap_problem_task_cost_offsetter = overlap_problem_task_cost_offsetter
             self.preassigned_to = preassigned_to #TODO MAYBE REMOVE that way can look up task to see who is assigned to it and when (when part might be more complicated)
             self.assigned_to = {key: [] for key in dayTimeSlotsKeysList} #Time, and who assigned to ( in list)#when, who #TODO GENERATE APON SCHEDULING
             self.task_variable_name = task_variable_name
@@ -1181,7 +1150,6 @@ class TaskManager:
             print(f"Importance: {self.importance}")
             print(f"Task Cost: {self.task_cost}")
             print(f"Assigned To: {self.preassigned_to if self.preassigned_to else 'Not Assigned'}")
-            print(f"Recommended: {self.reccomended}")
             print(f"Chosen: {self.chosen}")
             print(f"Gender Specific: {self.gender_specific}")
             print(f"Gender Required: {self.gender_required}")
@@ -1265,9 +1233,9 @@ def defaultTasksListCSVToDictConverter(): #consider renaming this later
             #1.8 put every TaskVariableName in a list so the autoComplete can use in menus and stuff
             defaultTasksVarNamesList.append(row['TaskVariableName'])
             
+            #BUG IF MESSED UP CHECK THESE INPUTS, aslo make them keyword for crying out loud so dont have to deal with this shit
             #2, Second have auto cycle through and popualte all class attribtues with data from CSV) # Create a new Task instance and store it with the user-defined name as the key
             defaultTasksDictionary[row['TaskVariableName']] = TaskManager.Task(
-            #row['\ufeffTaskVariableName'], #TODO evaluate if need or find work around ERROR i think because dict cannot have any duplicate values
             row['TaskName'],
             row['Frequency'],
             row['StartTime'],
@@ -1276,13 +1244,12 @@ def defaultTasksListCSVToDictConverter(): #consider renaming this later
             None, #row['Importance'] idk if will acutally wind up using this
             None, #task cost, calc later during algo bc of strings and dynamic stuff
             None, #will not inlcuding preassigned_to mess it up?
-            row['Recommended'],
+            None,
             None, #row['WillSpawnTodayChosen'] selected by an algorithm
             tier,
             row['GenderSpecific'],
             row['GenderReq'],
             None, #ADD preassigned to csv file, for like checkin / checkout tasks 
-            row['OverlapProblemTaskCostOffsetter'],
             row['PrefTime'],
             row['TimePreferred'],
             row['NotBeforeTime'],
@@ -1303,23 +1270,64 @@ def defaultTasksListCSVToDictConverter(): #consider renaming this later
             row['SpawnSaturday'],
             row['TaskVariableName2'] #Made a 2nd column in the csv file and TaskVariableName2 bc i think since i made the key TaskVariableName, i cant use that column again when defining var names in the class because it would have duplicate names and values and duplicates aren't allowed in dicitonaries.
             )
-            #TODO this will probbably be a problem later
-            #duration = row['TaskDuration'].strip() 
-            #converted_duration = try_convert_to_int(duration)
-            #defaultTasksDictionary[task] = converted_duration
-    testOutput("TEST | new func csv task converter", defaultTasksDictionary)
-    #defaultTasksDictionary['DH'].describe_verbose()
-
-    #testOutput("TEST | converted duration type", type(converted_duration))
-    #testOutput("\n Task durations:\n",defaultTasksDictionary, "\n")
-    
+            #might encouter error with task var name bc is needed, could edit the task class with an if statement and see if that work
 defaultTasksListCSVToDictConverter()
+
 #endregion
 
 #region---------------------------- NightChore System #TODO MAKE THIS
+
 #TODO create nightchore list and data structures
+def night_chores_list_CSV_import_converter():
+    with open("CSV Data Folder/SWATNightChoresInfo.csv", newline='', encoding='utf-8-sig') as csvfile:
+        csvreader = csv.DictReader(csvfile, dialect='excel')
+        for row in csvreader:
+            
+            defaultTasksDictionary[row['TaskName']] = TaskManager.Task(
+            row['TaskName'],
+            row['Frequency'],
+            row['StartTime'],
+            row["TaskDuration"],
+            row['MinNumPeopleNeeded'], #NOTE remember to watch for trailing or leading whitespaces in the csv, will mess stuff up. CHECK THIS IF ERROR
+            None, #row['Importance'] 
+            None, #task cost, 
+            None, #preassigned_to
+            None, #WillSpawnTodayChosen
+            None, #Tier
+            None, #GenderSpecific
+            row['GenderReq'],
+            None, #preassigned
+            None,
+            None, #PrefTime
+            None, #TimePreferred
+            None, #NotBeforeTime
+            None, #NotAfterTime
+            row['StartTime2'],
+            row['StartTime3'],
+            row['StartTime4'],
+            row['StartTime5'],
+            row['StartTime6'],
+            None, #ScheduledOccurance
+            None, #OccursEveryNDays
+            row['SpawnSunday'],
+            row['SpawnMonday'],
+            row['SpawnTuesday'],
+            row['SpawnWensday'],
+            row['SpawnThursday'],
+            row['SpawnFriday'],
+            row['SpawnSaturday'],
+            None #TaskVariableName2
+            ) 
+night_chores_list_CSV_import_converter()
+
 nightChores = []
-#make seperate csv file for it? That way wont have to do nightchore? if so yes, idk may be better on algo. for now can just put on the main list IG.
+
+#TODO #should Nightchores be own dict? how would that work????????, review how assignment work. maybe need mater dict idk, then before algo merge all together after sort??????? idk idk idk 
+#TODO look at algorithm need to figure out if A: What happens if don't fill the Freq column? does it default to 1? What about the duration, should i look at this for class and algo?, what about gender req and min_num_of_people. Think about errors and exceptions
+#TODO BIGGER PICTURE should night chroe be defined by tie or by after sweeting, etc. How should i define stuff like this??
+#This question is part of the problem of getting tasks to spawn inbetween stuff.
+
+
 #endregion
 
 #region--------------------------- Special Task System #TODO MAKE THIS
@@ -1343,7 +1351,6 @@ else:
     daySpecialTasks = 0 #WHY I PROGRAMMED IT LIKE THIS: all these key = 0, is so that when counting the len of dict it doesnt return error if dateValue represents / is a normal day, and thus it knows there are no special tasks. For use comparing total time avail to total tasks needed to be done.
 
     #TODO later when making master task list see what I should have this as, none or something else
-#testOutput("TEST | value daySpecialTasks", daySpecialTasks)
 
 testOutput("TEST | daySpecialTasks type check", daySpecialTasks)
 if dateValue == 7 or dateValue == 6: #BIG LEARNING CONCEPT: if dateValue == 7 or 6: This condition does not check if dateValue is either 7 or 6. Instead, it checks if dateValue is 7, or if 6 is true. Since non-zero integers are considered truthy in Python, 6 is always true, making the condition always evaluate to true.
@@ -1357,42 +1364,27 @@ task_manager = TaskManager(defaultTasksDictionary) #add specialTasksDict later
 #Generate total tasks & special tasks depending on dateValue (date)
 #TODO be able to assign addtional tasks to certain people
 #TODO be able to say when task is and use multi-duration
-#TODO give current tasks loaded for day and let choose from default, so they can see if they need to add more.
-#TODO make reccommended algo???????? --------------
 #TODO make a way to insert like a list of things you need done for the day more eaisly like a row in a csv or spreadsheet - could maybe come from default tasks, just be like any default taks yo uwant done, and ask if so when(or if predetermined time is acceptable, for special ones))
-#daysTasks = additionalTasks + needToDoTasks(could maybe come from default tasks, just be like any default taks yo uwant done, and ask if so when(or if predetermined time is acceptable, for special ones)) + specialTasks + NightChore
 
 #------------------- Tasks Editor and Selector (Special and Default)
 
 selected_default_basic_tasks_dict = {}
-selected_default_basic_tasks__var_names_list = []
-
+selected_default_basic_tasks__var_names_list = [] #TODO WHY NEED THIS?
 
 #-------------Auto-Recommended tasks algorithm
 #merge the special, default, and night chore tasks together into once list. Then calcualte and make list that is auto then diplay the auto reccomended
 @timer
-def default_selected_tasks_recommendation_algorithm(defaultTasksDictionary,dayName,selected_default_basic_tasks__var_names_list,selected_default_basic_tasks_dict):
-    #first get the day,  then actual day/time for repeating tasks.
-    #TODO - far future - would be good if could pre compile which occcur on what day. That way could just load in, all this looping through cant be good for efficency
-    
+def default_selected_tasks_recommendation_algorithm(defaultTasksDictionary,dayName,selected_default_basic_tasks__var_names_list,selected_default_basic_tasks_dict):    
     attribute_name = 'spawn_'+dayName.lower() #WHY .lower to create name value? It refs dateValue num to corresponding dictionary values which are day names, and the day names are capitalized. However the obj attribute daynames are not, so we lowercase this name.
     for task_name, instance in defaultTasksDictionary.items(): 
         attr_value = getattr(instance,attribute_name)
-        #print("TEST| get attr value, type, length",attr_value,type(attr_value),len(attr_value)) #since attr are named by day, and only looking for todays attr. Can copy attr name style and just append todays Name to end and then get the data for it.
         if attr_value.capitalize().strip() == 'Yes': #WHY - .upper() bc comparison value is upper case, and its just incase someones puts a lowercase 'yes' on the csv they wont screw everyhting up. #TODO(later also look for "depends' for scheduled basis tasks such as water flowers)
             selected_default_basic_tasks__var_names_list.append(task_name)
-            #print("TEST| selected_default_basic_tasks__var_names_list IN IF",selected_default_basic_tasks__var_names_list)
             selected_default_basic_tasks_dict[task_name]=instance
-            #print("TEST| selected_default_basic_tasks_dict IN IF",selected_default_basic_tasks_dict)      
     #TODO SIMPLE, GOOD, IDEA!!! CHECK IF ERROR, in future update may later change from "yes" to True, will be faster too?
-     #- 2nd reminder, add in reoccuring scheduled tasks later (like ones that occur every x days ex: Water flowers)
-
+    #- 2nd reminder, add in reoccuring scheduled tasks later (like ones that occur every x days ex: Water flowers)
 default_selected_tasks_recommendation_algorithm(defaultTasksDictionary,dayName,selected_default_basic_tasks__var_names_list,selected_default_basic_tasks_dict)
-#print("TEST| selected_default_basic_tasks__var_names_list POST IF",selected_default_basic_tasks__var_names_list)
-#print("TEST| selected_default_basic_tasks_dict POST IF",selected_default_basic_tasks_dict)      
 
-#print("TEST default var names list", defaultTasksVarNamesList)
-#TODO copy all tasks that are reccomend or meet criteria into this list????
 
 def default_selcted_tasks_confirmation_and_editor(selected_default_basic_tasks_dict,selected_default_basic_tasks__var_names_list,defaultTasksVarNamesList,defaultTasksDictionary):
     print("\n----------------------------------------------------------------------------\n")
@@ -1484,18 +1476,15 @@ def default_selcted_tasks_confirmation_and_editor(selected_default_basic_tasks_d
                     continueEditing = True
                     #So since the user command at this point can only be 'back' we let the loop iterate back to the beginning.
     else:
-        print("Selected basic tasks confirmed.\n\n") 
-        
+        print("Selected basic tasks confirmed.\n\n")       
 default_selcted_tasks_confirmation_and_editor(selected_default_basic_tasks_dict,selected_default_basic_tasks__var_names_list,defaultTasksVarNamesList,defaultTasksDictionary)
 
-#print("TEST EDITOR OUTPUT: - selected_default_basic_tasks__var_names_list ", selected_default_basic_tasks__var_names_list)
-#print("TEST EDITOR OUTPUT - selected_default_basic_tasks_dict", selected_default_basic_tasks_dict,"\n")
 
-#TODO SERIOUS, MAKE  AHELP GUIDE / DICTIONARY DESCRIBING WHAT EACH OF THE ATRRIBUTES REPRESENT. SO THAT WAY USER CAN TYPE HELP AND IT WILL PULL UP THE DEFINITON.
-#TODO make transition and explain now filling in data for previously selected tasks that need user Input
 # ----------------------- Fill in any missing data for the tasks.
-#TODO now that selected, make user input data for certain attributes of tasks that ask for user input, that way have all the nessecay info. Maybe make a need user completion attribute????
+
+#TODO make transition and explain now filling in data for previously selected tasks that need user Input
 def check_for_user_input(obj,taskName):
+    
     for attr in dir(obj):
         # Ignore special attributes and methods
         if not attr.startswith('__') and not callable(getattr(obj, attr)):
@@ -1532,7 +1521,6 @@ def check_for_user_input(obj,taskName):
                                         break
                                 value[index] = userData
                                 print(f"TEST | Result for {attr}[{index}]: ", value[index])
-
 #NOTE from a UI perspective this part is terribly confusing but will leave it as is bc IDGAF. I dont want ohave to write 250 more lines of code that wont probbaly be used in the final GUI.
 for tasks, instance in selected_default_basic_tasks_dict.items():
     check_for_user_input(instance,tasks)
@@ -1542,11 +1530,10 @@ for tasks, instance in selected_default_basic_tasks_dict.items():
 def user_PromptXY_YesOrNo_If_So_PromptABC_Template(variable,stringprompt):
     pass 
 def user_Adds_Additonal_Tasks():
-    #UNDER CONSTRUCTION ------------------------------------------------------------------------
-    #REALLY GOOD IMPLEMENTATION OF LOOPS AND INs AND APPENDING DICTIONARIES HERE
     #Insert ability to make custom tasks...
-    #TODO ADD AFTER DEBUGGING | additionalTasksTF = input("\nAre there any additional tasks you want to add for the day? Y or N? ")
-    additionalTasksTF = "N" #TODO remove after debugging
+    
+    #TODO ADD FUNCTIONALITY IN AFTER DEV | additionalTasksTF = input("\nAre there any additional tasks you want to add for the day? Y or N? ")
+    additionalTasksTF = "N" #TODO remove after dev
     taskDictLocal = {}
     while additionalTasksTF in yesAnswers:
             print("(SYSTEM LIMITATION) PLEASE NOTE: The all instances of this task will have the same duration and min number of people required. If this is a problem create a seperate task for each instance where the min number of people or the duration changes.\nUnfortunately there is no solution for this yet.")
@@ -1695,11 +1682,8 @@ class Schedule:
     def generate_dynamic_time_slot_qeues_for_day(self,timeSlotsStandardizedDictStn,timeSlotsStandardizedDictNtS,dayTimeSlotsKeysList,daysTasks):
         #original generation of timeslots and assign to dict, #INITALIZATION OF VALUES
         for time_slot in dayTimeSlotsKeysList:
-            #print("TEST (for key) |", key)
             self.dynamicTimeSlotQueuesDict[time_slot] = Schedule.dynamicTimeSlotQueue(timeSlotsStandardizedDictStn,timeSlotsStandardizedDictNtS,dayTimeSlotsKeysList,time_slot)
-        #print("\n\nTEST| dynamicTimeSlotQueuesDict[item]",self.dynamicTimeSlotQueuesDict.items())    
-        #print("\n\nTEST| 2", self.dynamicTimeSlotQueuesDict["7:00am"])
-        #print("\nTEST| dayTimeSlotsStandardizedNtS: ", dayTimeSlotsStandardizedNtS)
+
     
     def describe_dynamic_time_slot_qeues(self):
         print("\nA list of dynamic time slot qeues and their associated tasks:\n")
@@ -1727,22 +1711,17 @@ class Schedule:
                     if isinstance(dataGrouping, dict):
                         #print("TEST -2 what datagrouping", dataGrouping)
                         for key, instance in dataGrouping.items():
-                            #print("TEST| Instance: ", instance)
-                            #print("TEST| instance.start_time_iter += 1: ", instance.start_time_iter)
 
                             if hasattr(instance, 'start_time') and hasattr(instance, 'start_time_iter'):
                             # Assuming each value has a 'start_time' list and a 'start_time_iter' attribute
                                 
                                 if instance.start_time and  0 <= instance.start_time_iter < len(instance.start_time): #WUT??? #to account for the fact that there may be multiple start tiems and are comparing to the right startime.
                                     # Compare searchVal with the current start_time value
-                                    #print("TEST searchVal", searchVal)
-                                    #print("INSTANCE test: start_time", instance.start_time)
+
                                     if searchVal == instance.start_time[instance.start_time_iter]:
                                         instance.start_time_iter += 1  # Increment the iterator
-                                        #print("TEST| instance.start_time_iter += 1: ", instance.start_time_iter)
                                         activitesThatMeetCriteria.append(key)
-                                        #print("TEST| activitesThatMeetCriteria.append(key)", activitesThatMeetCriteria)
-                                        #print("\n\nTEST internal 0", instance.start_time,"\n\n")
+
                                     #else:
                                         #print("ERROR | time not in activity, IDK ")
                                 #else:
@@ -1780,19 +1759,14 @@ class Schedule:
                 # if first duratin value in the sorted duration list is equal to that objects duration value. 
                 
                 for index, taskName in enumerate(tasks_meet_prev_criteria):
-                    #print("TEST index val", index)
-                    #print("TEST IF | Duration:Index", defaultTasksDictionary[taskName].duration, refDurationList[index])
                     if defaultTasksDictionary[taskName].duration == refDurationList[index]:
                         #4. If so then add to the tasks sorted by duration list, then move on and search for the object that equals the 2nd value
                         # in the sorted durations list and so on until all tasks have been added in the order of their values Min to 
                         # max(aka the order of the tasks duration list).
                         tasks_sorted_by_duration.append(taskName)
-                        #print("TEST IN FOR LOOP tasks_sorted_by_duration", tasks_sorted_by_duration)
                 #5. then return the tasks_sorted_by_duration list for use by the next function / to be assigned to the variable
                 return tasks_sorted_by_duration
             tasks_stage2_now_sorted_by_duration = searchQuereDurationPeriodTasks(tasks_that_meet_start_time_criteria)
-            #print("DONE searchQuereDurationPeriodTasks -------------------")
-            #print("TEST | tasks_stage2_now_sorted_by_duration", tasks_stage2_now_sorted_by_duration)
 
             #Sort by tier last, bc some large tasks may have to be scheduled last but by dur they wouldn't
             @timer
@@ -1813,12 +1787,9 @@ class Schedule:
                         tasks_sorted_by_tier.append(taskName)
                 return tasks_sorted_by_tier
             tasks_final_sorted = sortTierPeriodTasks(tasks_stage2_now_sorted_by_duration)
-            #print("TEST | tasks_final_sorted: ", tasks_final_sorted)
-            #print("DONE sortTierPeriodTasks -------------------")
             
             #TODO consider making match-reorder-reassign function for above 2 function, idk if will help with readability tho   
             self.queue = tasks_final_sorted
-            #print("TEST | dynamicSlotQueue | tasks for time Period/Slot:" , tasks_final_sorted)
                     
         def assign_tasks(self,employee_info=None):
             avail_employees_in_period = employee_manager.get_available_employees(self.time_slot)
@@ -1863,9 +1834,7 @@ class Schedule:
                     del avail_employees_in_period[name]
                     if employees_with_req_traits: #bc otherwise will delete an empty dict and cause an error
                         del employees_with_req_traits[name]
-                    #print("UPADTE FUNCTION OUTPUT | +1")
                      
-                #Put outside update funciton so onyl have to calculate once, and not everytime need to assign task to someone
                 def calculate_time_slots_for_duration(task_name):
                     # Get the task object (assuming you have a way to access it via task_name)
 
@@ -1873,7 +1842,7 @@ class Schedule:
                     
                     duration = int(task_manager.tasks[task_name].duration) # WHY int - Ensure duration is an integer bc dictionary to convert value will onyl take integer
                     
-                    if duration > 1:
+                    if duration > 1: #TODO remind myself what this does again exactly
                     # Check the duration of the task
                         
                         #FORGET FOR NOW - think unessecary WHY - subtract one, subtracting 1 from the task's duration accounts for including the starting time slot as part of the duration. This adjustment helps to ensure the task is scheduled for the correct number of time slots, starting from the initial slot.
@@ -1937,7 +1906,6 @@ class Schedule:
                     #then do the normal
                     #check if in avail employees for period, would slow down if didnt have to but dict means fast look up.
                     #temp prinout to see if assigning to tasks:
-                    #print(f"{task_name} is assigned to: {assigned_people}.") #still not working???
                 employees_with_req_traits = generate_list_of_eligible_employees()
                 assign_employees_to_task(employees_with_req_traits, task_name, time_slot)
                 

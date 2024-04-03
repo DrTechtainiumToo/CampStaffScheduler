@@ -1,18 +1,18 @@
-﻿NightChore, GenderReq, MinNumPeopleNeeded
-OFFICE, None,1
-GIRLS GROTTO, Female,1
-BARRET, None,1
-PAC, None,1
-OFFICE, None,1
-GIRLS BATH, Female,1
-TRASH WATER, None,3
-PAC, None,1
-CLODGE, None,1
-CHAPEL, None,1
-POOL,None,1
-SLOUNGE, None,1
-PAV, None,1
-HC, None,1
-BOYS BATH, Male,1
-BOYS GROTTO, Male,1
-POOL, None,1
+﻿TaskName,TaskDuration, GenderReq,MinNumPeopleNeeded,Frequency,StartTime,SpawnSunday,SpawnMonday,SpawnTuesday,SpawnWensday,SpawnThursday,SpawnFriday,SpawnSaturday,TaskCost,Category
+OFFICE,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+GIRLS GROTTO,1, Female,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+BARRET,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+PAC,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+OFFICE,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+GIRLS BATH,1, Female,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+TRASH WATER,1,,3,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+PAC,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+CLODGE,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+CHAPEL,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+POOL,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+SLOUNGE,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+PAV,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+HC,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+BOYS BATH,1, Male,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+BOYS GROTTO,1, Male,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+POOL,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
