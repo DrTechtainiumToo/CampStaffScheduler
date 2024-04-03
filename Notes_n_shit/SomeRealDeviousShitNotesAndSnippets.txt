@@ -122,91 +122,12 @@ if ogVariableTF in noAnswers:
     #something else happens
 #they way i have the while loop done makes it a little harder to understand with the var names, but is more efficnet code wise than repeating stuff
 
-
-GPT SUGGESTION:
-Tasks:
-Each task could be represented as a dictionary with its properties.
-tasks: {'TaskName': 'Clean Windows', 'Duration': 2, 'NumPeopleNeeded': 1, 'Importance': 5, 'GenderSpecific': None}
-Employees:
-A list where each employee is a dictionary with their details and availability.
-Example: {'Name': 'Alice', 'Gender': 'F', 'Preferences': ['Task1', 'Task2'], 'PartialAvailability': {'Morning': True, 'Afternoon': False}}
-Timeslots:
-You could use a list if timeslots are fixed and ordered or a dictionary for more flexibility.
-Example: [{'Timeslot': '08:00-10:00', 'AvailableEmployees': ['Alice', 'Bob']}] or {'Morning': {'StartTime': '08:00', 'EndTime': '12:00', 'AvailableEmployees': ['Alice', 'Bob']}}
-Task Assignments:
-A dictionary to hold which tasks are assigned in which timeslots and to whom.
-Example: {'08:00-10:00': {'Task1': ['Alice'], 'Task2': ['Bob']}}
-
-
 #ADDITONAL IDEAS
 #idea to make more user friendly, make a final program that takes the csv file and converts it to an excel file that can be modified & styled by the user. Idk maybe even get it able to format the excel file - prob to complicated tho.
 #resources for conversion and then formatting excel file: 
 #***https://blog.devgenius.io/how-to-produce-beautiful-well-formatted-excel-reports-using-python-fd87146a1e0e
 #https://www.geeksforgeeks.org/convert-csv-to-excel-using-pandas-in-python/
 #**https://www.cybrosys.com/blog/how-to-convert-csv-to-excel-using-pandas-in-python#:~:text=In%20python%2C%20we%20convert%20CSV,labeled”%20information%20handy%20and%20intuitive.
-
-
-
-#PROBLEMS ------------------------------:
-#problems how to do multi hour tasks, pre assign peopl stuff or intentionally leaving part of the scheudle blank. Other concerns: efficency, and overcomplication, how easy would it be to modify and make user friendly? Also how easy to port to google workspace addon to google sheets
-"""
-
-#LEARNING SHIT AND OTHER STUFF ------------------------------:
-
-
-#LEARNING CONCEPT & CODE snippet efficency
-#easier way to return t/f values in a function
-
-"""
-Concise way:
-return response in yesAnswers #if not then false is returned
-
-Verbose way:
-if response in yesAnswers:
-    response = True
-    return response
-else: 
-    response = False
-    return response
-    """
-
-#LEARNING CONCEPT if getting "dict_keys" at beginning of list, cus trying to get the keys, then call list() on the dictionary instead:
-#LEARNING - I keep accidentally doing == evaluator operator # instead of = assignment operator when I use T/F for loops and then I wonder why the loop doesn't work
-#LEARNING CONCEPT - strings are immutable so have to specifically assign shit to them
-#LEARNING CONCEPT - can use (string name).replace("thing to replace", "thing to replace with") to replace stuff in a string
-#LEARNING CONCEPT -
-#LEARNING CONCEPT GPT4- python treats empty strings ("") as False and non-empty strings as True when evaluated in a Boolean context.
-#LEARNING CONCEPT: GPT-4 Assigning data to obj.attr (obj.attr = userData) doesn't actually change the attribute named attr. To set an attribute on an object dynamically, use setattr(obj, attr_name, value) instead of obj.attr = value.
-#LEARNING CONCEPT: dir() function to get a list of all the attributes (including methods) of an object.
-#LEARNING CONCEPT: use the getattr(obj,attr) function to retrieve the value of each attribute.
-#LEARNING CONCEPT: You'll want to filter out methods and focus on attributes, which you can do by using the callable() function or checking attribute types, 
-#LEARING CONCEPT - range (timeAPeriod,timeBPeriod+1) why +1, because the range funciton is sort of like a list where it starts at 0, so to have it include the end digit you have to give it+1
-#LEARNING CONCEPT: If not - The if not statement in Python checks for the opposite of the condition specified, is used to execute a block of code if a condition evaluates to False.
-#LEANRING CONCEPT: Not operator is a logical operator that inverts the truth value of the condition that follows it
-#LEARNING CONCEPT: In operator is used to check if a value exists within a sequence or collection, such as a list, tuple, string, dictionary, or set. 
-#LEARNING CONCEPT: The error message you're seeing, TypeError: 'str' object is not callable, suggests that somewhere in your code, you're treating a string like a function—trying to "call" it with parentheses as if it were a method or function, but it's actually a string object. A common cause for this type of error is shadowing built-in functions with variables. For example, if at some point in your code before this input() call, you've assigned a string to a variable named input, you'd be shadowing the built-in input() function. Here's an example of how this might happen: To resolve this issue, check your code for any variable named input and rename it to something else that doesn't collide with Python's built-in functions. This kind of issue can occur with any built-in function (like str, list, dict, etc.), not just input, so it's a good practice to avoid using names of built-in functions for your variables.
-#LEANRING CONCEPT: Formate datetime parser to be without leading zeros with "-","%-I:%M %p"
-#LEARNING CONCEPT: dont do this('exit'.lower()), its redundant. use: if userData is None or userData.lower() == 'exit':
-#LEARNING CONCEPT: Can access class variables outside of class by directly via the class name from outside the class. aka Classname.varAcessing then blah blah blah
-#LEARNING CONCEPT, .cls is similar to .self
-#LEANRING CONCEPT: Using TODO in VS Code. Mark with a '+' marks as complete. Can also use #FIXME and #NOTE, also see how to guid for exstension I installed.
-#LEARNING CONCEPT - can put if & else statments all one line: weekday = 1 if weekday == 7 else weekday + 1. "(x if condition else y) The ternary operator is used for selecting between two values based on a condition, not for executing statements."
-
-
-
-"""
-ChatGPT
-The use of enumerate in a for loop is a common Python idiom for iterating over a sequence when you need both the index and the value of each item in the sequence. 
-The function enumerate takes an iterable (like a list, tuple, or string) as an input and returns an iterator that produces pairs of indexes and values from the iterable.
-
-enumerate(timeListToSortAlgo): This call to enumerate takes the list timeListToSortAlgo as an argument. 
-timeListToSortAlgo is assumed to be a list of strings, where each string represents a time (e.g., "12:30", "09:45").
-enumerate Functionality: For each item in timeListToSortAlgo, enumerate generates a pair consisting of an index (starting from 0) and the value at that index in the list. 
-So, if timeListToSortAlgo is ["12:30", "09:45", "23:59"], enumerate(timeListToSortAlgo) would produce (0, "12:30"), (1, "09:45"), and (2, "23:59") in successive iterations.
-for index, timeStr in enumerate(timeListToSortAlgo): This unpacks each pair generated by enumerate into index and timeStr. In the first iteration, index would be 0 and timeStr would be "12:30", in the second iteration, index would be 1 and timeStr would be "09:45", and so on. 
-This allows you to use both the index of each item (to access or modify items in the list by their position) and the value of each item (to work with the content directly) within the loop.
-"""
-#BIG LEARNING CONCEPT: (Or statements) if dateValue == 7 or 6: This condition does not check if dateValue is either 7 or 6. Instead, it checks if dateValue is 7, or if 6 is true. Since non-zero integers are considered truthy in Python, 6 is always true, making the condition always evaluate to true. if dateValue == 7 or dateValue == 6: is the proper way to implement a comparing "or" type argument
 
 
 
