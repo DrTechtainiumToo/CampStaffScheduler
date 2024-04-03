@@ -1,0 +1,21 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+#unavailabilityForm {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+}
+
+form label {
+    margin-top: 10px;
+    display: inline-block;
+    width: 120px;
+}
+
+form input,
+form button {
+    margin-top: 10px;
+}
+#thanks GPT for getting me started 

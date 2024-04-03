@@ -1,3 +1,5 @@
+"""Moved some stuff into folders, set up basic stuff to think about a web app. Most importantly fixed that bug with the table output task offset, not accounting to print blanks when there are no tasks."""
+
 #region--------------------------- FILE HEADER COMMENTS
 
 #LEARNING - If broken check to make sure dont have something twice, like an input or variable if it is broken via search / find like Issac did
@@ -570,6 +572,7 @@ dayTimeSlotsKeysList = list(dayTimeSlots[0].keys())  #for when i just want to di
 """Keep the Single Responsibility Principle in mind: a class should have one, and only one, reason to change. 
 This can help in deciding what functionality belongs where.
 """
+
 class EmployeeManager:
     """"For operations that involve multiple employees or require knowledge about the entire collection of employees"""
     def __init__(self):
@@ -618,7 +621,7 @@ class EmployeeManager:
         }  # WHY ok so if no reqs traits = one how to include employees that may meet the traits, wait no do that seperatley this should only be if the task has cert reqs
         return eligible_employees
     
-    def assign_task_to_employee(self,employee_name,task,time_slot): 
+    def assign_task_to_employee(self,employee_name, task, time_slot): 
         self.employees[employee_name].assign_task(time_slot,task)           
     
 
@@ -905,14 +908,22 @@ class AvailabilityManager:  #IDK, pointless for now until I make frontend???. Fu
       
 class Employee:
     """For operations that involve manipulating an employee's attributes"""
+    
+    #default times for taks assigned to - based on previous user input. #rename var later???? idk
+    default_assigned_to_times = {time_slot: None for time_slot in dayTimeSlotsKeysList}
+    #LEARNING CONCEPT - Basic dicitonary comprehension {key_expression: value_expression for item in iterable}
+ 
     def __init__(self, name, gender, preferences=None, certifications=None, position=None, off_week=None):
         self.name = name
         self.gender = gender
         self.preferences = preferences if preferences else []
         self.availability = {} #time_slot: True for time_slot in get_all_time_slots(), i think benifit of making timeSlots a dicitonary is that dont have to iterate and assign true to each one, but then have to use all those funcitons on it which complicates things. hmmmmmmmm
-        self.assigned_to = {}
+        self.assigned_to = Employee.default_assigned_to_times.copy() #Time: Task. #WHY set times ahead of time, timeslots for day are already set at this point, so if a employee doesn't get assgined a task for a slot it will report as none, that way it doesn't mess up the output order (by having a gap) when printed to excel or such. Tasks can still be assigned as needed. Better way to implement?
+        #TODO review this later #WHY -  .copy() This creates a shallow copy of default_assigned_to_times and assigns it to self.assigned_to, ensuring that changes to self.assigned_to do not affect the class variable default_assigned_to_times or those in other instances. - GPT Reccomendaition 
+       
         #HOW SHOULD I DO THIS, SO IMPLEMENT EFFICENTLY
         self.availabile_time_list = None #IDK if need or fast? #so can ref this list once rather than having to figure out available times via loop over and over again.
+        #TODO review if use this, and if nessecary
         
         #will have to make a way to easily insert these from other sources
         self.developerbonus = None #will actuallly need to be an if statement in the main code, #prob unethical to include this but lol, i can set my task pref to have maybe 10% more weight
@@ -941,7 +952,7 @@ class Employee:
     
     def get_available_time_slots(self):
         return list(self.availability.keys())
-
+        
     def assign_task(self,time_slot,task):
         """adds the task to the employees dict of times and tasks assigned at time
 
@@ -1832,8 +1843,8 @@ class Schedule:
                     #assigned_people[name] = None #hmm is this working right? so doesn't assing same people twice?? #ok if do this first, but then do total unavail. Proab could optimize here
                     #for multi duration tasks - rethink how to efficently implement this later.
                     employee_manager.set_employee_availability(name, self.time_slot) #IMPORTANT fix this and incorperate multi time assignment relevant_time_slots. #LEARNING CONCEPT - Issue was iteration over characters in value / str,list(self.time_slot) how to prevent#TODO INSPECT THIS, think this has to be a list??? TODO CHECK HTIS LATER, need better type checkers and descs in program
-                    employee_manager.assign_task_to_employee(name, self.time_slot, task_name) #see if can take list like for employee availability
-                    task_manager.tasks[task_name].assign_employee_to_task(self.time_slot, name) #TODO, make
+                    employee_manager.assign_task_to_employee(name, task_name, self.time_slot) #TODO see if can take list like for employee availability, for multi duration args
+                    task_manager.tasks[task_name].assign_employee_to_task(self.time_slot, name) #TODO, multi time??? is this even needed???
                     del avail_employees_in_period[name]
                     if employees_with_req_traits: #bc otherwise will delete an empty dict and cause an error
                         del employees_with_req_traits[name]
@@ -1861,6 +1872,8 @@ class Schedule:
                             if chosen_name not in assigned_people and chosen_name not in avail_employees_in_period: #use all??
                                 break #Break the loop if a suitable employee is found
                         update_data(chosen_name)
+                        
+                    #TODO make update so that can do generate in between times a min num of people, also if have some reqs but want remaining stuff like all females idl
                     else:
                         attribute = getattr(task_manager.tasks[task_name], 'min_num_people_needed') #IMPORTANT, #COULD SET THIS TO STAND VAR, THEN HAVE FUNCTION NEAR IMPORTS THAT GETS A LIST OF CODE WORDS AND CONVERTS THEM TO STAND VALUE
                         #WHY - convert if input string / csv data is anything but a number tha can convert to int.
@@ -1985,7 +1998,7 @@ class OutputSchedule():
         from openpyxl import worksheet
         excel_workbook = Workbook()
         formatted_date_Month_Day = datetime.datetime.now().strftime("%b %d, %A, %m:%s")
-        file_title = f"SWAT Schedule for {formatted_date_Month_Day}" #maybe then week and day?
+        file_title = f"OUPUT xslx TEST - SWAT Schedule for {formatted_date_Month_Day}" #maybe then week and day?
         worksheet1 = excel_workbook.active #get default worksheet
         alt_date_format = datetime.datetime.now().strftime("%d, %A")
         worksheet1.title = f"SWAT Schedule {alt_date_format}" #BROKEN - vars in title not working
@@ -2029,13 +2042,17 @@ class OutputSchedule():
         row_start = 4
         for employee in employee_manager.employees:
             column_start = 2
-            for task, time_slot in employee_manager.employees[employee].assigned_to.items():
+            for time_slot, task in employee_manager.employees[employee].assigned_to.items():
+                if task is None: #TODO future settings here??? #LEARNING CONCETP - Also "is" is the most accurate check to use for none. EXPAND ON WHY
+                    task = ""
+                #EASY TO IMPLEMENT UNAVAILBILITY HERE, IDK IF MOST EFFICENT THO. CHECK IF UNAVAILABLE AT TIMESLOT, MAYBE MAKE AN ATTR WITH UNAVAILABILITES
                 data_cell = worksheet1.cell(row=row_start, column=column_start, value=task) 
                 data_cell.border = thin_border
                 #TODO INSERT CONDITIONAL FORMATTING HERE
                 column_start +=1
                  # +1 offset from employee labels
             row_start += 1
+        #TODO HARD need to make sure boundary boxes r a thing? Need to make sure boxes are wide enought for msot words (while staying within A4 paper bounf (hard part))
         
         
         #TODO maybe make vars, or settings system so can easily shift stuff around?? IDK
