@@ -30,6 +30,15 @@
 #TODO Get user feedback, incoperate feedback & iterate
 #TODO Finalize & Deploy
 
+
+--------- Aditional TODOS during development:
+
+#NOTE can add functionality later, keep it simple
+#TODO #should Nightchores be own dict? how would that work????????, review how assignment work. maybe need mater dict idk, then before algo merge all together after sort??????? idk idk idk 
+#TODO look at algorithm need to figure out if A: What happens if don't fill the Freq column? does it default to 1? What about the duration, should i look at this for class and algo?, what about gender req and min_num_of_people. Think about errors and exceptions
+#TODO BIGGER PICTURE should night chroe be defined by tie or by after sweeting, etc. How should i define stuff like this??
+#This question is part of the problem of getting tasks to spawn inbetween stuff.
+
 #PROGRAM OVERVIEW --------------------------------------------------
 #load in default info, employee gender info & nickname, basic tasks & stand duration, timeslots, & nightchore
 #Ask for special tasks for the day and relevant info, also determine based on date user inputs what are some routinly occuring speical events that need to be accounted for.
