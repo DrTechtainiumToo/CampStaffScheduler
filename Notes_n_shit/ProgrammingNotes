@@ -5,6 +5,10 @@ Programming Notes
 Keys() vs list() so for non printing cases where I need the keys .keys() is slightly more efficenty. But if I need it to print out i need to use list() on the keys so i dont get that weird dict_keys thing at the beginning. But overall doesn't really matter. The .keys() in pyhton 3x is a veiw object which is slightly more memory efficent. But unless bottleneck then prioritize readability. But if need .keys a bunch, easier just to create a list.
 
 
+
+#try else
+
+
 Code Notes and Style ---------
 
 

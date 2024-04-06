@@ -931,7 +931,6 @@ class Employee:
             self.availability[time_slot] = True
             
     def set_unavailability(self, unavailable_times):
-        
         for time_slot in unavailable_times:
             if time_slot in self.availability: #adds some time to program, plus dont know if really nessecary with accoutning for it in multi times func
                 self.availability[time_slot] = False
@@ -949,7 +948,6 @@ class Employee:
         
     def assign_task(self,time_slot,task):
         """adds the task to the employees dict of times and tasks assigned at time
-
         Args:
             time_slot (str): 7:00am etc
             task (str): TaskVarName
@@ -1013,8 +1011,18 @@ print("\n-----------------------------------------------------------------------
 #region----------------------------- Tasks import data and basic data structures
 #TODO maybe need to check if multi start times then go thru start times, also how to integrate with premade lsit for startTime one in additional tasks function, also see if can do something / same thing for frequency
 
+def try_convert_to_int(value): #TODO figure out try/excpet and how to deal with none args
+    """Use when have csv values that ur assigning to function attr but need them to be ints, instead of the standard string.
+    If unconvertable, None for instances, sets value = 0"""
+    try:
+        return int(value)
+    except ValueError:
+        return 0  #IF ERROR, check this, sets to 0
+
 class TaskManager:
-    def __init__(self, defaultTasksDictionary, **kwargs):
+    def __init__(self, defaultTasksDictionary):
+        if not isinstance(defaultTasksDictionary, dict):
+            raise TypeError("defaultTasksDictionary must be a dictionary")
         self.tasks = {**defaultTasksDictionary} # A list to hold all tasks, add specialTasksDict later **specialTasksDict
     
     def add_task(self, task_identifier, task):
@@ -1073,10 +1081,11 @@ class TaskManager:
             info = cls.task_attribute_guide.get(topic, "Help topic not found.")
             print(f"\n{topic}:\n {info}\n")
         
-        def __init__(self, task_name, task_frequency, start_time, duration, min_num_people_needed, importance, task_cost, preassigned_to=None, chosen=None, task_tier=None, gender_specific=None, gender_required=None, preassigned=None, pref_time=None, time_preferred=None, not_before_time=None, not_after_time=None, start_time2=None, start_time3=None, start_time4=None, start_time5=None, start_time6=None, scheduledoccurance=None, occurs_every_n_days=None, spawn_sunday=None, spawn_monday=None, spawn_tuesday=None, spawn_wensday=None, spawn_thursday=None, spawn_friday=None, spawn_saturday=None, task_variable_name=None, certs_required=None, requires_certs=None):
+        def __init__(self, task_name, task_frequency, start_time, duration, min_num_people_needed, importance, task_tier = None, **kwargs):
+            #WHY **args, was gettign confused abotu KWARGS and assignment with csv converter rows, bc this one kwarg wasnt working, and was consulting GPT4
+            #GPT4 reccomended that i use kwargs for optional ones to simplify the func call and i thought it was a good idea.
             
-            #-2
-            #WUT?????
+            #WUT????? - maybe so can have master converter so that no matter what in csv can assign it to that value and funct arent depenet on specific words???
             #ALL NEGATIVES IN CSV NEED TO CHANGE
             #1.1 = userInput
             #1.21 = allMales
@@ -1087,86 +1096,56 @@ class TaskManager:
             #1.9 unassigned_employeess
             #4 Last
             #5 Very last
+            #NOTE DONT USE FLOATS, ints are faster
+                        
+            def safe_int_conversion(value):
+                """WHY - Use when have csv values that ur assigning to function attr but need them to be ints, instead of the standard string."""
+                try:
+                    return int(value)
+                except (ValueError, TypeError):
+                    return 0    
+            self.tier = safe_int_conversion(task_tier)
+            #WHY - task_tier is not included in the **kwargs & assignment loop below bc i need to explicity make it a int, and simpler to do it this way.
             
-            
-            #TODO maybe make specialStringVar Versions
-            self.tier = task_tier   # Initialize as 0, may change later based on your TODO note
             self.task_name = task_name
             self.frequency = task_frequency
             self.duration = duration
             self.min_num_people_needed = min_num_people_needed
             self.importance = importance
-            self.gender_specific = gender_specific
-            self.gender_required = gender_required
-            self.preassigned = preassigned
-            self.pref_time = pref_time  # Optional, based on your TODO note
-            self.time_preferred = time_preferred  # Optional, based on your TODO note
-            self.not_before_time =  not_before_time
-            self.not_after_time = not_after_time
-            self.start_time2 = start_time2
-            self.start_time3 = start_time3
-            self.start_time4 = start_time4
-            self.start_time5 = start_time5
-            self.start_time6 = start_time6
-            self.start_time = [time for time in [start_time, start_time2, start_time3, start_time4, start_time5, start_time6] if time.strip()] #Thanks GPT4            
-            self.scheduledoccurance = scheduledoccurance
-            self.occurs_every_n_days = occurs_every_n_days
-            self.spawn_sunday = spawn_sunday
-            self.spawn_monday = spawn_monday
-            self.spawn_tuesday = spawn_tuesday
-            self.spawn_wensday = spawn_wensday
-            self.spawn_thursday = spawn_thursday
-            self.spawn_friday = spawn_friday
-            self.spawn_saturday = spawn_saturday
-            self.chosen = chosen
-            self.task_cost = "To be caculated at assignment time in algorith with calc_task_cost()"
-            self.preassigned_to = preassigned_to #TODO MAYBE REMOVE that way can look up task to see who is assigned to it and when (when part might be more complicated)
-            self.assigned_to = {key: [] for key in dayTimeSlotsKeysList} #Time, and who assigned to ( in list)#when, who #TODO GENERATE APON SCHEDULING
-            self.task_variable_name = task_variable_name
-            self.start_time_iter = 0
-            self.requires_certs = requires_certs
-            self.certs_required = certs_required #List the cert req, maybe set to dict by default? so easy to call up?? and can = 0 if none of type req. like {} for none or {None:None} or {Lifegaurd:2}
-            #TODO add this to csv file, and file converter program
-            #self.order
             
-        def calc_task_cost(self, **kwargs):
-            self.task_cost = task_frequency*len(self.start_time)
+            # Assign all additional parameters
+            for key, value in kwargs.items():
+                setattr(self, key, value)
+                #NOTE make key in kwargs what you want the attr name to be, so func can use consistently
+    
+            #Interally calcualted attr 
+                # WHY - assigned after additional **kwargs para, so have all the data needed from other attrs.
+            self.start_time = [time for time in [start_time, self.start_time2, self.start_time3, self.start_time4, self.start_time5, self.start_time6]] #if time.strip()# #Thanks GPT4 
+                #why did i need .strip() again?  #now its - ['7:00am', '', '', '', '', '']  #NOTE if problems revert so start time given inital values then reassigns a list of all startime values to itself, #NOTE SEE IF BUG
+            self.start_times_iter = 0
+            self.assigned_to = {key: [] for key in dayTimeSlotsKeysList} #Time, and who assigned to ( in list)#when, who #TODO GENERATE APON SCHEDULING
+            self.task_cost = "To be caculated at assignment time in algorith with calc_task_cost()"
+            self.chosen #TODO figure out what use this for again, need to make documentation now at this point.
+            
+        def calc_task_cost(self):
+            self.task_cost = self.task_frequency*len(self.start_time) #what if for multiple durations??
             #TODO idk if work but can call during althorithm to calc exact freq 
             #worry about later
         
-        def describe_var_name_times(self,**kwargs): #
-            print(f"Task var name: {Fore.BLUE}{Style.BRIGHT}{self.task_variable_name}{Style.RESET_ALL} {self.start_time}")
+        def describe_var_name_times(self,): #
+            print(f"Task var name: {Fore.BLUE}{Style.BRIGHT}{self.task_variable_name}{Style.RESET_ALL} at {self.start_time}")
 
-        def describe_verbose(self,**kwargs): #
+        def describe_verbose(self):
             print("---------------------------------------------")
             print(f"Task var name: {Fore.BLUE}{Style.BRIGHT}{self.task_variable_name}{Style.RESET_ALL}")
-            #if kwargs.get('verbose', False): #This approach does not actually check verbose to be false; rather, it provides a default value (False) to use in case verbose is not specified when the 
-            print(f"Task name: {self.task_name}")
-            print(f"Tier: {self.tier}")
-            print(f"Frequency: {self.frequency}")
-            print(f"Start Times: {self.start_time}")
-            print(f"Duration: {self.duration}")
-            print(f"Minimum Number of People Needed: {self.min_num_people_needed}")
-            print(f"Importance: {self.importance}")
-            print(f"Task Cost: {self.task_cost}")
-            print(f"Assigned To: {self.preassigned_to if self.preassigned_to else 'Not Assigned'}")
-            print(f"Chosen: {self.chosen}")
-            print(f"Gender Specific: {self.gender_specific}")
-            print(f"Gender Required: {self.gender_required}")
-            print(f"Preassigned: {self.preassigned}")
-            print(f"Overlap Problem Task Cost Offsetter: {self.overlap_problem_task_cost_offsetter}")
-            print(f"Preferred Time: {self.pref_time}")
-            print(f"Time Preferred: {self.time_preferred}")
-            print(f"Not Before Time: {self.not_before_time}")
-            print(f"Not After Time: {self.not_after_time}")
-            # Assuming start_time2 to start_time6 are additional optional start times
-            #additional_start_times = [self.start_time2, self.start_time3, self.start_time4, self.start_time5, self.start_time6]
-            #print("Additional Start Times: ", [time for time in additional_start_times if time is not None])
-            print(f"Scheduled Occurrence: {self.scheduledoccurance}")
-            print(f"Occurs Every N Days: {self.occurs_every_n_days}")
+            
+            for attr_name, attr_value in vars(self).items(): #use pythons introspection abilites to help with this, can use vars(), get the vars of the obj, using dir() would have to filter out built in attr and use getattr() method
+                if attr_name in ['start_time2','start_time2','start_time3','start_time4','start_time5','start_time6']:
+                    continue #skip attributes
+                print(f"{attr_name.replace('_', ' ').title()}: {attr_value}") #thanks GPT for new output format by replacing '_' with ' ', so look nicer/
+            
             # Weekday spawns
             weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] 
-            #TODO fix this shit so actually represent what is yes / no. IMPORTANT
             spawns = [self.spawn_sunday, self.spawn_monday, self.spawn_tuesday, self.spawn_wensday, self.spawn_thursday, self.spawn_friday, self.spawn_saturday]
             print("Spawn Days: ", [day for day, spawn in zip(weekdays, spawns) if spawn]) 
             print("----------------------------------------------\n")
@@ -1187,345 +1166,116 @@ class TaskManager:
                     self.assigned_to[slot].append(employee_name)
             else:
                 self.assigned_to[time_slot].append(employee_name) #IDK if will work #QUESTION - should be extend or append idk what if not pre exisitng lists
-            #TODO make sure doesnt override and stuff, figure out later           
-                        
-def try_convert_to_int(value):
-    try:
-        return int(value)
-    except ValueError:
-        return value  #IF ERROR, check this, maybe set to None.
+            #TODO make sure doesnt override and stuff, figure out later
 
-
-#TODO take remaining slots and ones that require user input off the diplay / desribe list and edit list???? idk how to deal with them. atleast take cusotm ones off, can ask what they want spare slots to be.
-
-defaultTasksDictionary = {}
-defaultTasksVarNamesList = []
-
-@timer
-def defaultTasksListCSVToDictConverter(): #consider renaming this later
-    with open('CSV Data Folder/SWATBasicTasksListForScheduler.csv', newline='', encoding='utf-8-sig') as csvfile:
-        # Create a csv.reader object
-        csvreader = csv.DictReader(csvfile, dialect='excel')
-        #for row in csvreader:
+class TaskDataConverter:
+    def __init__ (self):
+        self.tasks_dict = {}
+        self.task_variable_names = []
         
-        #1, First create dict with VarName as key and the object as the value
-        for row in csvreader:
-            # Use the 'a' column as keys and 'b' column as values
-            #task_name = row['TaskVariableName']    
+    @timer
+    def add_tasks_from_csv(self, file_name='CSV Data Folder/SWATBasicTasksListForScheduler.csv', file_dialect = 'excel', new_line_value = '', encoding_value = 'utf-8-sig'):
+        """Converts a CSV file of standard tasks into a dictionary where keys are task identifiers and values are Task objects.
+        Args:
+        csvfile (str): Path to csv file
+        file_dialect (str): Dialect of file, defaults to 'excel'. WHY - csv module has dialect option idk if make diff, also i make my csvs in excel."""
+        
+        with open(file_name, newline=new_line_value, encoding=encoding_value) as csvfile:
+            # Create a csv.reader object
+            csvreader = csv.DictReader(csvfile, dialect=file_dialect)  
             
-            """
-            # Convert frequency and min_num_people_needed to integers
-            frequency = try_convert_to_int(row['Frequency'])
-            min_num_people_needed = try_convert_to_int(row['MinNumPeopleNeeded'])
-            duration = try_convert_to_int(row['TaskDuration'])
-            #print("min_num_people_needed", type(min_num_people_needed),min_num_people_needed)
-            #print("frequency", type(frequency),frequency)
-            #print("duration", type(duration),duration)"""
-
-
-            tier = try_convert_to_int(row['Tier'])
-            #print("tier", type(tier),tier)
-
-            #task_cost = frequency * (min_num_people_needed * duration)
-            #print("task_cost", type(task_cost),task_cost)
-            
-
-            #1.8 put every TaskVariableName in a list so the autoComplete can use in menus and stuff
-            defaultTasksVarNamesList.append(row['TaskVariableName'])
-            
-            #BUG IF MESSED UP CHECK THESE INPUTS, aslo make them keyword for crying out loud so dont have to deal with this shit
-            #2, Second have auto cycle through and popualte all class attribtues with data from CSV) # Create a new Task instance and store it with the user-defined name as the key
-            defaultTasksDictionary[row['TaskVariableName']] = TaskManager.Task(
-            row['TaskName'],
-            row['Frequency'],
-            row['StartTime'],
-            row["TaskDuration"],
-            row['MinNumPeopleNeeded'],
-            None, #row['Importance'] idk if will acutally wind up using this
-            None, #task cost, calc later during algo bc of strings and dynamic stuff
-            None, #will not inlcuding preassigned_to mess it up?
-            None,
-            None, #row['WillSpawnTodayChosen'] selected by an algorithm
-            tier,
-            row['GenderSpecific'],
-            row['GenderReq'],
-            None, #ADD preassigned to csv file, for like checkin / checkout tasks 
-            row['PrefTime'],
-            row['TimePreferred'],
-            row['NotBeforeTime'],
-            row['NotAfterTime'],
-            row['StartTime2'],
-            row['StartTime3'],
-            row['StartTime4'],
-            row['StartTime5'],
-            row['StartTime6'],
-            row['ScheduledOccurance'],
-            row['OccursEveryNDays'],
-            row['SpawnSunday'],
-            row['SpawnMonday'],
-            row['SpawnTuesday'],
-            row['SpawnWensday'],
-            row['SpawnThursday'],
-            row['SpawnFriday'],
-            row['SpawnSaturday'],
-            row['TaskVariableName2'] #Made a 2nd column in the csv file and TaskVariableName2 bc i think since i made the key TaskVariableName, i cant use that column again when defining var names in the class because it would have duplicate names and values and duplicates aren't allowed in dicitonaries.
-            )
-            #might encouter error with task var name bc is needed, could edit the task class with an if statement and see if that work
-defaultTasksListCSVToDictConverter()
-
-#endregion
-
-#region---------------------------- NightChore System #TODO MAKE THIS
-
-#TODO create nightchore list and data structures
-def night_chores_list_CSV_import_converter():
-    with open("CSV Data Folder/SWATNightChoresInfo.csv", newline='', encoding='utf-8-sig') as csvfile:
-        csvreader = csv.DictReader(csvfile, dialect='excel')
-        for row in csvreader:
-            
-            defaultTasksDictionary[row['TaskName']] = TaskManager.Task(
-            row['TaskName'],
-            row['Frequency'],
-            row['StartTime'],
-            row["TaskDuration"],
-            row['MinNumPeopleNeeded'], #NOTE remember to watch for trailing or leading whitespaces in the csv, will mess stuff up. CHECK THIS IF ERROR
-            None, #row['Importance'] 
-            None, #task cost, 
-            None, #preassigned_to
-            None, #WillSpawnTodayChosen
-            None, #Tier
-            None, #GenderSpecific
-            row['GenderReq'],
-            None, #preassigned
-            None,
-            None, #PrefTime
-            None, #TimePreferred
-            None, #NotBeforeTime
-            None, #NotAfterTime
-            row['StartTime2'],
-            row['StartTime3'],
-            row['StartTime4'],
-            row['StartTime5'],
-            row['StartTime6'],
-            None, #ScheduledOccurance
-            None, #OccursEveryNDays
-            row['SpawnSunday'],
-            row['SpawnMonday'],
-            row['SpawnTuesday'],
-            row['SpawnWensday'],
-            row['SpawnThursday'],
-            row['SpawnFriday'],
-            row['SpawnSaturday'],
-            None #TaskVariableName2
-            ) 
-night_chores_list_CSV_import_converter()
-
-nightChores = []
-
-#TODO #should Nightchores be own dict? how would that work????????, review how assignment work. maybe need mater dict idk, then before algo merge all together after sort??????? idk idk idk 
-#TODO look at algorithm need to figure out if A: What happens if don't fill the Freq column? does it default to 1? What about the duration, should i look at this for class and algo?, what about gender req and min_num_of_people. Think about errors and exceptions
-#TODO BIGGER PICTURE should night chroe be defined by tie or by after sweeting, etc. How should i define stuff like this??
-#This question is part of the problem of getting tasks to spawn inbetween stuff.
-
-
-#endregion
-
-#region--------------------------- Special Task System #TODO MAKE THIS
-
-#TODO somehow standardize these into time slots - see intial time section and make a function, think about time stand sys.
-wenSpecialTaskList = {'Clean Up Pizza Night': "TIME DOES NOT EXIST", 'Pac Chair Set Up -> Dance ->': "TIME DOES NOT EXIST",'Adoration -> Pac Chair Takedown': "TIME DOES NOT EXIST", "NightChore":'9:30ish Maybe'}
-tuesSpecialTaskList = {'Mens Sesh': "7ish",'Womens Sesh': "7ish",'Night Game': "sometime", 'Sweeting': "9ish", 'Pizza Run Leave At 4:05Pm': "3:45"}
-friSpecialTaskList = {}
-satSpecialTaskList = {}
-sunSpecialTaskList = {}
-
-specialTasksDict = {
-    3: wenSpecialTaskList,
-    5: friSpecialTaskList,
-    6: satSpecialTaskList,
-    7: sunSpecialTaskList
+            for row in csvreader:
+                # Use the column headers as keys the rows as values
+                
+                #Second have auto cycle through and popualte all class attribtues with data from CSV) # Create a new Task instance and store it with the user-defined name as the key
+                task_details = {
+                    #NOTE the keys are attr names, so don't fuck with them as other function rely on them
+                        'task_name': row.get('TaskName'),
+                        'task_frequency': row.get('Frequency'),
+                        'start_time': row.get('StartTime'),
+                        'duration': row.get('TaskDuration'),
+                        'min_num_people_needed': row.get('MinNumPeopleNeeded'),
+                        'importance': row.get('Importance', None),
+                        'task_cost': row.get('TaskCost', None),  # Calculated later, default set here if needed
+                        'chosen': row.get('WillSpawnTodayChosen', None),
+                        'task_tier': row.get('Tier', None),
+                        'gender_specific': row.get('GenderSpecific', None),
+                        'gender_required': row.get('GenderReq', None),
+                        'pref_time': row.get('PrefTime', None),
+                        'time_preferred': row.get('TimePreferred', None),
+                        'not_before_time': row.get('NotBeforeTime', None),
+                        'not_after_time': row.get('NotAfterTime', None),
+                        'start_time2': row.get('StartTime2', None),
+                        'start_time3': row.get('StartTime3', None),
+                        'start_time4': row.get('StartTime4', None),
+                        'start_time5': row.get('StartTime5', None),
+                        'start_time6': row.get('StartTime6', None),
+                        'scheduled_occurance': row.get('ScheduledOccurance', None),
+                        'occurs_every_n_days': row.get('OccursEveryNDays', None),
+                        'spawn_sunday': row.get('SpawnSunday', None),
+                        'spawn_monday': row.get('SpawnMonday', None),
+                        'spawn_tuesday': row.get('SpawnTuesday', None),
+                        'spawn_wensday': row.get('SpawnWensday', None),
+                        'spawn_thursday': row.get('SpawnThursday', None),
+                        'spawn_friday': row.get('SpawnFriday', None),
+                        'spawn_saturday': row.get('SpawnSaturday', None),
+                        'task_variable_name': row.get('TaskVariableName2'),
+                        'category': row.get('Category', None),
+                        'preassigned_to': row.get('PreassignedTo', None), #Note for error checks, not yet implemented yet
+                        'certs_required': row.get('CertificationsRequired', None)
                     }
-if dateValue in specialTasksDict:
-    daySpecialTasks = specialTasksDict[dateValue]
-else:
-    daySpecialTasks = 0 #WHY I PROGRAMMED IT LIKE THIS: all these key = 0, is so that when counting the len of dict it doesnt return error if dateValue represents / is a normal day, and thus it knows there are no special tasks. For use comparing total time avail to total tasks needed to be done.
+                #create dict with VarName as key and the object as the value
+                self.tasks_dict[row['TaskVariableName']] = TaskManager.Task(**task_details)
+                self.task_variable_names.append(row['TaskVariableName'])
 
-    #TODO later when making master task list see what I should have this as, none or something else
+    #from determine_eligible_task_types, give eligible files or something idk or give to csv converte and within those files only choose certain ones
+    
+    def process_files(self, file_names):
+        """Runs TaskDataConverter functions on files to convert csv files of tasks into dictionary where keys are task identifiers and values are Task objects."""
+        for file_name in file_names:
+            self.add_tasks_from_csv(file_name=file_name)
+        return self.tasks_dict, self.task_variable_names
 
-testOutput("TEST | daySpecialTasks type check", daySpecialTasks)
-if dateValue == 7 or dateValue == 6: #BIG LEARNING CONCEPT: if dateValue == 7 or 6: This condition does not check if dateValue is either 7 or 6. Instead, it checks if dateValue is 7, or if 6 is true. Since non-zero integers are considered truthy in Python, 6 is always true, making the condition always evaluate to true.
-    defaultTasksDictionary.clear() #WHY- because special schedule for these dates and it is easier just to preprogram in
+    def determine_eligible_task_types(): #- UNESSECARY - finish the MVP - what if someone just puts in into one giant file, might need backup system to sort them into categories so have same funcitonality 
+        #region--------------------------- Special Task System #TODO MAKE THIS
+            
+        #TODO create special task system
+
+        #TODO make a converter for special tasks csv sheet, integrate into converter class.
+        #TODO somehow standardize these into time slots - see intial time section and make a function, think about time stand sys.
+        #TODO integrate into converter class, and make work with night chores, so load in only tasks needed for day, besides the basic dictionary.
+
+        wenSpecialTaskList = {'Clean Up Pizza Night': "TIME DOES NOT EXIST", 'Pac Chair Set Up -> Dance ->': "TIME DOES NOT EXIST",'Adoration -> Pac Chair Takedown': "TIME DOES NOT EXIST", "NightChore":'9:30ish Maybe'}
+        tuesSpecialTaskList = {'Mens Sesh': "7ish",'Womens Sesh': "7ish",'Night Game': "sometime", 'Sweeting': "9ish", 'Pizza Run Leave At 4:05Pm': "3:45"}
+        friSpecialTaskList = {}
+        satSpecialTaskList = {}
+        sunSpecialTaskList = {}
+
+        specialTasksDict = {
+            3: wenSpecialTaskList,
+            5: friSpecialTaskList,
+            6: satSpecialTaskList,
+            7: sunSpecialTaskList
+                            }
+        if dateValue in specialTasksDict:
+            daySpecialTasks = specialTasksDict[dateValue]
+        else:
+            daySpecialTasks = 0 #WHY I PROGRAMMED IT LIKE THIS: all these key = 0, is so that when counting the len of dict it doesnt return error if dateValue represents / is a normal day, and thus it knows there are no special tasks. For use comparing total time avail to total tasks needed to be done.
+            
+            #TODO later when making master task list see what I should have this as, none or something else
+        if dateValue == 7 or dateValue == 6: #BIG LEARNING CONCEPT: if dateValue == 7 or 6: This condition does not check if dateValue is either 7 or 6. Instead, it checks if dateValue is 7, or if 6 is true. Since non-zero integers are considered truthy in Python, 6 is always true, making the condition always evaluate to true.
+            defaultTasksDictionary.clear() #WHY- because special schedule for these dates and it is easier just to preprogram in, faster than searching through.
+        #endregion
+           
+task_data_converter = TaskDataConverter()
+csv_tasks_files = ['CSV Data Folder/SWATBasicTasksListForScheduler.csv', 'CSV Data Folder/SWATNightChoresInfo.csv']
+#WHY - create the defaultTasksVarNamesList list so the autoComplete can use in menus and stuff
+defaultTasksDictionary, defaultTasksVarNamesList = task_data_converter.process_files(csv_tasks_files)
+#endregion
 #endregion
 
 #region--------------------------------------- Tasks User Input
-
-task_manager = TaskManager(defaultTasksDictionary) #add specialTasksDict later
-
-#Generate total tasks & special tasks depending on dateValue (date)
-#TODO be able to assign addtional tasks to certain people
-#TODO be able to say when task is and use multi-duration
-#TODO make a way to insert like a list of things you need done for the day more eaisly like a row in a csv or spreadsheet - could maybe come from default tasks, just be like any default taks yo uwant done, and ask if so when(or if predetermined time is acceptable, for special ones))
-
-#------------------- Tasks Editor and Selector (Special and Default)
-
-selected_default_basic_tasks_dict = {}
-selected_default_basic_tasks__var_names_list = [] #TODO WHY NEED THIS?
-
-#-------------Auto-Recommended tasks algorithm
-#merge the special, default, and night chore tasks together into once list. Then calcualte and make list that is auto then diplay the auto reccomended
-@timer
-def default_selected_tasks_recommendation_algorithm(defaultTasksDictionary,dayName,selected_default_basic_tasks__var_names_list,selected_default_basic_tasks_dict):    
-    attribute_name = 'spawn_'+dayName.lower() #WHY .lower to create name value? It refs dateValue num to corresponding dictionary values which are day names, and the day names are capitalized. However the obj attribute daynames are not, so we lowercase this name.
-    for task_name, instance in defaultTasksDictionary.items(): 
-        attr_value = getattr(instance,attribute_name)
-        if attr_value.capitalize().strip() == 'Yes': #WHY - .upper() bc comparison value is upper case, and its just incase someones puts a lowercase 'yes' on the csv they wont screw everyhting up. #TODO(later also look for "depends' for scheduled basis tasks such as water flowers)
-            selected_default_basic_tasks__var_names_list.append(task_name)
-            selected_default_basic_tasks_dict[task_name]=instance
-    #TODO SIMPLE, GOOD, IDEA!!! CHECK IF ERROR, in future update may later change from "yes" to True, will be faster too?
-    #- 2nd reminder, add in reoccuring scheduled tasks later (like ones that occur every x days ex: Water flowers)
-default_selected_tasks_recommendation_algorithm(defaultTasksDictionary,dayName,selected_default_basic_tasks__var_names_list,selected_default_basic_tasks_dict)
-
-
-def default_selcted_tasks_confirmation_and_editor(selected_default_basic_tasks_dict,selected_default_basic_tasks__var_names_list,defaultTasksVarNamesList,defaultTasksDictionary):
-    print("\n----------------------------------------------------------------------------\n")
-    print("Here are today's selected default basic tasks (auto-recommended by algorithm):")
-    print(selected_default_basic_tasks__var_names_list)
-    
-    #print("\n Printed above: today's selected default basic tasks (auto-recommended).\n")
-    decision = input("\nWould you like to edit them? y/n\n(Note: You can add custom tasks later): ")
-    if decision.strip() in yesAnswers:
-        def print_default_selcted_tasks_editior_commands():
-            print("\n[Options for Editing Tasks]") #Thanks to GPT4 for making my command instructions more concise
-            print("1. Add <TaskName> a tasks from the basic tasks dictionary.")
-            print("2. Remove <TaskName> a task from the selected list.")
-            print("3. Info <TaskName> - Know more about the parameters of a selected task, or any preprogrammed task.")
-            print("4. Display all tasks - Get a list of available preprogrammed tasks.")
-            print("5. Display selected tasks - Redisplay the tasks selected for the day.")
-            print("6. Clear all tasks - Remove all tasks from the selected list.")
-            print("7. Back - Exits out of current command, to command list")
-            print("8. Exit - Exists the editor, assuming your done editing tasks.")
-            print("7. Commands - Reprints commands")
-        print_default_selcted_tasks_editior_commands()
-        instructionString = "\nPlease enter your choice ('add', 'remove', 'info', 'display all tasks', 'display selected tasks', 'clear all tasks', 'back', 'exit', 'commands'):\n"
-        taskEditorCommandList = ['add', 'remove', 'info', 'display all tasks', 'display selected tasks', 'clear all tasks', 'back','exit', 'commands']
-        #TODO maybe later make it be able to edit the selected tasks characteristics, that way can edit it if it is off
-        #TODO make it put out list of taks and times they at, even better if go by time. IDK stuff for long term
-        
-        #Loop to continually prompt the user until they're done editing.
-        continueEditing = True
-        while continueEditing:
-            userCommand = xyz_input_auto_completer(instructionString, taskEditorCommandList).strip().lower()
-            match userCommand:
-                case 'add' | 'remove' | 'info':
-                    print(f"Type a {Fore.YELLOW}{Style.BRIGHT}task{Style.RESET_ALL} to use the {Fore.GREEN}{Style.BRIGHT}{userCommand}{Style.RESET_ALL} command on.\n", end="")
-                    userCommandModedPrompt = f"{userCommand} "
-                    while True:
-                        if userCommand in ['add', 'info']:
-                            while True:
-                                userTaskSelected = xyz_input_auto_completer(userCommandModedPrompt, defaultTasksVarNamesList)
-                                if userTaskSelected in defaultTasksVarNamesList: break
-                            if userTaskSelected == 'back': break
-                            #userTaskSelected = userTaskSelected.upper() #CHECK IF ERROR, just incase it wasnt in caps already. Task names in master dict and lists are in Caps so trying to keep it consistent
-                            #TODO idk maybe just make it loop if invalid input.
-                            #TODO maybe hould make if reject if doesnt enter a valid task name from the dict, / check to see if it is in it
-                            #TODO add nightchore and special to this eventually actually, well maybe ill just integrate them in
-                            if userCommand == 'add':
-                                selected_default_basic_tasks__var_names_list.append(userTaskSelected)
-                                selected_default_basic_tasks_dict.update({userTaskSelected: defaultTasksDictionary[userTaskSelected]})
-                                print("Updated selected tasks list: ", selected_default_basic_tasks__var_names_list, selected_default_basic_tasks_dict)
-                            else:  # 'info'
-                                task_manager.task_info(userTaskSelected)
-                        
-                        elif userCommand == 'remove':
-                            print("Tasks: ", selected_default_basic_tasks__var_names_list)
-                            while True:
-                                userTaskSelected = xyz_input_auto_completer(userCommandModedPrompt, selected_default_basic_tasks__var_names_list)
-                                if userTaskSelected in defaultTasksVarNamesList: break
-                            if userTaskSelected == 'back': break
-                            selected_default_basic_tasks__var_names_list.remove(userTaskSelected)
-                            selected_default_basic_tasks_dict.pop(userTaskSelected, None)  # Use pop with None to avoid KeyError
-                            print("Selected tasks remaining: ", selected_default_basic_tasks__var_names_list, selected_default_basic_tasks_dict)
-
-                        print(f"\ntype {Fore.RED}{Style.BRIGHT}'back'{Style.RESET_ALL} to {Fore.RED}{Style.BRIGHT}exit section{Style.RESET_ALL}")
-                        print(f"{Fore.GREEN}{Style.BRIGHT}to continue using {userCommand} [press enter]{Style.RESET_ALL}")
-                        userContinueQuestion = input().strip().lower()
-                        if userContinueQuestion == 'back':
-                            break
-                
-                case 'display all tasks':
-                    task_manager.display_all_tasks()
-                
-                case 'display selected tasks':
-                    print(selected_default_basic_tasks__var_names_list)
-                
-                case 'clear all tasks':
-                    selected_default_basic_tasks__var_names_list.clear()
-                    selected_default_basic_tasks_dict.clear()
-                    #IDK implement later once figure how will format the selected tasks list
-
-                case 'commands':
-                    print_default_selcted_tasks_editior_commands()
-                    print("\n\nList of commands:")
-                    print(taskEditorCommandList)
-                
-                case 'exit':
-                    continueEditing = False
-                    print("Selected basic tasks confirmed.")
-                
-                case _:  # This acts like an 'else' to handle unexpected commands
-                    continueEditing = True
-                    #So since the user command at this point can only be 'back' we let the loop iterate back to the beginning.
-    else:
-        print("Selected basic tasks confirmed.\n\n")       
-default_selcted_tasks_confirmation_and_editor(selected_default_basic_tasks_dict,selected_default_basic_tasks__var_names_list,defaultTasksVarNamesList,defaultTasksDictionary)
-
-
-# ----------------------- Fill in any missing data for the tasks.
-
-#TODO make transition and explain now filling in data for previously selected tasks that need user Input
-def check_for_user_input(obj,taskName):
-    
-    for attr in dir(obj):
-        # Ignore special attributes and methods
-        if not attr.startswith('__') and not callable(getattr(obj, attr)):
-            value = getattr(obj, attr)
-            #print("TEST2 what is obj & attr = ", value) #NOTE LEARN MORE: Still confused about what its cycling thru a bit, like i get what dir does, but the print statments make it seem like it goes thru all instances attr and not just the classes once idk
-            # Assuming the attributes we care about are strings or lists, you might need to adjust this
-            if isinstance(value, str) and "userInput" in value:
-                print(f"{taskName} task {attr} needs userInput.\n{Fore.YELLOW}{Style.BRIGHT}If you are confused about what needs input-ing, type 'help' to get more information about the data your're supposed to enter.{Style.RESET_ALL}\nSeperatley if no value is needed, enter None\n")
-                while True: 
-                    userData = input(f"Input {attr} for {taskName}: ")#.upper() idk why have this here
-                    if userData.lower().strip() == 'help':
-                        TaskManager.Task.print_help(attr)
-                    else: 
-                        break
-                setattr(obj, attr, userData)
-                print(f"TEST | Result for {attr}: ", getattr(obj, attr))
-            elif isinstance(value, list):
-                autoEnter = False 
-                for index, item in enumerate(value):
-                    if "userInput" in item: 
-                            print(f"\n{taskName} {attr} needs userInput. If done entering or no more values then enter 'exit'\n{Fore.YELLOW}{Style.BRIGHT}If you are confused about what needs input-ing, type 'help' to get more information about the data your're supposed to enter.{Style.RESET_ALL}\n")
-                            if autoEnter == True:
-                                print(f"Exiting {taskName} {attr} input sequence, filling remaining userInput values for {attr} with 'None'")
-                                value[index] = None
-                            else:
-                                while True: 
-                                    userData = input(f"Input {attr} for {taskName}: ")
-                                    if userData.lower().strip() == 'help':
-                                        TaskManager.Task.print_help(attr)
-                                    elif userData == "exit":
-                                        autoEnter = True
-                                        break
-                                    else: 
-                                        break
-                                value[index] = userData
-                                print(f"TEST | Result for {attr}[{index}]: ", value[index])
-#NOTE from a UI perspective this part is terribly confusing but will leave it as is bc IDGAF. I dont want ohave to write 250 more lines of code that wont probbaly be used in the final GUI.
-for tasks, instance in selected_default_basic_tasks_dict.items():
-    check_for_user_input(instance,tasks)
-    
-
+ 
 # --------------------- Additional Tasks
 def user_PromptXY_YesOrNo_If_So_PromptABC_Template(variable,stringprompt):
     pass 
@@ -1598,6 +1348,7 @@ def user_Adds_Additonal_Tasks():
                 task_tier = 0, #CHECK IF ERROR, may need to change later, MAYBE make upmost importance??
                 task_name = userTaskName,
                 task_frequency = userFrequency,
+                # = userStartTime[0] #- idk if nessecary but since i now have start time and starttimes list, tho idk if needed, maybe was better earlier
                 start_time = userStartTime, #List, so if multiple times can just use one var and iterate through
                 duration = userDuration, #TODO make Auto convert if user enters time range etc
                 min_num_people_needed = userMinManpower,
@@ -1623,15 +1374,202 @@ def user_Adds_Additonal_Tasks():
             additionalTasksTF = input("Are there any additionally tasks you want to add for the day? Y or N?\n\nUser: ")
     if additionalTasksTF in noAnswers:
         print("No extra tasks! YIPPIE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    #testOutput("TEST | FINAL taskDictLocal List ", taskDictLocal)
-    return (taskDictLocal) 
+    return (taskDictLocal)
 additionalTasks = user_Adds_Additonal_Tasks() #TODO re add once done debugging
-testOutput("TEST |  NEW additionalTasks List ", additionalTasks)
-#-----------------------------------------------------------------
 
+defaultTasksDictionary = defaultTasksDictionary | additionalTasks #note if duplicates bc of union operater tasks in additionalTasks will overwrite defaultTasksDictionary, which is good because probbaly want specificed tasks.
+#yeah want this before incase puts in duplicate task, the filling in details and correcting errors should at least be last thig done. Well cant not fill in a feild for the dup tasks tho
+
+class TaskRecommender():
+    """Tasks Editor and Selector (Special and Default), Generate total tasks & special tasks depending on dateValue (date). 
+    Returns a master task dict, with everything filled in"""
+    #TODO be able to assign addtional tasks to certain people
+    #TODO be able to say when task is and use multi-duration
+    #TODO make a way to insert like a list of things you need done for the day more eaisly like a row in a csv or spreadsheet - could maybe come from default tasks, just be like any default taks yo uwant done, and ask if so when(or if predetermined time is acceptable, for special ones))
+    #TODO merge the special, default, and night chore tasks together into once list. Then calcualte and make list that is auto then diplay the auto reccomended
+
+    def __init__ (self, dayName):
+        self.selected_tasks_dict = {}
+        self.selected_tasks_var_names_list = []
+        #self.master_task_dict = master_task_dict #if Maybe see if will use this for simplicity later, error see if copied corretly or something, still unfamiliar
+        self.dayName = dayName
+
+    @timer
+    def recommend_tasks(self, master_task_dict):    
+        """Auto-Recommended tasks algorithm"""
+        attribute_name = 'spawn_'+ self.dayName.lower() #WHY .lower to create name value? It refs dateValue num to corresponding dictionary values which are day names, and the day names are capitalized. However the obj attribute daynames are not, so we lowercase this name.
+        for task_name, instance in master_task_dict.items(): 
+            attr_value = getattr(instance, attribute_name)
+            
+            #WHY check for Yes"?  bc looking at SpawnMonday etc attributes, so checking if it occurs on those days
+            if attr_value.capitalize().strip() == 'Yes': #WHY - .upper() bc comparison value is upper case, and its just incase someones puts a lowercase 'yes' on the csv they wont screw everyhting up. #TODO(later also look for "depends' for scheduled basis tasks such as water flowers)
+                self.selected_tasks_dict[task_name]=instance
+        self.selected_tasks_var_names_list = list(self.selected_tasks_dict) #assume faster if just generate list from dict keys after, instead of appending values along with the dict #OPTIMIZATION QUESTION
+
+        #TODO SIMPLE, GOOD, IDEA!!! CHECK IF ERROR, in future update may later change from "yes" to True, will be faster too?
+        #- 2nd reminder, add in reoccuring scheduled tasks later (like ones that occur every x days ex: Water flowers)
+        
+    def modify_tasks_interface(self, master_task_dict_names_list):  
+        def print_default_selcted_tasks_editior_commands():
+            print("\n[Options for Editing Tasks]") #Thanks to GPT4 for making my command instructions more concise
+            print("1. Add <TaskName> a tasks from the basic tasks dictionary.")
+            print("2. Remove <TaskName> a task from the selected list.")
+            print("3. Info <TaskName> - Know more about the parameters of a selected task, or any preprogrammed task.")
+            print("4. Display all tasks - Get a list of available preprogrammed tasks.")
+            print("5. Display selected tasks - Redisplay the tasks selected for the day.")
+            print("6. Clear all tasks - Remove all tasks from the selected list.")
+            print("7. Back - Exits out of current command, to command list")
+            print("8. Exit - Exists the editor, assuming your done editing tasks.")
+            print("7. Commands - Reprints commands")
+        print_default_selcted_tasks_editior_commands()
+        
+        instructionString = "\nPlease enter your choice ('add', 'remove', 'info', 'display all tasks', 'display selected tasks', 'clear all tasks', 'back', 'exit', 'commands'):\n"
+        taskEditorCommandList = ['add', 'remove', 'info', 'display all tasks', 'display selected tasks', 'clear all tasks', 'back','exit', 'commands']
+        #TODO maybe later make it be able to edit the selected tasks characteristics, that way can edit it if it is off
+        #TODO make it put out list of taks and times they at, even better if go by time. IDK stuff for long term
+        
+        #Loop to continually prompt the user until they're done editing.
+        continueEditing = True
+        while continueEditing:
+            userCommand = xyz_input_auto_completer(instructionString, taskEditorCommandList).strip().lower()
+            match userCommand:
+                case 'add' | 'remove' | 'info':
+                    print(f"Type a {Fore.YELLOW}{Style.BRIGHT}task{Style.RESET_ALL} to use the {Fore.GREEN}{Style.BRIGHT}{userCommand}{Style.RESET_ALL} command on.\n", end="")
+                    userCommandModedPrompt = f"{userCommand} "
+                    while True:
+                        if userCommand in ['add', 'info']:
+                            #User selects the task to preform either command on first
+                            while True:
+                                userTaskSelected = xyz_input_auto_completer(userCommandModedPrompt, master_task_dict_names_list)
+                                if userTaskSelected in master_task_dict_names_list: break
+                                
+                            if userTaskSelected == 'back': break
+                            #userTaskSelected = userTaskSelected.upper() #CHECK IF ERROR, just incase it wasnt in caps already. Task names in master dict and lists are in Caps so trying to keep it consistent
+                            #TODO idk maybe just make it loop if invalid input.
+                            #TODO maybe hould make if reject if doesnt enter a valid task name from the dict, / check to see if it is in it
+                            #TODO add nightchore and special to this eventually actually, well maybe ill just integrate them in
+                            
+                            if userCommand == 'add':
+                                self.selected_tasks_var_names_list.append(userTaskSelected)
+                                self.selected_tasks_dict.update({userTaskSelected: master_task_dict[userTaskSelected]})
+                                print("Updated selected tasks list: ", self.selected_tasks_var_names_list, self.selected_tasks_dict)
+                            else:  # 'info'
+                                task_manager.task_info(userTaskSelected)
+                        
+                        elif userCommand == 'remove':
+                            print("Tasks: ", self.selected_tasks_var_names_list)
+                            while True:
+                                userTaskSelected = xyz_input_auto_completer(userCommandModedPrompt, self.selected_tasks_var_names_list)
+                                if userTaskSelected in master_task_dict_names_list: break
+                            if userTaskSelected == 'back': break
+                            self.selected_tasks_var_names_list.remove(userTaskSelected)
+                            self.selected_tasks_dict.pop(userTaskSelected, None)  # Use pop with None to avoid KeyError
+                            print("Selected tasks remaining: ", self.selected_tasks_var_names_list, self.selected_tasks_dict)
+
+                        print(f"\ntype {Fore.RED}{Style.BRIGHT}'back'{Style.RESET_ALL} to {Fore.RED}{Style.BRIGHT}exit section{Style.RESET_ALL}")
+                        print(f"{Fore.GREEN}{Style.BRIGHT}to continue using {userCommand} [press enter]{Style.RESET_ALL}")
+                        userContinueQuestion = input().strip().lower()
+                        if userContinueQuestion == 'back':
+                            break
+                
+                case 'display all tasks':
+                    task_manager.display_all_tasks()
+                
+                case 'display selected tasks':
+                    print(self.selected_tasks_var_names_list)
+                
+                case 'clear all tasks':
+                    self.selected_tasks_var_names_list.clear()
+                    self.selected_tasks_dict.clear()
+                    #IDK implement later once figure how will format the selected tasks list
+
+                case 'commands':
+                    print_default_selcted_tasks_editior_commands()
+                    print("\n\nList of commands:")
+                    print(taskEditorCommandList)
+                
+                case 'exit':
+                    continueEditing = False
+                    print("Selected basic tasks confirmed.")
+                
+                case _:  # This acts like an 'else' to handle unexpected commands
+                    continueEditing = True
+                    #So since the user command at this point can only be 'back' we let the loop iterate back to the beginning.      
+
+    def edit_selected_tasks(self, master_task_dict_names_list):
+        print("\n----------------------------------------------------------------------------\n")
+        print("Here are today's selected default basic tasks (auto-recommended by algorithm):")
+        print(self.selected_tasks_var_names_list)
+        
+        #print("\n Printed above: today's selected default basic tasks (auto-recommended).\n")
+        decision = input("\nWould you like to edit them? y/n\n(Note: You can add custom tasks later): ")
+        if decision.strip() in yesAnswers:
+            self.modify_tasks_interface(master_task_dict_names_list)
+        else:
+            print("Selected basic tasks confirmed.\n\n") 
+    
+    # ----------------------- Fill in any missing data for the tasks.
+    #TODO make better transition and explain now filling in data for previously selected tasks that need user Input
+    #NOTE from a UI perspective this part is terribly confusing but will leave it as is bc IDGAF. I dont want ohave to write 250 more lines of code that wont probbaly be used in the final GUI.
+    
+    @timer
+    def check_missing_details(self):
+        def check_and_fill_details(obj, taskName): #hmm ad things to check for to args??
+            for attr in vars(obj): #for attr in dir(obj): #why not just use var()
+                # Ignore special attributes and methods
+                #if not attr.startswith('__') and not callable(getattr(obj, attr)): 
+                    value = getattr(obj, attr)
+                    #print("TEST2 what is obj & attr = ", value) #NOTE LEARN MORE: Still confused about what its cycling thru a bit, like i get what dir does, but the print statments make it seem like it goes thru all instances attr and not just the classes once idk
+                    # Assuming the attributes we care about are strings or lists, you might need to adjust this
+                    if isinstance(value, str) and "userInput" in value:
+                        print(f"{taskName} task {attr} needs userInput.\n{Fore.YELLOW}{Style.BRIGHT}If you are confused about what needs input-ing, type 'help' to get more information about the data your're supposed to enter.{Style.RESET_ALL}\nSeperatley if no value is needed, enter None\n")
+                        while True: 
+                            userData = input(f"Input {attr} for {taskName}: ")#.upper() idk why have this here
+                            if userData.lower().strip() == 'help':
+                                TaskManager.Task.print_help(attr)
+                            else: 
+                                break
+                        setattr(obj, attr, userData)
+                        print(f"TEST | Result for {attr}: ", getattr(obj, attr))
+                    elif isinstance(value, list) and "userInput" in value:
+                        autoEnter = False 
+                        for index, item in enumerate(value):
+                            if "userInput" in item: #hmm will get rid of this for now, auto assign btwn two points should take care of this in the long run. or [] in item: #Why do i need to iterate over an empty list??? #LEARNING CONCEPT cant iterate over None, so need to provide a safe alternative, can be [] bc None represent no value, iterate over empty list (doesn't do anything, but also no error) - learn more  #in operator vs in syntax for "for loop"
+                                    print(f"\n{taskName} {attr} needs userInput. If done entering or no more values then enter 'exit'\n{Fore.YELLOW}{Style.BRIGHT}If you are confused about what needs input-ing, type 'help' to get more information about the data your're supposed to enter.{Style.RESET_ALL}\n")
+                                    if autoEnter == True:
+                                        print(f"Exiting {taskName} {attr} input sequence, filling remaining userInput values for {attr} with 'None'")
+                                        value[index] = None
+                                    else:
+                                        while True: 
+                                            userData = input(f"Input {attr} for {taskName}: ")
+                                            if userData.lower().strip() == 'help':
+                                                TaskManager.Task.print_help(attr)
+                                            elif userData == "exit":
+                                                autoEnter = True
+                                                break
+                                            else: 
+                                                break
+                                        value[index] = userData
+                                        print(f"TEST | Result for {attr}[{index}]: ", value[index]) 
+        
+        for tasks, instance in self.selected_tasks_dict.items():
+            check_and_fill_details(instance,tasks)
+
+    def return_selected_tasks_for_day(self):
+        return self.selected_tasks_dict, self.selected_tasks_var_names_list
+    
+task_recommender = TaskRecommender(dayName)
+task_recommender.recommend_tasks(defaultTasksDictionary)
+task_recommender.edit_selected_tasks(defaultTasksVarNamesList)
+task_recommender.check_missing_details() #defaultTasksDictionary
+defaultTasksDictionary, defaultTasksVarNamesList = task_recommender.return_selected_tasks_for_day() #IDK how this OG worked i forgot, well then i deleted all the old code and refeactored before understnaidn what I/O it really had
+
+task_manager = TaskManager(defaultTasksDictionary) #maybe later change to master tasks list / name idk get current stuff to work rn
+#TODO might have to reevaluate how i use the task manager and the default tasks dict.
 
 # ------------------------------ Master Task List
-daysTasks = [additionalTasks, defaultTasksDictionary, nightChores]
+daysTasks = [defaultTasksDictionary]
+
 #TODO maybe at some point - maybe also make a days tasks dict, that way for algo only have to use that. would allow speeration of night chore and special dict, but speical dict honestly is kidna, well eh never mind idk about performance improvement
 #TaskRank1, TaskRank2,TaskRank3 can add other lists into them??
 
@@ -1712,20 +1650,20 @@ class Schedule:
                         #print("TEST -2 what datagrouping", dataGrouping)
                         for key, instance in dataGrouping.items():
 
-                            if hasattr(instance, 'start_time') and hasattr(instance, 'start_time_iter'):
-                            # Assuming each value has a 'start_time' list and a 'start_time_iter' attribute
+                            if hasattr(instance, 'start_time') and hasattr(instance, 'start_times_iter'):
+                            # Assuming each value has a 'start_time' list and a 'start_times_iter' attribute
                                 
-                                if instance.start_time and  0 <= instance.start_time_iter < len(instance.start_time): #WUT??? #to account for the fact that there may be multiple start tiems and are comparing to the right startime.
+                                if instance.start_time and  0 <= instance.start_times_iter < len(instance.start_time): #WUT??? #to account for the fact that there may be multiple start tiems and are comparing to the right startime.
                                     # Compare searchVal with the current start_time value
 
-                                    if searchVal == instance.start_time[instance.start_time_iter]:
-                                        instance.start_time_iter += 1  # Increment the iterator
+                                    if searchVal == instance.start_time[instance.start_times_iter]:
+                                        instance.start_times_iter += 1  # Increment the iterator
                                         activitesThatMeetCriteria.append(key)
 
                                     #else:
                                         #print("ERROR | time not in activity, IDK ")
                                 #else:
-                                    #print("ERROR | len instance.start_time_iter: ", instance.start_time_iter)
+                                    #print("ERROR | len instance.start_times_iter: ", instance.start_times_iter)
                                     #print("ERROR | prob an empty list or startime is out of bounds")
                                     
                             #print("TEST | INTERNAL", dataGrouping.items())
@@ -1851,7 +1789,7 @@ class Schedule:
                         # Get the numeric value for the current time slot
                         current_slot_numeric = dayTimeSlotsStandardizedStN[self.time_slot]
 
-                        # Calculate numeric values for the duration of the task
+                        # Calculate numeric timekey values for the duration of the task
                         duration_slots_numeric = [current_slot_numeric + i for i in range(duration)] #good list comprehension
 
                         # Convert numeric values back to string representations
@@ -2035,59 +1973,81 @@ class OutputSchedule():
         #make a .CSV and autoconver values, also find work around for KSWAT and such.
         
         task_format = {
+        'Default' : workbook.add_format({
+            'bg_color': '#F4CCCC',
+            'border': 1
+        }),
         'SERVE': workbook.add_format({
-            'bg_color': '#FFFFCC'
+            'bg_color': '#FFFFCC',
+            'border': 1
         }),
         'HALF STAFF': workbook.add_format({
-            'bg_color': '#C6EFCE'
+            'bg_color': '#C6EFCE',
+            'border': 1
         }),
         'SEE R00SKI': workbook.add_format({
-            'bg_color': '#FFD9B3'
+            'bg_color': '#FFD9B3',
+            'border': 1
         }),
         'SEE JESUS': workbook.add_format({
-            'bg_color': '#FFF2CC'
+            'bg_color': '#FFF2CC',
+            'border': 1
         }),
         'MAIL': workbook.add_format({
-            'bg_color': '#DDEBF7'
+            'bg_color': '#DDEBF7',
+            'border': 1
         }),
         'DISH': workbook.add_format({
-            'bg_color': '#FFEB9C'
+            'bg_color': '#FFEB9C',
+            'border': 1
         }),
         'PLAYTIME': workbook.add_format({
-            'bg_color': '#B6D7A8'
+            'bg_color': '#B6D7A8',
+            'border': 1
         }),
         'SEE SLIPS': workbook.add_format({
-            'bg_color': '#D9D9D9'
+            'bg_color': '#D9D9D9',
+            'border': 1
         }),
         'BALLOONS': workbook.add_format({
-            'bg_color': '#EAD1DC'
+            'bg_color': '#EAD1DC',
+            'border': 1
         }),
         'PHONES': workbook.add_format({
-            'bg_color': '#DBDBDB'
+            'bg_color': '#DBDBDB',
+            'border': 1
         }),
         'CAMP STORE': workbook.add_format({
-            'bg_color': '#C9DAF8'
+            'bg_color': '#C9DAF8',
+            'border': 1
         }),
         'PIZZA': workbook.add_format({
-            'bg_color': '#F4CCCC'
+            'bg_color': '#F4CCCC',
+            'border': 1
         }),
         'DH': workbook.add_format({
-            'bg_color': '#F4CCCC'
+            'bg_color': '#F4CCCC',
+            'border': 1
         }),
         'WATER RUN': workbook.add_format({
-            'bg_color': '#F4CCCC'
+            'bg_color': '#F4CCCC',
+            'border': 1
         }),
         'BALLOONS': workbook.add_format({
-            'bg_color': '#F4CCCC'
+            'bg_color': '#F4CCCC',
+            'border': 1
         }),
         'FLAG UP': workbook.add_format({
-            'bg_color': '#F4CCCC'
+            'bg_color': '#F4CCCC',
+            'border': 1
         }),
         'SEE EAGLE': workbook.add_format({
-            'bg_color': '#F4CCCC'
+            'bg_color': '#F4CCCC',
+            'border': 1
         }),
         'FLAG UP': workbook.add_format({
-            'bg_color': '#F4CCCC'
+            'bg_color': '#F4CCCC',
+            'border': 1
         }),
         'KSWAT1' : workbook.add_format({
             'align': 'center',
@@ -2153,14 +2113,16 @@ class OutputSchedule():
                         multi_period_task_name_counter += 1
                         if multi_period_task_name_counter == duration:
                             start_col = column - (duration-1) #minus one bc duration count is inclusive, we have to account for timeslot we are in as part of it
-                            worksheet.merge_range(row, start_col, row, column, task, task_format[task])
+                            format = task_format.get(task,task_format.get('Default'))  
+                            worksheet.merge_range(row, start_col, row, column, task, format)
                             multi_period_task_name_counter = 0
                         column += 1
                     else:
-                        worksheet.write(row, column, task, task_format[task])
+                        format = task_format.get(task, task_format.get('Default'))  #bc wont take a list type thing in the ar
+                        worksheet.write(row, column, task, format) #.get to prevent key error if i havent added a format for it, could i set it to None also? idk would have to read docs
                         column += 1
                 else:
-                    worksheet.write(row, column, task)
+                    worksheet.write(row, column, task) #just puts blank
                     column += 1  # Skip if no task
             row += 1
         

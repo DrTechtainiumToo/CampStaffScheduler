@@ -1,3 +1,94 @@
+
+
+OLD CSV CONVERTER STRUCTURES:
+
+
+
+
+                """defaultTasksDictionary[row['TaskVariableName']] = TaskManager.Task(
+                    task_name = row['TaskName'],
+                    task_frequency = row['Frequency'],
+                    start_time = row['StartTime'],
+                    duration = row["TaskDuration"],
+                    min_num_people_needed = row['MinNumPeopleNeeded'],
+                    
+                    #NOTE WHY DESIGN CHOICE - two choices here: can either set if there is no value, value = None, or can do it in the sheet then could just do **rows and not have to specify every column each time want to change. NO BC will have to change col key in sheet if var ref changes. Prob good to handle that here, cus easier on user? easy to change.
+                    #Decide to set column title to var, that way can change column titles as needed and wont effect the var names, vs column name is just assigned to var. Little more intensive but can also use the func for all task csv's
+                    
+                    #NOTE IMPORTANT - whatever you name these vars will be the attr names, BE CAREFUL
+                    importance = row.get(row['Importance'], None), #WHY - row.get() bc row is keting the key values from the csv which acts like a dict, so need to use it on row to protect agasint key eerrors aka no value for column header 
+                    task_cost=row.get('TaskCost', None),  # Calculated later, default set here if needed
+                    chosen=row.get('WillSpawnTodayChosen', None),
+                    task_tier=row.get('Tier', None),
+                    gender_specific=row.get('GenderSpecific', None),
+                    gender_required=row.get('GenderReq', None),
+                    pref_time=row.get('PrefTime', None),
+                    time_preferred=row.get('TimePreferred', None),
+                    not_before_time=row.get('NotBeforeTime', None),
+                    not_after_time=row.get('NotAfterTime', None),
+                    start_time2=row.get('StartTime2', None),
+                    start_time3=row.get('StartTime3', None),
+                    start_time4=row.get('StartTime4', None),
+                    start_time5=row.get('StartTime5', None),
+                    start_time6=row.get('StartTime6', None),
+                    scheduledoccurance=row.get('ScheduledOccurance', None),
+                    occurs_every_n_days=row.get('OccursEveryNDays', None),
+                    spawn_sunday=row.get('SpawnSunday', None),
+                    spawn_monday=row.get('SpawnMonday', None),
+                    spawn_tuesday=row.get('SpawnTuesday', None),
+                    spawn_wensday=row.get('SpawnWensday', None),
+                    spawn_thursday=row.get('SpawnThursday', None),
+                    spawn_friday=row.get('SpawnFriday', None),
+                    spawn_saturday=row.get('SpawnSaturday', None),
+                    task_variable_name=row.get('TaskName'),  # Assuming TaskVariableName2 is used as a unique identifier
+                    category=row.get('Category', None),
+                    preassigned_to=row.get('PreassignedTo', None) #NOTE not needed currently, if error with assignees check this
+                )"""    
+
+
+OLD TASK ARGS AND SELF ASSIGNMENT
+ #task_cost=None, preassigned_to=None, chosen=None, task_tier=None, gender_specific=None, gender_required=None, preassigned=None, pref_time=None, time_preferred=None, not_before_time=None, not_after_time=None, start_time2=None, start_time3=None, start_time4=None, start_time5=None, start_time6=None, scheduledoccurance=None, occurs_every_n_days=None, spawn_sunday=None, spawn_monday=None, spawn_tuesday=None, spawn_wensday=None, spawn_thursday=None, spawn_friday=None, spawn_saturday=None, task_variable_name=None, certs_required=None, requires_certs=None, category=None):
+ 
+            self.gender_specific = gender_specific
+            self.gender_required = gender_required
+            self.preassigned = preassigned
+            self.pref_time = pref_time  # Optional, based on your TODO note
+            self.time_preferred = time_preferred  # Optional, based on your TODO note
+            self.not_before_time =  not_before_time
+            self.not_after_time = not_after_time
+            self.start_time2 = start_time2
+            self.start_time3 = start_time3
+            self.start_time4 = start_time4
+            self.start_time5 = start_time5
+            self.start_time6 = start_time6
+            self.start_time = [time for time in [start_time, start_time2, start_time3, start_time4, start_time5, start_time6]] #if time.strip() #Thanks GPT4 
+            #why did i need .strip() again?  #now its - ['7:00am', '', '', '', '', '']  
+            self.scheduledoccurance = scheduledoccurance
+            self.occurs_every_n_days = occurs_every_n_days
+            self.spawn_sunday = spawn_sunday
+            self.spawn_monday = spawn_monday
+            self.spawn_tuesday = spawn_tuesday
+            self.spawn_wensday = spawn_wensday
+            self.spawn_thursday = spawn_thursday
+            self.spawn_friday = spawn_friday
+            self.spawn_saturday = spawn_saturday
+            self.chosen = chosen
+            self.task_cost = "To be caculated at assignment time in algorith with calc_task_cost()"
+            self.preassigned_to = preassigned_to #TODO MAYBE REMOVE that way can look up task to see who is assigned to it and when (when part might be more complicated)
+            self.assigned_to = {key: [] for key in dayTimeSlotsKeysList} #Time, and who assigned to ( in list)#when, who #TODO GENERATE APON SCHEDULING
+            self.task_variable_name = task_variable_name
+            self.start_time_iter = 0
+            self.requires_certs = requires_certs
+            self.certs_required = certs_required #List the cert req, maybe set to dict by default? so easy to call up?? and can = 0 if none of type req. like {} for none or {None:None} or {Lifegaurd:2}
+            self.category = category
+            #TODO add this to csv file, and file converter program
+            #self.order
+
+
+
+
+
+
 def employeeAdjustmentSection():
     """
     makes user adjust employee availabilites.

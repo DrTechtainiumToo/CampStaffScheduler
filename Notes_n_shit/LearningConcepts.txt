@@ -1,17 +1,16 @@
 
 #LEARNING SHIT AND OTHER STUFF ------------------------------:
 
-#LEARNING CONCEPT if getting "dict_keys" at beginning of list, cus trying to get the keys, then call list() on the dictionary instead:
+#LEARNING CONCEPT if getting "dict_keys" at beginning of list, cus trying to get the keys, then call list() on the dictionary instead, this is when printing tho
 #LEARNING - I keep accidentally doing == evaluator operator # instead of = assignment operator when I use T/F for loops and then I wonder why the loop doesn't work
-#LEARNING CONCEPT - strings are immutable so have to specifically assign shit to them
-#LEARNING CONCEPT - can use (string name).replace("thing to replace", "thing to replace with") to replace stuff in a string
-#LEARNING CONCEPT -
+#LEARNING CONCEPT: - strings are immutable so have to specifically assign shit to them
+#LEARNING CONCEPT: - can use (string name).replace("thing to replace", "thing to replace with") to replace stuff in a string
 #LEARNING CONCEPT GPT4- python treats empty strings ("") as False and non-empty strings as True when evaluated in a Boolean context.
 #LEARNING CONCEPT: GPT-4 Assigning data to obj.attr (obj.attr = userData) doesn't actually change the attribute named attr. To set an attribute on an object dynamically, use setattr(obj, attr_name, value) instead of obj.attr = value.
 #LEARNING CONCEPT: dir() function to get a list of all the attributes (including methods) of an object.
 #LEARNING CONCEPT: use the getattr(obj,attr) function to retrieve the value of each attribute.
 #LEARNING CONCEPT: You'll want to filter out methods and focus on attributes, which you can do by using the callable() function or checking attribute types, 
-#LEARING CONCEPT - range (timeAPeriod,timeBPeriod+1) why +1, because the range funciton is sort of like a list where it starts at 0, so to have it include the end digit you have to give it+1
+#LEARnING CONCEPT: - range (timeAPeriod,timeBPeriod+1) why +1, because the range funciton is sort of like a list where it starts at 0, so to have it include the end digit you have to give it+1
 #LEARNING CONCEPT: If not - The if not statement in Python checks for the opposite of the condition specified, is used to execute a block of code if a condition evaluates to False.
 #LEANRING CONCEPT: Not operator is a logical operator that inverts the truth value of the condition that follows it
 #LEARNING CONCEPT: In operator is used to check if a value exists within a sequence or collection, such as a list, tuple, string, dictionary, or set. 
@@ -28,7 +27,19 @@
 #LEARNING CONCEPT: strip(), Return a copy of the string with leading and trailing whitespace removed.
 #LEARNING - If broken check to make sure dont have something twice, like an input or variable if it is broken via search / find like Issac did
 #WHEN DEBUGGING remeber that everyhting is imported from csv so might need to use int()
-#LEARNING CONCEPT - HOW TO MAKE PYHTON WAIT BEFORE EXECUTING SOMETHING, import time, then time.sleep(x)
+#LEARNING CONCEPT: - HOW TO MAKE PYHTON WAIT BEFORE EXECUTING SOMETHING, import time, then time.sleep(x)
+#LEARNING CONCEPT: - https://docs.python.org/3/howto/logging.html loggging
+#LEARNING CONCEPT: - Dict & List Unpacking + Functions, literally *args and **kwargs are just the argument versions of **dict and *list unpackings.
+#LEARNING CONCEPT: - .get() is a dict method? can provide default if no key to avoid KeyError. If default not given auto gives None.
+#LEARNING CONCEPT: - iterating over kwargs iters over the keys not the values
+#LEARNING CONCEPT: - Q: what about if I want to see if a word is inside a string? A: 
+#LEARNING CONCEPT: - Use 'continue' to skip if statments and other conditionals say if dont want to execute on certain conditions, but do on others
+#LEARNING CONCEPT: - GPT explains my mistake to me, in importance = row.get(row['Importance'], None), get() wont protect me bc row is fecting the dictionary so I need to use get() on the row. Thus will use: importance = row.get('Importance', None)
+
+
+
+
+
 
 #LEARNING CONCEPT & CODE snippet efficency
 #easier way to return t/f values in a function

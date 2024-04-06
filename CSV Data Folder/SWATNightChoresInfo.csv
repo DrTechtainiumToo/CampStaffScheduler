@@ -1,18 +1,18 @@
-﻿TaskName,TaskDuration, GenderReq,MinNumPeopleNeeded,Frequency,StartTime,SpawnSunday,SpawnMonday,SpawnTuesday,SpawnWensday,SpawnThursday,SpawnFriday,SpawnSaturday,TaskCost,Category
-OFFICE,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-GIRLS GROTTO,1, Female,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-BARRET,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-PAC,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-OFFICE,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-GIRLS BATH,1, Female,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-TRASH WATER,1,,3,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-PAC,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-CLODGE,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-CHAPEL,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-POOL,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-SLOUNGE,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-PAV,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-HC,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-BOYS BATH,1, Male,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-BOYS GROTTO,1, Male,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
-POOL,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+﻿TaskVariableName,TaskName,TaskDuration,GenderReq,MinNumPeopleNeeded,Frequency,StartTime,SpawnSunday,SpawnMonday,SpawnTuesday,SpawnWensday,SpawnThursday,SpawnFriday,SpawnSaturday,TaskCost,Category
+OFFICE,OFFICE,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+GIRLS GROTTO,GIRLS GROTTO,1," Female",1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+BARRET,BARRET,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+PAC,PAC,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+OFFICE,OFFICE,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+GIRLS BATH,GIRLS BATH,1," Female",1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+TRASH WATER,TRASH WATER,1,,3,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+PAC,PAC,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+CLODGE,CLODGE,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+CHAPEL,CHAPEL,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+POOL,POOL,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+SLOUNGE,SLOUNGE,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+PAV,PAV,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+HC,HC,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+BOYS BATH,BOYS BATH,1," Male",1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+BOYS GROTTO,BOYS GROTTO,1," Male",1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
+POOL,POOL,1,,1,1,9:00pm,Yes,Yes,Yes,Yes,Yes,Yes,No,,NightChore
