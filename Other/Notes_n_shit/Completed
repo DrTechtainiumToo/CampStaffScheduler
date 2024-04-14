@@ -1,0 +1,9 @@
+Completed Tasks List:
+
+
+#DONE create nightchore list and data structures
+#DONE via editior / complete incomplete tasks take remaining slots and ones that require user input off the diplay / desribe list and edit list???? idk how to deal with them. atleast take cusotm ones off, can ask what they want spare slots to be.
+#DONE, aslo make (column values to tasks csv to parameter var names for task class) them keyword for crying out loud so dont have to deal with this shit
+#DONE to break down function more, and have better single responsibility may I should split
+#DONE wonder if i can sort obj and durations together via dict, then just get the keys and make list and it would be faster?
+
