@@ -1,0 +1,18 @@
+Mainly expalining hwo to make a fornt end for this, and concepts to be familar with.
+
+
+Key Data Points
+Task Name and Tier: These identify the task and its priority or level.
+Task Duration and Frequency: Important for scheduling and understanding how often a task should occur.
+Minimum Number of People Needed: Indicates the staffing requirements for each task.
+Day-specific Fields: These indicate on which days tasks can spawn (e.g., SpawnMonday, SpawnTuesday).
+Gender Specific Requirements: May be relevant for certain tasks that have specific gender requirements.
+Special Circumstances: For conditional task activation.
+Recommended GUI Components
+Task Overview Card: Each task can have a card-like interface showing key details at a glance (name, tier, duration, next occurrence).
+Detailed Edit Modal: Clicking on a task card can open a modal or a new page with detailed editable fields:
+Text Fields: For task name and other descriptions.
+Number Input: For task duration and people required.
+Dropdowns: For tier, and binary choices like gender-specific needs.
+Checkboxes or Toggles: For each day of the week to indicate when the task can occur.
+Conditional Fields: Display or hide based on specific requirements (e.g., show gender requirement options only if "Gender Specific" is toggled on).

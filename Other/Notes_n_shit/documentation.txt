@@ -1,0 +1,193 @@
+Credit to Chat GPT for recommending how I should split up what had been a 2100+ Lines that i had to navigate.
+
+Modularization Steps
+Isolate the Core Logic: Separate all your business rules and algorithms from any input/output code. This core module will handle tasks, scheduling algorithms, and any other logic.
+Create a Data Access Layer: This layer will handle all database interactions or file manipulations. It acts as an intermediary between the core logic and the actual data storage.
+Develop the Terminal Interface: This module will handle user input from the command line and display outputs. It will make calls to the core logic but manage user interactions independently.
+Develop the Web Interface: Similar to the terminal interface, this will handle HTTP requests and responses. It will use frameworks like Flask or Django to manage web routes and sessions.
+Configuration and Bootstrap: Implement a configuration system that can read settings (possibly from a file) to decide which front-end to launch. This part of the system will also handle the initialization and setup of dependencies.
+Dependency Injection: Utilize dependency injection for flexibility in swapping out components, such as replacing a mock database with a real one or changing the user interface.
+
+/project_root
+    /backend
+        __init__.py
+        /core
+            __init__.py
+            task_manager.py
+            scheduler.py
+        /data
+            __init__.py
+            database.py
+            file_manager.py
+    /interfaces
+        __init__.py
+        /terminal
+            __init__.py
+            terminal_ui.py
+        /web
+            __init__.py
+            web_server.py
+    /config
+        __init__.py
+        settings.py
+    main.py
+/ = folder
+
+task_manager.py and scheduler.py would contain your business logic.
+database.py and file_manager.py handle all data storage and retrieval.
+terminal_ui.py manages the command line user interface.
+web_server.py sets up the web routes and handlers.
+settings.py manages configurations, such as which UI to use or database settings.
+main.py would be the entry point of the application, reading the configuration, initializing the appropriate UI, and starting the application.
+
+Core Logic (Backend Services)
+Handles all business logic, such as task management, scheduling, and data manipulation.
+Provides API-like functions that the different front-ends can call.
+
+Data Access Layer
+Manages all interactions with persistent storage (e.g., databases, files).
+Provides abstracted functions to retrieve and store data, ensuring the core logic is not dependent on the storage mechanism.
+
+Terminal Interface
+Handles all input/output in the terminal environment.
+Calls services from the core logic to perform operations.
+
+Web Interface
+A web server (e.g., using Flask) that provides endpoints for web-based interactions.
+Converts HTTP requests into service calls to the core logic.
+
+Configuration/System Initialization
+Manages configuration settings that determine which front-end to use and other system behaviors.
+Initializes the system based on the selected configuration.
+
+
+
+To set up __init__.py files effectively in your Python project, you'll want to follow a few straightforward steps. These files are used to initialize Python packages and can include import statements, initialization code, or define __all__ to limit imports from the package to specific modules. Here’s a simple guide on how to use them:
+
+1. Create __init__.py in Each Directory
+First, place an __init__.py file in every directory that you want to treat as a Python package. This includes your main project folder and any subdirectories containing Python code that you want to import. The presence of an __init__.py file in a directory indicates to Python that the directory should be treated as a package.
+
+Basic Structure
+Suppose you have the following directory structure:
+
+markdown
+Copy code
+myproject/
+│
+├── backend/
+│   ├── __init__.py
+│   ├── database.py
+│   └── api.py
+│
+├── core/
+│   ├── __init__.py
+│   ├── utilities.py
+│   └── settings.py
+│
+└── __init__.py
+2. Use __init__.py to Manage Imports
+You can use the __init__.py file to facilitate and control how modules within the package are exposed to the rest of your application. For example:
+
+myproject/backend/init.py
+python
+Copy code
+from .database import DatabaseManager
+from .api import start_api_service
+myproject/core/init.py
+python
+Copy code
+from .utilities import parse_data, calculate_metrics
+from .settings import load_settings
+3. Define __all__
+You can also define an __all__ list in your __init__.py file to specify which modules or symbols the package exports by default when imported with from package import *.
+
+myproject/core/init.py
+python
+Copy code
+__all__ = ['parse_data', 'calculate_metrics', 'load_settings']
+This list restricts what is imported when you use the from ... import * syntax. It doesn’t limit what can be accessed directly (e.g., from package.module import X).
+
+4. Initialize Package Resources
+If your package needs to perform some initialization tasks, such as setting up a connection pool or loading configuration data when the package is first imported, add this code to __init__.py.
+
+myproject/backend/init.py
+python
+Copy code
+print("Initializing backend package...")
+db_manager = DatabaseManager()
+db_manager.setup()
+5. Importing From Your Package
+Now you can import the modules or defined variables/functions from anywhere in your project as follows:
+
+python
+Copy code
+from myproject.backend import start_api_service
+from myproject.core import parse_data, load_settings
+These __init__.py files make your imports cleaner and your package's structure more understandable, while also encapsulating package initialization logic in a central place
+
+
+
+
+#TODOLIST bc my dumbass has 1mb of working memory ----------------------------------------------------------------------------------------------------------------
+
+#TODO Redo defaultInfo csv file, storage, retrevial, and interpetation system. Now need to ad gender column too
+#TODO Create save system for preferential stuff that you dont want to type in repeatedly but cant be in defaultInfo, will have to maeke csv readers & converters tho
+#TODO Finish getting all the time and special events listed
+#TODO Create master task list (just add some stuff some like 80% there)
+#TODO Preferences system
+#TODO Time system, how work? its input blocks or time date, or give options. also make smart function to calc distance btwn two numbers to get duration, will have to maeke csv readers & converters too tho
+#TODO Importance system
+#TODO Multi-timeblock system
+#TODO Merge all input data into master roster for algorithm
+#TODO Actually devlop algorithm - will be a pain in the ass week long affair probbably
+    #TODO Probability system
+    #TODO Sort system and arrange data for selectioin
+    #TODO Anti Overlap System
+    #TODO A bunch of other algorithim stuff
+    #TODO Error Log, Exceptions, & Final Error Report System
+    #TODO prob a bunch of other shit I forgot
+#TODO Format Console Output (Potentially scrapped)
+#TODO Format CSV / Excel Output --> Core Feature
+#TODO Decide if format for google sheets or app plugin (Somewhat likely)
+#TODO Decide if format for web application deployment via Flask and Google Cloud (Highly Likely)
+#TODO Potentially make gui to make input easier??? DO AFTER Decide on output format
+#TODO Final review of entire system for user friendly-ness changes and bugs
+#TODO Review to ensure scalability
+#TODO Documentation
+#TODO Bug Reporting and Diagnostic Mechanism - maybe make an internal log that saves each time you use and had a toon of data so if there is a glitch, or at the end fo the program it asks the user any glitches, if yess then saves to log which i can look at later and user can also make comments on messsup.
+#TODO Clean up comments and consolidate learning experience and examples maybe at the end to show what learned?
+#TODO Cry
+#TODO Get user feedback, incoperate feedback & iterate
+#TODO Finalize & Deploy
+
+
+--------- Aditional TODOS during development:
+
+#NOTE can add functionality later, keep it simple
+#TODO #should Nightchores be own dict? how would that work????????, review how assignment work. maybe need mater dict idk, then before algo merge all together after sort??????? idk idk idk 
+#TODO look at algorithm need to figure out if A: What happens if don't fill the Freq column? does it default to 1? What about the duration, should i look at this for class and algo?, what about gender req and min_num_of_people. Think about errors and exceptions
+#TODO BIGGER PICTURE should night chroe be defined by tie or by after sweeting, etc. How should i define stuff like this??
+#This question is part of the problem of getting tasks to spawn inbetween stuff.
+
+#PROGRAM OVERVIEW --------------------------------------------------
+#load in default info, employee gender info & nickname, basic tasks & stand duration, timeslots, & nightchore
+#Ask for special tasks for the day and relevant info, also determine based on date user inputs what are some routinly occuring speical events that need to be accounted for.
+#Generate Total Tasks
+#People Avialable for day (Check for exceptions), *also find out partial avialibilites*
+#Timeslot
+#Tasks due in timeslot & number of people per task
+#Rank tasks in importance
+#See how many ppl avail in timeslot, then check if enough people  to complete tasks for that timeslot -> throw exception if isnt list shortage amount, 
+#then base on importance list find how many task you can fill and then state what tasks cannot be filled, maybe in final log
+#then take that list and save it in new variable to be used in the assignment loop for that slot???? idk, that way dont have to re calc in loop. (Could hurt multi timeslot assignments maybe??)
+#(Req people task preferences???)
+# MAKE THIS A LOOP, Assign tasks  until all needed tasks are assigned or no room / people to complete all task in slot (make sure (idk when in program) to define when task need done by / deadlines  
+    #How to implement the assignment loop? 
+    #Take list of tasks that we determined earlier can be filled, then start with most important task, but first check if it is a mulit hour / timeslot task if it is then (Nested loop?) take the pool of avialible employees and randomly select one, 
+    #this probbaility can be modifyied by a pref variable which can make it more liely for certain employees to get certain tasks if they prefer them, this information would be stored somewhere in the program and could be modified by the user.
+    #See if the selected employee is avialiable for next time slots or as long as needed for the long task, if not then cycle to next until find one? If it is not a long task then just randomly select from the available employee pool and employee, 
+    #Also some tasks are gender dependent: but really only matters for specific special events that happen at a routine time every week: men-womans sessions & nightchores such as clenaing men or womens bathroom etc.
+    #Randomly select person (Based on "people power" (lol) pool calc probbability of person recieving each task) #loop by person or task? does it matter??? -Person bc assigning it to a person
+    #Then if can't assign all tasks in timeslot give error and add to final report what couldnt be assigned what was moved and why, and if able to fit into the schudle someowhere else maybe dont notify in final report?
+#Print final scheudle output and error logs in console, also write resutls to CSV so can be the formatted or manually modified in excel or google sheets. Maybe if adapated as a google workspace add in it could directly output the information into the sheet then user made final adjsutments.
+
