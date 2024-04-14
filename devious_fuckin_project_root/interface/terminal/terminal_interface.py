@@ -47,7 +47,7 @@ from interface.terminal.terminal_ui_logic import (
     EmployeeAvailabilityUI,
     describe_dynamic_time_slot_qeues
 )
-from backend.core.scheduler2 import return_scheduling_algo_time, instantiate_and_run_scheduler
+from backend.core.scheduler import return_scheduling_algo_time, instantiate_and_run_scheduler
 from backend.core.output_schedule import OutputSchedule
 
 def display_menu(options):
