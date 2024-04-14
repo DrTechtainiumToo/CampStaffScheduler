@@ -1,0 +1,28 @@
+Task Population and Sorting
+Populating the Queue:
+Finding Tasks: For each given time slot, tasks are identified that have a start time matching the time slot (find_tasks_in_time_slot). This involves filtering tasks where the current time slot equals the task's start time as indexed by start_times_iter.
+Sorting Tasks:
+By Duration: Tasks are first sorted by duration in descending order (sort_tasks_by_duration), prioritizing longer tasks.
+By Tier: Subsequently, tasks are sorted by their tier to prioritize tasks of higher importance or urgency (sort_tasks_by_tier).
+Handling Special Tasks:
+Windowed Tasks: Tasks that might have flexible scheduling within certain time windows are collected separately (collect_windowed_tasks). This could involve tasks that are not strictly bound to start at the beginning of their time windows but have a preferred duration.
+
+
+Start
+|
+|--> Initialize Schedule
+|     |--> Create Time Slot Queues
+|
+|--> Populate Queues with Tasks
+|     |--> Find Tasks for Each Time Slot
+|     |--> Sort Tasks by Duration
+|     |--> Sort Tasks by Tier
+|     |--> Collect Windowed Tasks
+|
+|--> Assign Tasks
+      |--> For Each Task in Queue:
+            |--> Calculate Time Slots Needed
+            |--> Select Employees
+            |--> Assign Employees to Task
+            |--> Update Task and Employee Data
+End

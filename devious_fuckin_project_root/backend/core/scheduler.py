@@ -5,7 +5,13 @@ from typing import Dict, List, Any
 from backend.core.tasks import TaskManager
 from backend.core.employees import EmployeeManager, Employee
 
-
+def scheduling_algo_prep(task_dict, task_manager):
+    """just presorting some stuff for efficency"""
+    task_dict = sorted
+    #TODO figure this out to speedup search algorithm
+    
+    #TODO populate queues concurrently - last resort
+    #also can concurrently load tasks stuff while filling out time info.
 
 class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj if inst then will refer to inst? what if multiple
     def __init__(self) -> None:

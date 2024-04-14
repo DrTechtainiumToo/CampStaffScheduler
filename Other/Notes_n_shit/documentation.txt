@@ -128,28 +128,30 @@ These __init__.py files make your imports cleaner and your package's structure m
 
 
 
-#TODOLIST bc my dumbass has 1mb of working memory ----------------------------------------------------------------------------------------------------------------
+TODOLIST bc my dumbass has 1mb of working memory ----------------------------------------------------------------------------------------------------------------
 
-#TODO Redo defaultInfo csv file, storage, retrevial, and interpetation system. Now need to ad gender column too
+#DONE Redo defaultInfo csv file, storage, retrevial, and interpetation system. Now need to ad gender column too
 #TODO Create save system for preferential stuff that you dont want to type in repeatedly but cant be in defaultInfo, will have to maeke csv readers & converters tho
-#TODO Finish getting all the time and special events listed
-#TODO Create master task list (just add some stuff some like 80% there)
-#TODO Preferences system
-#TODO Time system, how work? its input blocks or time date, or give options. also make smart function to calc distance btwn two numbers to get duration, will have to maeke csv readers & converters too tho
-#TODO Importance system
-#TODO Multi-timeblock system
-#TODO Merge all input data into master roster for algorithm
+#IN PROGRESS Finish getting all the time and special events listed
+#DONE Create master task list (just add some stuff some like 80% there)
+#IN PROGRESS Preferences system
+#DONE Time system, how work? its input blocks or time date, or give options. also make smart function to calc distance btwn two numbers to get duration, will have to maeke csv readers & converters too tho
+#SCRAPPED Importance system
+#DONE Multi-timeblock system
+#DONE Merge all input data into master roster for algorithm
+#TODO village schedule, and smart offweek system and associated tasks
+#TODO Sweetings
 #TODO Actually devlop algorithm - will be a pain in the ass week long affair probbably
     #TODO Probability system
-    #TODO Sort system and arrange data for selectioin
-    #TODO Anti Overlap System
-    #TODO A bunch of other algorithim stuff
-    #TODO Error Log, Exceptions, & Final Error Report System
-    #TODO prob a bunch of other shit I forgot
-#TODO Format Console Output (Potentially scrapped)
-#TODO Format CSV / Excel Output --> Core Feature
-#TODO Decide if format for google sheets or app plugin (Somewhat likely)
-#TODO Decide if format for web application deployment via Flask and Google Cloud (Highly Likely)
+    #IN PROGRESS anti cert use up system
+    #TODO no double-consecutive assignment system (no 2 KWSATS in a row)
+    #DONE Sort system and arrange data for selectioin
+    #DONE Anti Overlap System
+    #IN PROGRESS Multi-time windowed tasks
+#IN PROGRESS Format Console Output (Potentially scrapped)
+#IN PROGRESS Format CSV / Excel Output --> Core Feature
+#SCRAPPED Decide if format for google sheets or app plugin (Somewhat likely)
+#PLANNED Decide if format for web application deployment via Flask and Google Cloud (Highly Likely)
 #TODO Potentially make gui to make input easier??? DO AFTER Decide on output format
 #TODO Final review of entire system for user friendly-ness changes and bugs
 #TODO Review to ensure scalability
@@ -164,8 +166,8 @@ These __init__.py files make your imports cleaner and your package's structure m
 --------- Aditional TODOS during development:
 
 #NOTE can add functionality later, keep it simple
-#TODO #should Nightchores be own dict? how would that work????????, review how assignment work. maybe need mater dict idk, then before algo merge all together after sort??????? idk idk idk 
-#TODO look at algorithm need to figure out if A: What happens if don't fill the Freq column? does it default to 1? What about the duration, should i look at this for class and algo?, what about gender req and min_num_of_people. Think about errors and exceptions
+#DONE #should Nightchores be own dict? how would that work????????, review how assignment work. maybe need mater dict idk, then before algo merge all together after sort??????? idk idk idk 
+#DONE look at algorithm need to figure out if A: What happens if don't fill the Freq column? does it default to 1? What about the duration, should i look at this for class and algo?, what about gender req and min_num_of_people. Think about errors and exceptions
 #TODO BIGGER PICTURE should night chroe be defined by tie or by after sweeting, etc. How should i define stuff like this??
 #This question is part of the problem of getting tasks to spawn inbetween stuff.
 
