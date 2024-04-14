@@ -1,9 +1,12 @@
 import time
-from config.utility import timer
+
+start_main_algo_time = time.perf_counter()
+from config.utility import timer # type: ignore
 import random
 from typing import Dict, List, Any
-from backend.core.tasks import TaskManager
-from backend.core.employees import EmployeeManager, Employee
+from backend.core.tasks import TaskManager # type: ignore
+from backend.core.employees import EmployeeManager, Employee # type: ignore
+#import pyximport; pyximport.install() # type: ignore
 
 
 
@@ -294,3 +297,12 @@ def instantiate_and_run_scheduler(
         task_manager,
         employee_manager,
     )
+
+
+end_mainAlgo_time = time.perf_counter()
+elapsed_mainAlgo_time = round(end_mainAlgo_time - start_main_algo_time, 5)
+
+
+def return_scheduling_algo_time():  # hmm how to do, so can easily use in frontend???, oh auto global variable - need to brush up more on functions
+    algo_time = f"Elapsed time for main algorithim: {elapsed_mainAlgo_time} seconds"
+    return algo_time

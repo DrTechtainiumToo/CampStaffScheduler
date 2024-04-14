@@ -4,6 +4,8 @@ from config.utility import timer
 from backend.core.time_processes import fill_time_slots_inbetween_A_and_B, find_valid_time_slot
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
+from typing import Dict, List, Any
+
 
 def get_employee_name_gender_list_from_csv():
     pass
@@ -113,7 +115,7 @@ class Employee:
     def get_available_time_slots(self):
         return list(self.availability.keys())
     
-    def assign_task(self,time_slot,task):
+    def assign_task(self, time_slot: Any, task: str):
         """adds the task to the employees dict of times and tasks assigned at time
         Args:
             time_slot (str): 7:00am etc

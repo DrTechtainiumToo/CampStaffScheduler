@@ -15,8 +15,6 @@ from config import settings, utility
 import asyncio
 import os
 
-#logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 def main(): 
     #does execution logic
     
