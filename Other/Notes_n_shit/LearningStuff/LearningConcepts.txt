@@ -37,6 +37,7 @@
 #LEARNING CONCEPT: - GPT explains my mistake to me, in importance = row.get(row['Importance'], None), get() wont protect me bc row is fecting the dictionary so I need to use get() on the row. Thus will use: importance = row.get('Importance', None)
 #LEARNING CONCEPT: - any() generator
 #LEARNING CONCEPT: __init__.py marks a directory as a Python package, allowing its modules to be imported.
+#LEARNING CONCEPT: Generators - (expression for item in iterable if condition)
 
 
 

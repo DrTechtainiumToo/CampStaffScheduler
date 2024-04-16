@@ -59,9 +59,12 @@ def xyz_input_auto_completer(promptstring, refList): #TODO this might mess up mu
         refList (list): _description_
     """
     # Define a list of autocomplete words.
-    xCompleter = WordCompleter(refList,ignore_case=True) #WHY ignore_care=True, allowing case-insensitive input bc some ref list entries may be capitalized, but dont want to make user have to capitalize input to get auto suggestion    
-    user_input = prompt(promptstring, completer=xCompleter)
-    return user_input
+    try:
+        completer = WordCompleter(refList, ignore_case=True) #WHY ignore_care=True, allowing case-insensitive input bc some ref list entries may be capitalized, but dont want to make user have to capitalize input to get auto suggestion    
+        user_input = prompt(promptstring, completer=completer)
+        return user_input
+    except Exception as e:
+        print("Error during prompt:", e)
 
 # Selection sort
 # time complexity O(n*n)

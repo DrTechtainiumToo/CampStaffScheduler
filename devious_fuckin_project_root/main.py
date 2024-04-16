@@ -6,6 +6,11 @@ __version__ = "1.3.2"
 __maintainer__ = "Andrew Dybala"
 __email__ = "andrew@dybala.com"
 __status__ = "In development"
+__compiler__ = "Python 3.12.0"
+
+#https://medium.com/@joshuale/a-practical-guide-to-python-project-structure-and-packaging-90c7f7a04f95
+#https://docs.python-guide.org/writing/structure/
+
 
 #import logging
 from interface import web_app
@@ -14,6 +19,10 @@ from backend.data import file_manager
 from config import settings, utility
 import asyncio
 import os
+import logging
+
+
+
 
 def main(): 
     #does execution logic
@@ -36,3 +45,6 @@ async def main_logic():
 
 if __name__ == "__main__":
     asyncio.run(main_logic())"""
+
+#python -m cProfile -s time your_script.py
+#snakeviz profile.prof

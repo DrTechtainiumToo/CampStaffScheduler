@@ -171,7 +171,7 @@ class OutputSchedule():
             'bg_color': '#F4CCCC',
             'border': 1
         }),
-        'FLAG UP': workbook.add_format({
+        'FLAG DOWN': workbook.add_format({
             'bg_color': '#F4CCCC',
             'border': 1
         }),
