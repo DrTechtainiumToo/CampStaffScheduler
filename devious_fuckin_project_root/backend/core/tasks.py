@@ -121,7 +121,7 @@ class TaskManager:
             self.start_time = [time for time in [start_time, self.start_time2, self.start_time3, self.start_time4, self.start_time5, self.start_time6]] #Thanks GPT4 
                 #why did i need .strip() again?  #now its - ['7:00am', '', '', '', '', '']  #NOTE if problems revert so start time given inital values then reassigns a list of all startime values to itself, #NOTE SEE IF BUG
             self.start_times_iter = 0
-            self.assigned_to = {key: [] for key in TaskManager.Task.dayTimeSlotsKeysList} #Time, and who assigned to ( in list)#when, who #TODO GENERATE APON SCHEDULING
+            self.assigned_to = {key: [] for key in TaskManager.Task.dayTimeSlotsKeysList} #Time, and who assigned to (in list)#when, who
             self.task_cost = "To be caculated at assignment time in algorith with calc_task_cost()"
             self.chosen #TODO figure out what use this for again, need to make documentation now at this point.
               
@@ -152,8 +152,8 @@ class TaskManager:
         def describe_var_name_times(self): 
            return self.task_variable_name, self.start_time 
 
-        #TODO fix up later
-        def describe_verbose(self):
+        #DONE fix up later
+        def describe_verbose(self) -> list[list[str], list[str], str]:
             attributes = []
             for attr_name, attr_value in vars(self).items(): #use pythons introspection abilites to help with this, can use vars(), get the vars of the obj, using dir() would have to filter out built in attr and use getattr() method
                 if attr_name in ['start_time2','start_time2','start_time3','start_time4','start_time5','start_time6']:

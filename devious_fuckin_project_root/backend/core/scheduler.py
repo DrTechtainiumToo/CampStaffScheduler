@@ -116,7 +116,6 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
             @timer
             def assign_task(task_name: str):
                 assigned_people: dict[str, Any] = {}
-                # TODO if leave stuff blank have it assume none or "", esp for tasks and stuff
                 # TODO evantually redo this and figure out how to implement how many certs you need. Also maybe make a table with prelisted number of people with certs, might be faster
 
                 def generate_list_of_eligible_employees() -> Any:  # need to rename this
@@ -141,7 +140,6 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
                     # lower probbs if certs in other things and tasks with those certs are needed in the period
                     return removeLater
 
-                # TODO optimize this if possible, bc have to do for everyone
                 def update_data(name: str, time_slots: list[str]) -> None:
                     # assigned_people[name] = None #TODO fix #POTENTIAL TO  CAUSE BUG hmm is this working right? so doesn't assing same people twice?? #ok if do this first, but then do total unavail. Proab could optimize here
                     # for multi duration tasks - rethink how to efficently implement this later.
@@ -252,19 +250,24 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
                 
                 #special process for windowed tasks -> moves task to next queue acc to freq attr
                 if task_name in self.windowed_tasks_list:
+                    #DONE, originally was problem bc check against windowed and windowed wansnt getting updated unless queue prematurely full, so have add to that list here
                     required_assignments = int(task_manager.tasks[task_name].frequency) 
                     current_assignments = sum(1 for people in task_manager.tasks[task_name].assigned_to.values() if people) #GPT had to help me on this one
                     if current_assignments < required_assignments:
                         #TODO make it skip certain times such as lunch, dinner, breakfast? or not nessecary
                         next_queue_key = dayTimeSlotsStandardizedNtS[self.time_slot_num + 1]
+                        Schedule.dynamicTimeSlotQueuesDict[next_queue_key].windowed_tasks_list.append(task_name)
                         Schedule.dynamicTimeSlotQueuesDict[next_queue_key].queue.append(task_name)
+                        
                     #else just stays in this queue like normal, doesn't go to next stage
                     #NOTE Moved out of update data bc otherwise ever person assigned goes thru this and adds a duplicate to next queue
             
             def roll_over_tasks(task: str) -> None:
                 """roll over remaining windowed tasks"""
+                
                 #easier to check here, than keeping lists, and removing any STATIC or non windowed tasks
                 start_index = self.queue.index(task)
+                
                 #TODO what if there is a windowed that was due this period but didn't get shceduled?? how do I filter it out?
                 filtered = [task for task in self.queue[start_index:] if task in self.windowed_tasks_list] #-1 to be inclusive of task
                 self.remaining_tasks = filtered
