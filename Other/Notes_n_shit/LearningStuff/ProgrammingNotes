@@ -16,8 +16,9 @@ Avoid circular imports, where two modules import each other as this can lead to 
 Use a __init__.py file in each directory that should be treated as a package. This isn’t necessary in Python 3.3 and above, but it can still be useful for clarifying package structure.
 Limit the use of global variables between modules. Instead, pass data to functions as parameters."""
 
-
 #try else
+
+#https://mypy.readthedocs.io/en/stable/getting_started.html
 
 
 Code Notes and Style ---------

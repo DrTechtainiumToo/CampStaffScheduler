@@ -4,8 +4,6 @@ import random
 from backend.core.tasks import TaskManager
 from backend.core.employees import EmployeeManager, Employee
 import logging
-import re
-pattern = re.compile(r'^[0-9]+$')
 from typing import Any
 test_type: int = 5
 
@@ -64,7 +62,7 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
             def find_tasks_in_time_slot(daysTasks: list[dict], searchVal: str) -> list[str]:
                 """Only dicts inside the input list!"""
                 activitesThatMeetCriteria: list[str] = []
-                for (dataGrouping) in (daysTasks):  # takes care of facts that the daysTasks is a list and tasks are in [0], aka daysTasks = [tasks to acess]
+                for dataGrouping in daysTasks:  # takes care of facts that the daysTasks is a list and tasks are in [0], aka daysTasks = [tasks to acess]
                     for key, instance in dataGrouping.items(): #NOTE why is key constant? 
                         # Assuming each value has a 'start_time' list and a 'start_times_iter' attribute bc iter is assigned 0 for all objs, and startime should be filled, esp since validated all task details earlier in program.
                         if (instance.start_time and 0 <= instance.start_times_iter < len(instance.start_time)):  #NOTE even needed, literally just doing an abstract version of code below. #to account for the fact that there may be multiple start times and are comparing to the right startime.
@@ -77,21 +75,15 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
                     #else: logging.warning(f"ERROR | prob an empty list or startime is out of bounds at: for key, instance in dataGrouping.items()")
                 return activitesThatMeetCriteria
             
-            tasks_matching_start_time = find_tasks_in_time_slot(self.daysTasks, self.time_slot)
-
             # PROBLEM, what if the duration or num of people is dynamically generated at assignment bc it depends on what other things have been added. in part what tier is for too
             def sort_tasks_by_duration(tasks: list[str]) -> list[str]:
                 tasks.sort(key=lambda task: tasks_dict[task].duration, reverse=True)
                 return tasks
             
-            tasks_by_duration = sort_tasks_by_duration(tasks_matching_start_time)
-
             # Sort by tier last, bc some large tasks may have to be scheduled last but by dur they wouldn't
             def sort_tasks_by_tier(tasks: list[str]) -> list[str]:
                 tasks.sort(key=lambda task: tasks_dict[task].tier)
                 return tasks
-
-            tasks_by_tier = sort_tasks_by_tier(tasks_by_duration)
 
             # TODO this will prob need quite a bit of work
             def collect_windowed_tasks(tasks: list[str]) -> None:  
@@ -103,9 +95,10 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
                     if "Yes" == getattr(tasks_dict[task], "window"):
                         self.windowed_tasks_list.append(task)
 
+            tasks_matching_start_time = find_tasks_in_time_slot(self.daysTasks, self.time_slot)
+            tasks_by_duration = sort_tasks_by_duration(tasks_matching_start_time)
+            tasks_by_tier = sort_tasks_by_tier(tasks_by_duration)
             collect_windowed_tasks(tasks_by_tier)
-
-            # TODO consider making match-reorder-reassign function for tier and duration functions, idk if will help with readability tho
             self.queue = tasks_by_tier
 
         @timer
@@ -288,19 +281,17 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
             for task in self.queue: #NOTE Shortcoming -what if task that trips this reqs 4, but next one reqs 2, and there are two employees avail, but when populating queue tasks are sorted by duration from max->min
                 if avail_employees_in_period: 
                     ppl_needed = task_manager.tasks[task].min_num_people_needed
-                    if pattern.match(ppl_needed): #TODO need to understand how regex works a little better, bc i think this will let some errors thru
+                    if ppl_needed.isdigit():
                         if (len(avail_employees_in_period)+1 >= int(ppl_needed)): 
                             if getattr(task_manager.tasks[task], "window", None) != "Yes": #if STATIC task
                                 assign_task(task)
                                 #break
-                            elif "Yes" == getattr(task_manager.tasks[task], "window") and ((int(task_manager.tasks[task].duration)) <= task_manager.recalculate_distance_to_deadline(task, self.time_slot, dayTimeSlotsStandardizedStN)): #NOTE consider Update on Change instead of on point calc. IF statement before to prevent non windowed from getting distance calced (error)
-                                #starts_from, due_by #csv
-                                
+                            elif "Yes" == getattr(task_manager.tasks[task], "window") and ((int(task_manager.tasks[task].duration)) <= task_manager.recalculate_distance_to_deadline(task, self.time_slot, dayTimeSlotsStandardizedStN)): #IF statement before to prevent non windowed from getting distance calced (error)                                
                                 assign_task(task)
                             else:
                                 logging.warning(f"At {self.time_slot}: Not enough time remaining to schedule {task} because duration would put it past it's deadline. Adding to failed tasks. Or a STATIC task got thru somehow")
-                                #Schedule.failed_to_schedule.append(task) #TODO deal with later
-                                continue #hmm
+                                Schedule.failed_to_schedule.append(task) #TODO deal with later
+                                continue
                         elif task_manager.tasks[task].window: #Only rolls over the windowed tasks NOT the STATIC ones, 
                             roll_over_tasks(task)
                         else: #STATIC tasks just get ignored, goes to
