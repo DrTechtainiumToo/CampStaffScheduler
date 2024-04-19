@@ -37,6 +37,8 @@ from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 from colorama import Fore, Style
 import re
+from typing import Dict, Any, Type
+
 
 def get_date_value_ui(get_date_auto=False, get_next_day=False, max_entry_attempts=int):
     """Gets the date value either from computer or by user input. Returns: (int) representing the weekday"""
@@ -58,7 +60,7 @@ def get_date_value_ui(get_date_auto=False, get_next_day=False, max_entry_attempt
                 return date_value  # acceptable value found
         play_joke_on_user()
 
-def employee_name_input_auto_completer(employeeNamesList, promptString):
+def employee_name_input_auto_completer(promptString, names_list):
     """
     Prints out whatever prompt is given in the prompt string, (if nothing given then prints nothing). Then auto completes the user input with an employee name from employeeNamesList.
     It then automatically capitalizes the employee name. Finally the function returns the employee name (capitalized).
@@ -68,16 +70,16 @@ def employee_name_input_auto_completer(employeeNamesList, promptString):
     Uses prompttoolkit
 
     Args:
-        employeeNamesList (list): list of employee names
+        names_list (list): list of employee names
         promptString (string): Only insert one string of prompt strings you want printed, if none given then prints nothing
     """
     
     #if no text given to function, makes prompt blank
-    if promptString == False: #WHY & CHECK IF ERROR: GPT4- python treats empty strings ("") as False and non-empty strings as True when evaluated in a Boolean context.
+    if promptString == False:
         promptString = ""
     
     # Define a list of autocomplete words.
-    employee_Name_Completer = WordCompleter(employeeNamesList,ignore_case=True) #WHY ignore_care=True, allowing case-insensitive input bc employee names list is capitalized, but dont want to make user have to capitalize input to get auto suggestion
+    employee_Name_Completer = WordCompleter(names_list,ignore_case=True) #WHY ignore_care=True, allowing case-insensitive input bc employee names list is capitalized, but dont want to make user have to capitalize input to get auto suggestion
     # Use the completer in the prompt.
     user_input = prompt(promptString, completer=employee_Name_Completer)
     
@@ -89,7 +91,7 @@ class EmployeeAvailabilityUI:
     def __init__(self, availability_logic):
         self.availability_logic = availability_logic
 
-    def prompt_employee_unavailability(self):
+    def prompt_employee_unavailability(self, dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS):
         while True:
             print("\n\nWho is unavailable?\n")
             employee_name = employee_name_input_auto_completer("Enter employee name: ", employeeNamesList)
@@ -97,7 +99,8 @@ class EmployeeAvailabilityUI:
                 break
             print("Invalid employee name. Please check and try again.")
 
-        unavailable_times = self.collect_unavailability_times(employee_name)
+        unavailable_times = self.collect_unavailability_times(employee_name, dayTimeSlotsKeysList)
+        unavailable_times = self.availability_logic.multi_time_input_detector_and_converter_employee_unavailability(unavailable_times, dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS)
         self.availability_logic.set_employee_unavailability(employee_name, unavailable_times)
         print(f"\nConfirmed: {employee_name} is unavailable at {unavailable_times}.\n")
 
@@ -127,15 +130,16 @@ class EmployeeAvailabilityUI:
     def validate_time_format(self, time_str):
         # Validate time format here, returning True if valid
         return bool(re.match(r"\d{1,2}(:\d{2})?\s*(am|pm)", time_str, re.IGNORECASE))
-
-    def user_input_employee_unavailabilities(self):
+    
+    #TODO SUPER IMPORTANT!!!!!!!!!!!!!!! MAKE THE UNAVAILBILITES LIKE THE TIME OCCURINGS -inclusive, otherwise will cause problems
+    def user_input_employee_unavailabilities(self, dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS):
         anyoneUnavailable = input(
             "\nIs anyone unavailable today?\n\ny or n? \n\nUser: "
         )
         if anyoneUnavailable in noAnswers:
             print("\nConfirmed: No unavailabilites.")
         else:
-            self.prompt_employee_unavailability()
+            self.prompt_employee_unavailability(dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS)
             while True:
                 print("\nIs anyone else unavailable?\n\nY or N?\n")
                 anyoneElse = input("\nUser: ")
@@ -143,7 +147,7 @@ class EmployeeAvailabilityUI:
                     print("\nConfirmed: no one else is unavailable.\n")
                     break
                 else:
-                    self.prompt_employee_unavailability()
+                    self.prompt_employee_unavailability(dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS)
 
 
 def user_decide_modify_times_ui(day_time_slots):
@@ -218,7 +222,7 @@ def modify_schedule_ui(day_time_slots):
     return day_time_slots
 
 
-class TaskUI:
+class TaskUI: #NOTE ah this is the UI counterpart to task manager logic?
     @classmethod
     def print_help(cls, topic):  # LEARNING CONCEPT, .cls is similar to .self
         """Prints help information for a given topic related to a task attributes=."""
@@ -253,7 +257,7 @@ class TaskUI:
          
         print("----------------------------------------------\n")"""    
 
-def user_adds_additonal_tasks_ui():
+def user_adds_additonal_tasks_ui(): #TODO GO THRU AND FIX
     # Insert ability to make custom tasks...
 
     # NOTE will probbably break first
@@ -318,30 +322,29 @@ def user_adds_additonal_tasks_ui():
         elif userGenderSpecific in noAnswers:
             userGenderSpecific = 0  # TODO may need to change data value type
 
-        userPrefTime = input("Is there a preferred time to schedule this y/n?: ")
-        if userPrefTime in yesAnswers:
-            userPrefTime = 1
-            userTimePreferred = input("What time:")
-            userPrefTimeAdditionalParametersTF = input(
-                "Do you want to input additional parameters such as, don't schedule before x time, and don't schedule after x time?"
+        user_time_window = input("Is there a time window to schedule this y/n?: ")
+        if user_time_window in yesAnswers:
+            user_time_window = "Yes"
+            #earliest_start = input( - 
+                #"don't schedule before x time, if none then type NONE"
+            #)
+            user_due_by = input(
+                "don't schedule after x time?, if none then type NONE"
             )
-            if userPrefTimeAdditionalParametersTF in yesAnswers:
-                Not_before_time = input(
-                    "don't schedule before x time, if none then type NONE"
-                )
-                userNot_after_time = input(
-                    "don't schedule after x time?, if none then type NONE"
-                )
         else:
-            userPrefTime = 0
+            user_time_window = None
             userTimePreferred = 0
-            userNot_before_time = None
-            userNot_after_time = None
+            user_earliest_start = None
+            user_due_by = None
         userFrequency = 0
+        
+        #NOTE THIS IS IMPORTANT AND COULD CAUSE BUGS IN THE FUTURE
+        #freq only matters if windowed, otherwise just basically basing it off of starttimes, will keep around for now but could be cut for optimization in the future, but also might be useful if times ref changes
         for times in userStartTime:  # Calc freq from number of start times
             userFrequency += 1
 
         taskDictLocal | (
+            #TODO  make kwarg??? for clarity
             user_adds_additonal_tasks(
                 taskDictLocal,
                 userTaskVariableName,
@@ -353,11 +356,11 @@ def user_adds_additonal_tasks_ui():
                 userImportance,
                 userGenderSpecific,
                 userAssignees,
-                userPrefTime,
+                user_time_window,
                 userTimePreferred,
-                userNot_before_time,
-                userNot_after_time,
-                task_tier=1,
+                user_earliest_start,
+                user_due_by,
+                task_tier=1, #might need to reasses
             )
         )
 
@@ -369,8 +372,9 @@ def user_adds_additonal_tasks_ui():
     return taskDictLocal
 
 class TaskRecommendationUI:
-    def __init__(self, recommendation_logic):
+    def __init__(self, recommendation_logic, dayTimeSlotsKeysList):
         self.recommendation_logic = recommendation_logic
+        self.dayTimeSlotsKeysList = dayTimeSlotsKeysList
 
     def modify_tasks_interface(self, master_task_dict_names_list, master_task_dict, task_manager):
         def print_default_selcted_tasks_editior_commands():
@@ -512,15 +516,17 @@ class TaskRecommendationUI:
         )
         print(self.recommendation_logic.selected_tasks_var_names_list)
 
-        # print("\n Printed above: today's selected default basic tasks (auto-recommended).\n")
-        decision = input(
-            "\nWould you like to edit them? y/n\n(Note: You can add custom tasks later): "
-        )
+        decision = input("\nWould you like to edit them? y/n\n(Note: You can add custom tasks later): ")
         if decision.strip() in yesAnswers:
             self.modify_tasks_interface(master_task_dict_names_list)
         else:
             print("Selected basic tasks confirmed.\n\n")
 
+    #NOTE WIP - prob will get rid of
+    def display_selected_tasks_as_schedule(self):
+        data = self.recommendation_logic.get_recommended_tasks_verbose
+        
+    
     #NOTE depreciated for now
     def request_missing_input(task_name: str, attribute: str = "attribute"):
     # This function could be part of the front-end
@@ -536,27 +542,37 @@ class TaskRecommendationUI:
 
     def collect_missing_details(self, task_name, obj, missing_details):
         def print_help(attr):
-            print("\n",TaskManager.Task.task_attribute_guide[attr], "\n")
+            print(f"\n{attr} = {TaskManager.Task.task_attribute_guide[attr]} \n")
         
         #TODO Def could make this cleaner, esp as attributes get more complex but will leave for now.
         print(f"{task_name} is missing some parameters, let's fill them in.\n{Fore.YELLOW}{Style.BRIGHT}Confused about what to input for a parameter? Type 'help' to get information about the data your're supposed to enter.{Style.RESET_ALL}\nSeperatley if no value is needed enter None, if you are done entering values for a sequence hit exit\n")
         for attr, value in missing_details.items():
             if isinstance(value, str):
-                while True:
-                    userData = input(f"Input {attr} for {task_name}: ")
-                    if userData.lower().strip() == 'help':
-                        print_help(attr)
-                    else:
-                        #validate input, can make exceptions later
-                        try: 
-                            int(userData)
-                        except:
+                while True: #TODO make sure validate time input, #BUG fix whatever is going on here
+                    if (attr == "earliest_start" and value) or (attr == "start_time" and value): #NOTE only cheking for userinput flag not emptyness
+                        #so can put in time autocompleter
+                        userData = xyz_input_auto_completer(f"Input {attr} for {task_name}: ", self.dayTimeSlotsKeysList)
+                        if userData.lower().strip() == 'help':
+                            print_help(attr)
                             continue
-                        setattr(obj, attr, userData)
-                        print(f"Confirmed | Task {attr} = {userData}\n")
-                        break
+                        elif userData not in userData: continue
+                        else:
+                            setattr(obj, attr, userData)
+                            print(f"Confirmed | Task {attr} = {userData}\n") 
+                            break
+                    else:
+                        userData = input(f"Input {attr} for {task_name}: ")
+                        if userData.lower().strip() == 'help':
+                            print_help(attr)
+                            continue
+                        else:
+                            setattr(obj, attr, userData)
+                            print(f"Confirmed | Task {attr} = {userData}\n")
+                            break
+                                #check if valid time
+                            
 
-            elif isinstance(value, list): #pretty much just for times
+            elif isinstance(value, list): #pretty much just for start times list,
                 autoEnter = False
                 for index, item in enumerate(value):
                         if autoEnter:
@@ -564,7 +580,7 @@ class TaskRecommendationUI:
                             value[index] = None
                         else: 
                             print(f"If done entering or no more values then enter 'exit'")
-                            userData = input(f"Input {attr} for {task_name}: ")
+                            userData = xyz_input_auto_completer(f"Input {attr} for {task_name}: ", self.dayTimeSlotsKeysList)
                             if userData.lower().strip() == 'help':
                                 print_help(attr)
                             elif userData.lower().strip() == 'exit':

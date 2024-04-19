@@ -1,6 +1,9 @@
 from config.settings import swat_basic_tasks_list_for_scheduler_csv, swat_night_chores_info_csv
 from config.utility import timer
 import csv
+from typing import Any, ParamSpec, Concatenate #LEARN
+from collections.abc import Callable
+
 
 def try_convert_to_int(value): #TODO figure out try/excpet and how to deal with none args
     """Use when have csv values that ur assigning to function attr but need them to be ints, instead of the standard string.
@@ -28,31 +31,18 @@ class TaskManager:
         # Similarly, this is a placeholder. You need to add logic to count today's tasks specifically.
         return len(self.tasks)
 
+    #NOTE NOT IN USE
     def assign_to(self,time_slot,employee_name):
         """assign employee to what task, this is confusing on task instances vs employee and who adds to who"""
     
-    def recalculate_distance_to_deadline(self, task_name, current_time, dayTimeSlotsStandardizedStN):
+    #maybe it is smart to just update per all of them that go thru, faster than having to recalc, can just do -1 or whatever, keep in mind if need to optimize, it was dumb of me to delete all those functions
+    def recalculate_distance_to_deadline(self, task_name: str, current_time: str, dayTimeSlotsStandardizedStN: dict[str, int]) -> int:
         """updates the distance to deadline for task, by recalculating what it would be for the current period, returns (int) distance"""
-        current_timeslot_number = dayTimeSlotsStandardizedStN[current_time]
-        deadline = dayTimeSlotsStandardizedStN[self.tasks[task_name].not_after_time]
-        distance = current_timeslot_number - deadline
-        return  distance
+        current_timeslot: int = dayTimeSlotsStandardizedStN[current_time]
+        deadline: int = dayTimeSlotsStandardizedStN[self.tasks[task_name].due_by]
+        distance: int = deadline - current_timeslot
+        return distance
     
-    def get_distance_to_deadline(self, task_name):
-        """for optional tasks to know how close they are to being due. Does not check if optional task, assuming task already is. Thus may get attr no found error if performed on not optional tasks.
-        Args: (int) current_time.
-        Returns: an integer representing # of timeslots until due"""
-        distance_to_deadline = self.tasks[task_name].distance_to_deadline
-        return distance_to_deadline #NOTE #TODO is not before time really nessecay? just use the startime, duh
-    
-    def update_distance_deadline(self, task_name, current_time, dayTimeSlotsStandardizedStN): #TODO may be able to get rid of later, leaving hre now for simplicity
-        """note will autoconvert current time to an integer and the process"""
-        current_timeslot_number = dayTimeSlotsStandardizedStN[current_time]
-        deadline = dayTimeSlotsStandardizedStN[self.tasks[task_name].not_after_time] #NOTE BUG possiblity <-- what if this is not a standardized slot????, maybe make input option only able to be exisitng time slots.
-        
-        distance = current_timeslot_number - deadline
-        self.tasks[task_name].self.distance_to_deadline = distance
-
     class Task():
         task_attribute_guide = {
         "task_name": "The name of the task.",
@@ -68,10 +58,10 @@ class TaskManager:
         "gender_specific": "Indicates if the task is gender-specific, requiring a specific gender to perform.",
         "gender_required": "Specifies the gender required for gender-specific tasks.",
         "preassigned": "Indicates if the task is pre-assigned to someone specific.",
-        "pref_time": "The preferred time for the task to start. This is considered during scheduling to optimize task assignments.",
+        "window": "Wether or not the task has a time window in which it must occur. In contrast to \"static\" tasks that occur according to their start times",
         "time_preferred": "Alternative or additional preferred start times for the task.",
-        "not_before_time": "The earliest time the task should start.",
-        "not_after_time": "The latest time the task should start.",
+        "earliest_start": "The earliest time the task should start (assumes task has a window).",
+        "due_by": "When the task is due",
         "scheduledoccurance": "Specifies if the task has a scheduled occurrence, potentially overriding other timing preferences.",
         "occurs_every_n_days": "For repeating tasks, specifies the interval in days between each occurrence.",
         "spawn_days": "Specifies on which days of the week the task is applicable, allowing for weekly scheduling patterns."
@@ -131,12 +121,10 @@ class TaskManager:
             self.start_time = [time for time in [start_time, self.start_time2, self.start_time3, self.start_time4, self.start_time5, self.start_time6]] #Thanks GPT4 
                 #why did i need .strip() again?  #now its - ['7:00am', '', '', '', '', '']  #NOTE if problems revert so start time given inital values then reassigns a list of all startime values to itself, #NOTE SEE IF BUG
             self.start_times_iter = 0
-            self.assigned_to = {key: [] for key in TaskManager.Task.dayTimeSlotsKeysList} #Time, and who assigned to ( in list)#when, who #TODO GENERATE APON SCHEDULING
+            self.assigned_to = {key: [] for key in TaskManager.Task.dayTimeSlotsKeysList} #Time, and who assigned to (in list)#when, who
             self.task_cost = "To be caculated at assignment time in algorith with calc_task_cost()"
             self.chosen #TODO figure out what use this for again, need to make documentation now at this point.
-            #for tasks which occur inbetween times
-            self.distance_to_deadline = 0 #maybe make it by default due time - start time/current time?
-                        
+              
         def calc_task_cost(self):
             self.task_cost = self.task_frequency*len(self.start_time) #what if for multiple durations??
             #TODO idk if work but can call during althorithm to calc exact freq 
@@ -164,8 +152,8 @@ class TaskManager:
         def describe_var_name_times(self): 
            return self.task_variable_name, self.start_time 
 
-        #TODO fix up later
-        def describe_verbose(self):
+        #DONE fix up later
+        def describe_verbose(self) -> list[list[str], list[str], str]:
             attributes = []
             for attr_name, attr_value in vars(self).items(): #use pythons introspection abilites to help with this, can use vars(), get the vars of the obj, using dir() would have to filter out built in attr and use getattr() method
                 if attr_name in ['start_time2','start_time2','start_time3','start_time4','start_time5','start_time6']:
@@ -200,6 +188,7 @@ class TaskDataConverter:
                 
                 #Second have auto cycle through and popualte all class attribtues with data from CSV) # Create a new Task instance and store it with the user-defined name as the key
                 task_details = {
+                    #TODO eventually figure out how to modularize
                     #NOTE the keys are attr names, so don't fuck with them as other function rely on them
                         'task_name': row.get('TaskName'),
                         'task_frequency': row.get('Frequency'),
@@ -212,10 +201,10 @@ class TaskDataConverter:
                         'task_tier': row.get('Tier', None),
                         'gender_specific': row.get('GenderSpecific', None),
                         'gender_required': row.get('GenderReq', None),
-                        'pref_time': row.get('PrefTime', None),
+                        'window': row.get('Window', None),
                         'time_preferred': row.get('TimePreferred', None),
-                        'not_before_time': row.get('NotBeforeTime', None),
-                        'not_after_time': row.get('NotAfterTime', None),
+                        'earliest_start': row.get('EarliestStart', None),
+                        'due_by': row.get('DueBy', None),
                         'start_time2': row.get('StartTime2', None),
                         'start_time3': row.get('StartTime3', None),
                         'start_time4': row.get('StartTime4', None),
@@ -281,7 +270,7 @@ class TaskDataConverter:
  
 # --------------------- Additional Tasks #TODO refine this later to be more elegant and standalone as backend
 def user_adds_additonal_tasks(taskDictLocal, userTaskVariableName, userTaskName, userFrequency, userStartTime, userDuration, userMinManpower, 
-                              userImportance, userGenderSpecific, userAssignees, userPrefTime, userTimePreferred, userNot_before_time, userNot_after_time, task_tier=1):
+                              userImportance, userGenderSpecific, userAssignees, user_windowed_task, userTimePreferred, user_earliest_start, user_due_by, task_tier=1):
     #Insert ability to make custom tasks...   
     task_name = userTaskName  # This could be any user-defined string
     
@@ -297,15 +286,14 @@ def user_adds_additonal_tasks(taskDictLocal, userTaskVariableName, userTaskName,
         importance = userImportance,
         gender_specific = userGenderSpecific,
         preassigned = userAssignees,
-        pref_time = userPrefTime,
+        window = user_windowed_task,
         time_preferred = userTimePreferred, 
-        not_before_time = userNot_before_time,  #TODO fix some bulltshit later, #CHECK IF ERROR, standard fale input = NONE, WHY = because will use timeslot standardized periods which will include 0
-        not_after_time = userNot_after_time,  #CHECK IF ERROR, standard fale input = NONE
+        earliest_start = user_earliest_start,  #TODO fix some bulltshit later, #CHECK IF ERROR, standard fale input = NONE, WHY = because will use timeslot standardized periods which will include 0
+        due_by = user_due_by,  #CHECK IF ERROR, standard fale input = NONE
         chosen = 1, #set to yes by default, bc user #CHECK IF ERROR, may have to change default data rep
         task_cost = (userFrequency*userDuration)
         )
     return taskDictLocal
-
 class TaskRecommender():
     """Tasks Editor and Selector (Special and Default), Generate total tasks & special tasks depending on dateValue (date). 
     Returns a master task dict, and has user fill in any missing task detials"""
@@ -320,18 +308,24 @@ class TaskRecommender():
         #self.master_task_dict = master_task_dict #if Maybe see if will use this for simplicity later, error see if copied corretly or something, still unfamiliar
         self.dayName = dayName
 
-    @timer #NOTE DONE
+    @timer
     def recommend_tasks(self, master_task_dict):    
         """Auto-Recommended tasks algorithm"""
         attribute_name = 'spawn_'+ self.dayName.lower() #WHY .lower to create name value? It refs dateValue num to corresponding dictionary values which are day names, and the day names are capitalized. However the obj attribute daynames are not, so we lowercase this name.
         for task_name, instance in master_task_dict.items(): 
             attr_value = getattr(instance, attribute_name)
-            
             #WHY check for Yes"?  bc looking at SpawnMonday etc attributes, so checking if it occurs on those days
             if attr_value.capitalize().strip() == 'Yes': #WHY - .upper() bc comparison value is upper case, and its just incase someones puts a lowercase 'yes' on the csv they wont screw everyhting up. #TODO(later also look for "depends' for scheduled basis tasks such as water flowers)
                 self.selected_tasks_dict[task_name]=instance
-        self.selected_tasks_var_names_list = list(self.selected_tasks_dict) #assume faster if just generate list from dict keys after, instead of appending values along with the dict #OPTIMIZATION QUESTION
+        self.selected_tasks_var_names_list = list(self.selected_tasks_dict)
+         #assume faster if just generate list from dict keys after, instead of appending values along with the dict #OPTIMIZATION QUESTION
 
+    #NOTE not in use, for creating a schedule like rep of when stuff will happen
+    def get_recommended_tasks_verbose(self):
+        data = []
+        for task_name, instance in self.selected_tasks_dict.items():
+            pass
+        return data
         #TODO SIMPLE, GOOD, IDEA!!! CHECK IF ERROR, in future update may later change from "yes" to True, will be faster too?
         #- 2nd reminder, add in reoccuring scheduled tasks later (like ones that occur every x days ex: Water flowers)
     
@@ -351,11 +345,16 @@ class TaskRecommender():
                 value = getattr(obj, attr)
                 #make this to complex and might have neg performance
                 if (isinstance(value, str) and "userInput" in value) or (isinstance(value, list) and any(item in ["userInput"] for item in value)): #Note if ur going to have it look for blank timeslot lists or "" or None,
-                    #make sure it doesn't already have a normal value in there. Otherwise will put all tasks in there bc not all have 6 start times 
+                #make sure it doesn't already have a normal value in there. Otherwise will put all tasks in there bc not all have 6 start times 
                     missing_details[attr] = value
+                elif "Yes" == getattr(obj, "window"): #for windowed tasks
+                    if getattr(obj, "due_by") is None: #need to make sure only ACTIVATES FOR THE BLANKS
+                        if not getattr(obj, "start_time"):
+                            missing_details["start_time"] = "userInput" #BUG WUT AM I DOING WITH THIS???? #need to assume no starttime yet
+                        missing_details["due_by"] = "userInput"
         return missing_details
     
-    @timer
+    #TODO this can also be usefull for filling in stuff that the computer needs to do, such as Calc et cetra, or do at assignment
     def handle_missing_details(self, collect_missing):
         """args: (function)collect_missing: a function to use as a call back to the front end, which 
         fills in missing detials for that task"""
@@ -363,33 +362,40 @@ class TaskRecommender():
             missing_details = self.validate_details(obj)
             if missing_details:
                 collect_missing(task_name, obj, missing_details)
+                
+            #NOTE DEF CAN OPTIMIZE THIS LATER
+            #Use this to do any final corrections needed before assignment since already iterating thru the values
+            #quick patch bc don't want to do in front end or at assignment(again)
+
+            #NOTE can speed up by looking this up once then ref - in the if statement current_list
+            start_window = getattr(obj, "earliest_start") #this wont always eval to true, bc if empty string, list, or None then will be false
+            if start_window or getattr(obj, "due_by"): #NOTE Why should i check for due_by?? need to re look at this #NOTE ASSUMES ONLY ONE START TIME FOR WINDOW DURATIONS
+                start_times_list = getattr(obj, "start_time")
+                start_times_list[0] = start_window
+                setattr(obj,"start_time", start_times_list)  #NOTE change later once move list stuff
+            
                 #TODO in future, idk how work with web version, but to make more independent
                 #make a return value, then have it sort thru return values and assign stuff.
                 #So work better with web
+                #NOTE so im thinking it just give the filled ut value back in a specific format 
+                # then this backend updates stuff as needed - but more code tho :\
                     
     def return_selected_tasks_for_day(self):
         return self.selected_tasks_dict, self.selected_tasks_var_names_list
 
-def instantiate_tasks(dayName: str, additionalTasks: str, dayTimeSlotsKeysList: list):
+def instantiate_tasks(additionalTasks: dict[str, TaskManager.Task], dayTimeSlotsKeysList: list[str]) -> tuple[TaskManager, dict[str, object], list[str]]:
     """Return object, dict, list"""
+    
     TaskManager.Task.define_default_assigned_to_times(dayTimeSlotsKeysList) #bc need it for all creations
     
     task_data_converter = TaskDataConverter()
-    csv_tasks_files = [swat_basic_tasks_list_for_scheduler_csv, swat_night_chores_info_csv]
+    csv_tasks_files = [swat_basic_tasks_list_for_scheduler_csv, swat_night_chores_info_csv] #maybe add this to the args eventually
+    
     #WHY - create the defaultTasksVarNamesList list so the autoComplete can use in menus and stuff
     defaultTasksDictionary, defaultTasksVarNamesList = task_data_converter.process_files(csv_tasks_files)
     
     defaultTasksDictionary = defaultTasksDictionary | additionalTasks #note if duplicates bc of union operater tasks in additionalTasks will overwrite defaultTasksDictionary, which is good because probbaly want specificed tasks.
 
     task_manager = TaskManager(defaultTasksDictionary) 
-    #yeah want this before incase puts in duplicate task, the fi
-    return task_manager, defaultTasksDictionary, defaultTasksVarNamesList #,daysTasks
 
-"""task_recommender = TaskRecommender(dayName)
-    task_recommender.recommend_tasks(defaultTasksDictionary)
-    task_recommender.edit_selected_tasks(defaultTasksVarNamesList)
-    task_recommender.check_missing_details() #defaultTasksDictionary
-    defaultTasksDictionary, defaultTasksVarNamesList = task_recommender.return_selected_tasks_for_day() #IDK how this OG worked i forgot, well then i deleted all the old code and refeactored before understnaidn what I/O it really had
-
-    # ------------------------------ Master Task List
-    daysTasks = [defaultTasksDictionary]"""
+    return task_manager, defaultTasksDictionary, defaultTasksVarNamesList

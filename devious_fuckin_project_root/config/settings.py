@@ -33,9 +33,9 @@ daysKeyValueInverse = {1: "Monday", 2: "Tuesday", 3: 'Wednesday', 4: 'Thursday',
 normalDayTimeSlots = [{'7:00am': True, '7:45am': True, '9:15am': True, '9:50am': True, '10:00am': True, '11:00am': True, '11:45am': True, '1:45pm': True, '2:45pm': True, '3:45pm': True, '4:45pm': True, '5:30pm': True, '6:30pm': True, '7:00pm': False, '8:00pm': False, '9:00pm': False}] #'7ishpm': False, '8ishpm': False, '9ish': False #'7ish': 'NG', '8ish': 'Sweeting', '9ish': 'NightChore' #what do when have too special events at the same time??? such as NG and Playtime
 wenSpecialTimeslots = ['7:00', '7:45', '9:15', '9:50', '10:00', '11:00', '11:45', '1:45', '2:45', '3:45', '4:45', '5:20', 'TIME DOES NOT EXIST', 'TIME DOES NOT EXIST',  'TIME DOES NOT EXIST', '9is MAYBE'] #'TIME DOES NOT EXIST', 'TIME DOES NOT EXIST',  'TIME DOES NOT EXIST', '9is MAYBE' #can merge TIME DOES NOT EXIST and fromatting later, this is mainly all just formatted so the ;ogram can interpret it, will format for export seperatley
 tuesSpecialTimeslots = ['7:00', '7:45', '9:15', '9:50', '10:00', '11:00', '11:45', '1:45', '2:45', '3:45', '4:45', '5:30', '6:30', '7:15',  '8ish', '9:00']
-friSpecialTimeslots = []
-satSpecialTimeslots = []
-sunSpecialTimeslots = []
+friSpecialTimeslots = [] # type: ignore
+satSpecialTimeslots = [] # type: ignore
+sunSpecialTimeslots = [] # type: ignore
 
 #Other ---
 dumbMeme1 = "Here dem lyrics!\n\n\n\

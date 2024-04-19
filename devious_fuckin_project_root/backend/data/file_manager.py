@@ -5,7 +5,7 @@ from config.settings import swat_night_chores_info_csv, swat_scheduler_special_t
 #hmmm should this be done in main / interface or????
 
 @timer
-def intialCSVToDataStructures(employee_details_filepath = str):
+def intialCSVToDataStructures(swat_employee_info_csv):
     #take names and put into list
     employeeNamesList = []
     with open(swat_employee_info_csv, encoding='utf-8-sig', newline='') as csvfile:

@@ -47,9 +47,15 @@ from interface.terminal.terminal_ui_logic import (
     EmployeeAvailabilityUI,
     describe_dynamic_time_slot_qeues
 )
-from backend.core.scheduler import return_scheduling_algo_time, instantiate_and_run_scheduler
+from backend.core.scheduler import instantiate_and_run_scheduler
 from backend.core.output_schedule import OutputSchedule
+import time
+import cProfile
+import pstats
 
+profiler = cProfile.Profile()
+profiler.enable()
+    
 def display_menu(options):
     for number, option in enumerate(options, start=1):
         print(f"{number}. {option}")
@@ -123,30 +129,33 @@ availability_ui = EmployeeAvailabilityUI(availability_logic)
 employee_manager = instantiate_employees(
     employee_manager, dayTimeSlotsKeysList, employeeNamesList, employeeGenderList
 )
-availability_ui.user_input_employee_unavailabilities()
+availability_ui.user_input_employee_unavailabilities(dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS)
 
 # --------------------------------------- Tasks User Input
 
 # --------------------- Additional Tasks
-additional_tasks = user_adds_additonal_tasks_ui()
+additional_tasks = user_adds_additonal_tasks_ui() #move into task reccomender (thus before validation but after reccomendation), 
+#actually maybe make it a feature in the modification that can add more??
+#and rename class to be like task editing etc
 
 task_manager, defaultTasksDictionary, defaultTasksVarNamesList = instantiate_tasks(
-    day_name, additional_tasks, dayTimeSlotsKeysList
-)
+    additional_tasks,
+    dayTimeSlotsKeysList
+    )
 
 task_ui = TaskUI(task_manager)
-task_data_converter = TaskDataConverter()
 
 task_recommender = TaskRecommender(day_name)
-task_recommendation_ui = TaskRecommendationUI(task_recommender)
+task_recommendation_ui = TaskRecommendationUI(task_recommender, dayTimeSlotsKeysList)
 
 task_recommender.recommend_tasks(defaultTasksDictionary)
-task_recommendation_ui.edit_selected_tasks(defaultTasksVarNamesList)
+task_recommendation_ui.edit_selected_tasks(defaultTasksVarNamesList) #maybe change to edit reccomended tasks?? IDK
 task_recommender.handle_missing_details(task_recommendation_ui.collect_missing_details)
 
-tasks_dictionary, default_tasks_var_names_list = task_recommender.return_selected_tasks_for_day()
+tasks_dictionary, task_names_list = task_recommender.return_selected_tasks_for_day()
 daysTasks = [tasks_dictionary] #keep so can add more stuff if needed
 
+start_algo = time.perf_counter()
 # -------------------------------- Scheduling algo
 instantiate_and_run_scheduler(
     dayTimeSlotsStandardizedStN, 
@@ -158,13 +167,23 @@ instantiate_and_run_scheduler(
     employee_manager
 )
 
-#test
-with open("devious_fuckin_project_root/logs/program_times_log.txt", "a") as log_file:  # "a" opens the file in append mode
-        algo_time = return_scheduling_algo_time()
-        log_file.write(algo_time) #still dont know if this works")
-
+#TODO learn how to use timeit 
 # ------------------------------------ Output 
+end_algo = time.perf_counter()
+
+start_excel = time.perf_counter()
 output_schedule = OutputSchedule(dayTimeSlotsKeysList,employeeNamesList,employee_manager.employees)
 output_schedule.excel(employee_manager, task_manager)
+end_excel = time.perf_counter()
 
 end_time_log_cap()
+algo_res = end_algo-start_algo
+excel_res = end_excel-start_excel
+print("Algo:", (algo_res))
+print("Excel:", (excel_res))
+print("Program finished")
+
+profiler.disable()
+stats = pstats.Stats(profiler)
+profiler.print_stats(sort='cumtime')
+stats.dump_stats('profile.prof')

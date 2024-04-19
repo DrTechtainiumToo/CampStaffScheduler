@@ -106,6 +106,7 @@ class OutputSchedule():
         })
         #make a .CSV and autoconver values, also find work around for KSWAT and such.
         
+        #TODO put these in settings file, no magic shit
         task_format = {
         'Default' : workbook.add_format({
             'bg_color': '#F4CCCC',
@@ -135,7 +136,7 @@ class OutputSchedule():
             'bg_color': '#FFEB9C',
             'border': 1
         }),
-        'PLAYTIME': workbook.add_format({
+        'PLAYTIME/OFF': workbook.add_format({
             'bg_color': '#B6D7A8',
             'border': 1
         }),
@@ -171,7 +172,7 @@ class OutputSchedule():
             'bg_color': '#F4CCCC',
             'border': 1
         }),
-        'FLAG UP': workbook.add_format({
+        'FLAG DOWN': workbook.add_format({
             'bg_color': '#F4CCCC',
             'border': 1
         }),
@@ -242,12 +243,12 @@ class OutputSchedule():
                     duration = int(task_manager.tasks[task].duration) #why int = attr is assigned from csv sheet so need to convert it from string to int. #LEARNING use get get attr?? learn more. need to update my learning google doc. 
                     #TODO error gaurding - WHAT if task doesn't have a duration, how should i guard against this error, what would ouput look like?
                     
-                    # If task spans multiple columns
+                    # If task spans multiple columns (x--->) 
                     if duration > 1:
                         multi_period_task_name_counter += 1
                         if multi_period_task_name_counter == duration:
                             start_col = column - (duration-1) #minus one bc duration count is inclusive, we have to account for timeslot we are in as part of it
-                            format = task_format.get(task,task_format.get('Default'))  
+                            format = task_format.get(task, task_format.get('Default'))  
                             worksheet.merge_range(row, start_col, row, column, task, format)
                             multi_period_task_name_counter = 0
                         column += 1

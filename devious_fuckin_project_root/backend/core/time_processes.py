@@ -5,6 +5,7 @@ from config.settings import days, daysKeyValueInverse, normalDayTimeSlots, wenSp
 from config.utility import timer
 import re
 from colorama import Fore, Style
+from typing import Dict, List, Any
 
 datesTimeSlots = {
     1:normalDayTimeSlots,
@@ -117,39 +118,29 @@ def remove_time_slot(day_time_slots, time_to_remove):
         del day_time_slots[time_to_remove]
     return day_time_slots
 
-def timeSlotStandardizer(dayTimeSlotsKeysList):
+def timeSlotStandardizer(dayTimeSlotsKeysList: List[str]):
     """ Standardizes timeslots values and makes ref dictionaries. Takes the "dayTimeSlots" var. 
     Args:
         time_slots_of_the_day (Type: List): Input should be a list with dictionaries. Example: normalDayTimeSlots = [{'7:00': True, '7:45': True, '9:15': True, '9:50': True, '10:00': True, '11:00': True, '11:45': True, '1:45': True, '2:45': True, '3:45': True, '4:45': True, '5:20': True, '6:30': True, '7ish': 'NG', '8ish': 'Sweeting', '9ish': 'NightChore'}] #what do when have too special events at the same time??? such as NG and Playtime
     """
     
     #first have to make a ref book to convert the stuff into in, Makes a list of the times / keys of dayTimeSlots
-    lengthDayTimeSlots = len(dayTimeSlotsKeysList)-1 #WHY -1 len gives me one more than index number, so keep in mind when using len to go thru indexs
-    #testOutput("TEST | lengthdayTimeSlots: ", lengthDayTimeSlots)
-    iterDayTimeSlotsStandardizer = 0
-    while iterDayTimeSlotsStandardizer <= lengthDayTimeSlots:
-        iterDayTimeSlotsStandardizer += 1
-    #testOutput("TEST | 1 time_slot_keys: ", dayTimeSlotsKeysList)
+    num_of_time_slots: int = len(dayTimeSlotsKeysList)-1 #WHY -1 len gives me one more than index number, so keep in mind when using len to go thru indexs
 
-    # put times as values, and ascending number as key (NtS)- Numbers to Strings
-    dayTimeSlotsStandardizedNtSLocal = {}
-    iterDayTimeSlotsStandardizerA = 0
-    while iterDayTimeSlotsStandardizerA <= lengthDayTimeSlots:
-        dayTimeSlotsStandardizedNtSLocal.update({iterDayTimeSlotsStandardizerA:dayTimeSlotsKeysList[iterDayTimeSlotsStandardizerA]})
-        iterDayTimeSlotsStandardizerA+=1
-        #testOutput("[TEST | 2.1, IN LOOP] new dict dayTimeSlotsStandardizedNtSLocal: ", dayTimeSlotsStandardizedNtSLocal)
-    #testOutput("[TEST | 3.1, OUT OF LOOP] new dict dayTimeSlotsStandardizedNtSLocal: ", dayTimeSlotsStandardizedNtSLocal)
+    #put times as values, and ascending number as key (NtS)- Numbers to Strings
+    numbers_to_strings: Dict[int, str] = {}
+    i: int = 0
+    while i <= num_of_time_slots:
+        numbers_to_strings.update({i:dayTimeSlotsKeysList[i]})
+        i+=1
 
-    #TODO #ALSO INCLUDE IN MASTER CONVERTER - wut
     # put numbers as values, and times as key (StN)- Strings to Numbers
-    dayTimeSlotsStandardizedStNLocal = {}
-    iterDayTimeSlotsStandardizerB = 0
-    while iterDayTimeSlotsStandardizerB <= lengthDayTimeSlots:
-        dayTimeSlotsStandardizedStNLocal.update({dayTimeSlotsKeysList[iterDayTimeSlotsStandardizerB]:iterDayTimeSlotsStandardizerB})
-        iterDayTimeSlotsStandardizerB+=1
-        #testOutput("[TEST | 2.2, IN LOOP] new dict dayTimeSlotsStandardizedStNLocal: ", dayTimeSlotsStandardizedStNLocal)
-    #testOutput("[TEST | 3.2, OUT OF LOOP] new dict dayTimeSlotsStandardizedStNLocal: ", dayTimeSlotsStandardizedStNLocal)
-    return dayTimeSlotsStandardizedNtSLocal,dayTimeSlotsStandardizedStNLocal 
+    strings_to_numbers: Dict[str, int] = {}
+    i:int = 0
+    while i <= num_of_time_slots:
+        strings_to_numbers.update({dayTimeSlotsKeysList[i]:i})
+        i+=1
+    return numbers_to_strings, strings_to_numbers 
 
 def fill_time_slots_inbetween_A_and_B(timeA,timeB,dayTimeSlotsStandardizedStN,dayTimeSlotsStandardizedNtS):
                     #1, take input times, find corresponding standardized number for position in the master ref times list. 
@@ -164,8 +155,13 @@ def fill_time_slots_inbetween_A_and_B(timeA,timeB,dayTimeSlotsStandardizedStN,da
                         times.append(dayTimeSlotsStandardizedNtS[number])
                     return times
                 
-def find_valid_time_slot(input_time_str, times_list, time_list_minutes, time_list_minutes_compiled = False): #WHY thing to help only compile list once in function, and then just ref it after that. Rather than recompile every time subfunction runs. Efficency thing
-                        
+def seek_valid_time_slot(input_time_str: str, times_list: list[str]) -> str: #WHY thing to help only compile list once in function, and then just ref it after that. Rather than recompile every time subfunction runs. Efficency thing
+    #NOTE if broken: removed these from parameter: time_list_minutes, time_list_minutes_compiled = False
+    
+    time_list_minutes_compiled = False #WHY thing to help only compile list once in function, and then just ref it after that. Rather than recompile every time subfunction runs. Efficency thing
+    time_list_minutes = [] #WUT TODO investigate 
+    #NOTE BUG check this inner outer scope, thing prob will cause problems
+                      
     @timer
     def compile_time_list_minutes():
         nonlocal time_list_minutes  # Indicate that we're using the outer function's variable
@@ -175,6 +171,7 @@ def find_valid_time_slot(input_time_str, times_list, time_list_minutes, time_lis
         if not time_list_minutes_compiled:
             time_list_minutes = sorted([time_to_minutes(time_str) for time_str in times_list])
             time_list_minutes_compiled = True  # Update the flag to prevent re-compilation
+    #WHAT #TODO EXPLAIN WHY????
 
     @timer
     def time_to_minutes(time_str): #for intial conversion into min for comparison
@@ -182,11 +179,9 @@ def find_valid_time_slot(input_time_str, times_list, time_list_minutes, time_lis
         """Convert a hh:mm AM/PM time string to minutes since midnight."""
         time_str = time_str.upper() #makes AM/PM upper just incase
         
-        #check if without am/pm and asks to input to avoid errors before proceeding with the rest of the code.
         #time_pattern = r'^\d{1,2}(:\d{2})?$' # This pattern matches a string that looks like a time (one or two digits for hour, optionally followed by ":" and one or two digits for minutes)
-        
         """
-        #TODO reasses and figure if still needed and a workaround later
+        #TODO reasses and figure if still needed and a workaround later, prob use for front end
         if re.match(time_pattern, time_str) and not re.search(r'AM|PM', time_str, re.IGNORECASE): #Returns true if valid time, but no AM/PM, returns false if am/pm in it
             while True:
                     #print(f"\n{Fore.RED}{Style.BRIGHT}WARNING: {time_str} is missing an am/pm designator.{Style.RESET_ALL}")

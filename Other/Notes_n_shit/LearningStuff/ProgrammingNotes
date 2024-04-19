@@ -1,6 +1,12 @@
 
 Programming Notes
 
+UNIT TESTS
+Unit tests evaluate the smallest parts of an application—typically individual functions or methods—to ensure they perform expected tasks correctly. Good unit tests are:
+Isolated: Tests should not depend on external systems or the results of other tests.
+Repeatable: Tests should provide the same results every time you run them.
+Comprehensive: They should cover all cases, including typical use cases, edge cases, and potential error conditions.
+
 
 Keys() vs list() so for non printing cases where I need the keys .keys() is slightly more efficenty. But if I need it to print out i need to use list() on the keys so i dont get that weird dict_keys thing at the beginning. But overall doesn't really matter. The .keys() in pyhton 3x is a veiw object which is slightly more memory efficent. But unless bottleneck then prioritize readability. But if need .keys a bunch, easier just to create a list.
 
@@ -16,8 +22,9 @@ Avoid circular imports, where two modules import each other as this can lead to 
 Use a __init__.py file in each directory that should be treated as a package. This isn’t necessary in Python 3.3 and above, but it can still be useful for clarifying package structure.
 Limit the use of global variables between modules. Instead, pass data to functions as parameters."""
 
-
 #try else
+
+#https://mypy.readthedocs.io/en/stable/getting_started.html
 
 
 Code Notes and Style ---------
