@@ -129,7 +129,7 @@ availability_ui = EmployeeAvailabilityUI(availability_logic)
 employee_manager = instantiate_employees(
     employee_manager, dayTimeSlotsKeysList, employeeNamesList, employeeGenderList
 )
-availability_ui.user_input_employee_unavailabilities()
+availability_ui.user_input_employee_unavailabilities(dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS)
 
 # --------------------------------------- Tasks User Input
 

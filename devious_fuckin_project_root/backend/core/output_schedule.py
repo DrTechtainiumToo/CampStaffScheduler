@@ -243,7 +243,7 @@ class OutputSchedule():
                     duration = int(task_manager.tasks[task].duration) #why int = attr is assigned from csv sheet so need to convert it from string to int. #LEARNING use get get attr?? learn more. need to update my learning google doc. 
                     #TODO error gaurding - WHAT if task doesn't have a duration, how should i guard against this error, what would ouput look like?
                     
-                    # If task spans multiple columns
+                    # If task spans multiple columns (x--->) 
                     if duration > 1:
                         multi_period_task_name_counter += 1
                         if multi_period_task_name_counter == duration:

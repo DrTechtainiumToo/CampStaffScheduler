@@ -155,8 +155,13 @@ def fill_time_slots_inbetween_A_and_B(timeA,timeB,dayTimeSlotsStandardizedStN,da
                         times.append(dayTimeSlotsStandardizedNtS[number])
                     return times
                 
-def find_valid_time_slot(input_time_str, times_list, time_list_minutes, time_list_minutes_compiled = False): #WHY thing to help only compile list once in function, and then just ref it after that. Rather than recompile every time subfunction runs. Efficency thing
-                        
+def seek_valid_time_slot(input_time_str: str, times_list: list[str]) -> str: #WHY thing to help only compile list once in function, and then just ref it after that. Rather than recompile every time subfunction runs. Efficency thing
+    #NOTE if broken: removed these from parameter: time_list_minutes, time_list_minutes_compiled = False
+    
+    time_list_minutes_compiled = False #WHY thing to help only compile list once in function, and then just ref it after that. Rather than recompile every time subfunction runs. Efficency thing
+    time_list_minutes = [] #WUT TODO investigate 
+    #NOTE BUG check this inner outer scope, thing prob will cause problems
+                      
     @timer
     def compile_time_list_minutes():
         nonlocal time_list_minutes  # Indicate that we're using the outer function's variable
@@ -166,6 +171,7 @@ def find_valid_time_slot(input_time_str, times_list, time_list_minutes, time_lis
         if not time_list_minutes_compiled:
             time_list_minutes = sorted([time_to_minutes(time_str) for time_str in times_list])
             time_list_minutes_compiled = True  # Update the flag to prevent re-compilation
+    #WHAT #TODO EXPLAIN WHY????
 
     @timer
     def time_to_minutes(time_str): #for intial conversion into min for comparison

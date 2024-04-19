@@ -60,7 +60,7 @@ def get_date_value_ui(get_date_auto=False, get_next_day=False, max_entry_attempt
                 return date_value  # acceptable value found
         play_joke_on_user()
 
-def employee_name_input_auto_completer(employeeNamesList, promptString):
+def employee_name_input_auto_completer(promptString, names_list):
     """
     Prints out whatever prompt is given in the prompt string, (if nothing given then prints nothing). Then auto completes the user input with an employee name from employeeNamesList.
     It then automatically capitalizes the employee name. Finally the function returns the employee name (capitalized).
@@ -70,16 +70,16 @@ def employee_name_input_auto_completer(employeeNamesList, promptString):
     Uses prompttoolkit
 
     Args:
-        employeeNamesList (list): list of employee names
+        names_list (list): list of employee names
         promptString (string): Only insert one string of prompt strings you want printed, if none given then prints nothing
     """
     
     #if no text given to function, makes prompt blank
-    if promptString == False: #WHY & CHECK IF ERROR: GPT4- python treats empty strings ("") as False and non-empty strings as True when evaluated in a Boolean context.
+    if promptString == False:
         promptString = ""
     
     # Define a list of autocomplete words.
-    employee_Name_Completer = WordCompleter(employeeNamesList,ignore_case=True) #WHY ignore_care=True, allowing case-insensitive input bc employee names list is capitalized, but dont want to make user have to capitalize input to get auto suggestion
+    employee_Name_Completer = WordCompleter(names_list,ignore_case=True) #WHY ignore_care=True, allowing case-insensitive input bc employee names list is capitalized, but dont want to make user have to capitalize input to get auto suggestion
     # Use the completer in the prompt.
     user_input = prompt(promptString, completer=employee_Name_Completer)
     
@@ -91,7 +91,7 @@ class EmployeeAvailabilityUI:
     def __init__(self, availability_logic):
         self.availability_logic = availability_logic
 
-    def prompt_employee_unavailability(self):
+    def prompt_employee_unavailability(self, dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS):
         while True:
             print("\n\nWho is unavailable?\n")
             employee_name = employee_name_input_auto_completer("Enter employee name: ", employeeNamesList)
@@ -99,7 +99,8 @@ class EmployeeAvailabilityUI:
                 break
             print("Invalid employee name. Please check and try again.")
 
-        unavailable_times = self.collect_unavailability_times(employee_name)
+        unavailable_times = self.collect_unavailability_times(employee_name, dayTimeSlotsKeysList)
+        unavailable_times = self.availability_logic.multi_time_input_detector_and_converter_employee_unavailability(unavailable_times, dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS)
         self.availability_logic.set_employee_unavailability(employee_name, unavailable_times)
         print(f"\nConfirmed: {employee_name} is unavailable at {unavailable_times}.\n")
 
@@ -129,15 +130,16 @@ class EmployeeAvailabilityUI:
     def validate_time_format(self, time_str):
         # Validate time format here, returning True if valid
         return bool(re.match(r"\d{1,2}(:\d{2})?\s*(am|pm)", time_str, re.IGNORECASE))
-
-    def user_input_employee_unavailabilities(self):
+    
+    #TODO SUPER IMPORTANT!!!!!!!!!!!!!!! MAKE THE UNAVAILBILITES LIKE THE TIME OCCURINGS -inclusive, otherwise will cause problems
+    def user_input_employee_unavailabilities(self, dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS):
         anyoneUnavailable = input(
             "\nIs anyone unavailable today?\n\ny or n? \n\nUser: "
         )
         if anyoneUnavailable in noAnswers:
             print("\nConfirmed: No unavailabilites.")
         else:
-            self.prompt_employee_unavailability()
+            self.prompt_employee_unavailability(dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS)
             while True:
                 print("\nIs anyone else unavailable?\n\nY or N?\n")
                 anyoneElse = input("\nUser: ")
@@ -145,7 +147,7 @@ class EmployeeAvailabilityUI:
                     print("\nConfirmed: no one else is unavailable.\n")
                     break
                 else:
-                    self.prompt_employee_unavailability()
+                    self.prompt_employee_unavailability(dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS)
 
 
 def user_decide_modify_times_ui(day_time_slots):

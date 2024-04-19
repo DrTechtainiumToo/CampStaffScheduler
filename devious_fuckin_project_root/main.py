@@ -22,8 +22,6 @@ import os
 import logging
 
 
-
-
 def main(): 
     #does execution logic
     
@@ -35,16 +33,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-"""
-async def main_logic():
-    # Your main application logic here
-    await asyncio.sleep(1)  # Simulating some asynchronous operation
-    print("Main logic executed")
-
-if __name__ == "__main__":
-    asyncio.run(main_logic())"""
 
 #python -m cProfile -s time your_script.py
 #snakeviz profile.prof
