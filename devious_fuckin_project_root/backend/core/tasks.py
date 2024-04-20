@@ -1,4 +1,4 @@
-from config.settings import swat_basic_tasks_list_for_scheduler_csv, swat_night_chores_info_csv
+from config.settings import SWAT_BASIC_TASKS_LIST_FOR_SCHEDULER_CSV, SWAT_NIGHT_CHORES_INFO_CSV
 from config.utility import timer
 import csv
 from typing import Any, ParamSpec, Concatenate #LEARN
@@ -173,7 +173,7 @@ class TaskDataConverter:
         self.task_variable_names = []
         
     @timer
-    def add_tasks_from_csv(self, file_name=swat_basic_tasks_list_for_scheduler_csv, file_dialect = 'excel', new_line_value = '', encoding_value = 'utf-8-sig'):
+    def add_tasks_from_csv(self, file_name=SWAT_BASIC_TASKS_LIST_FOR_SCHEDULER_CSV, file_dialect = 'excel', new_line_value = '', encoding_value = 'utf-8-sig'):
         """Converts a CSV file of standard tasks into a dictionary where keys are task identifiers and values are Task objects.
         Args:
         csvfile (str): Path to csv file
@@ -305,12 +305,12 @@ class TaskRecommender():
     def __init__ (self, dayName):
         self.selected_tasks_dict = {}
         self.selected_tasks_var_names_list = []
-        #self.master_task_dict = master_task_dict #if Maybe see if will use this for simplicity later, error see if copied corretly or something, still unfamiliar
         self.dayName = dayName
 
     @timer
     def recommend_tasks(self, master_task_dict):    
         """Auto-Recommended tasks algorithm"""
+        #NOTE this spawn thing could be a problem if refactor in the future
         attribute_name = 'spawn_'+ self.dayName.lower() #WHY .lower to create name value? It refs dateValue num to corresponding dictionary values which are day names, and the day names are capitalized. However the obj attribute daynames are not, so we lowercase this name.
         for task_name, instance in master_task_dict.items(): 
             attr_value = getattr(instance, attribute_name)
@@ -389,7 +389,7 @@ def instantiate_tasks(additionalTasks: dict[str, TaskManager.Task], dayTimeSlots
     TaskManager.Task.define_default_assigned_to_times(dayTimeSlotsKeysList) #bc need it for all creations
     
     task_data_converter = TaskDataConverter()
-    csv_tasks_files = [swat_basic_tasks_list_for_scheduler_csv, swat_night_chores_info_csv] #maybe add this to the args eventually
+    csv_tasks_files = [SWAT_BASIC_TASKS_LIST_FOR_SCHEDULER_CSV, SWAT_NIGHT_CHORES_INFO_CSV] #maybe add this to the args eventually
     
     #WHY - create the defaultTasksVarNamesList list so the autoComplete can use in menus and stuff
     defaultTasksDictionary, defaultTasksVarNamesList = task_data_converter.process_files(csv_tasks_files)

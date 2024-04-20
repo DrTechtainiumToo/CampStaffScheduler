@@ -1,5 +1,26 @@
 Credit to Chat GPT for recommending how I should split up what had been a 2100+ Lines that i had to navigate.
 
+
+Consider using chainmap on dictionaries so dont have to creat a new one?
+Idk if really applicable tho bc everyhtingis in the functions
+
+EASY-ISH 
+Make employee id number (also have auto assign) - seperate thing (make one during program)
+Then can use IDs to ref shit would be pretty fast to:
+Task and Employee IDs: If tasks or employees are referenced by string identifiers that are convertible to numeric IDs (e.g., UUIDs to integers), this conversion can also improve lookup and sorting performance.
+
+Time Slots as Numbers: Converting dayTimeSlotsStandardizedStN (string-to-number) and dayTimeSlotsStandardizedNtS (number-to-string) into purely numerical representations can streamline operations involving time slots. For instance, calculating the next or previous time slot becomes a simple numerical operation rather than a string manipulation task.
+
+
+maybe:
+Handling Mixed Types: If you need to maintain human-readable formats (like strings for task names), consider using enums or similar constructs for frequently accessed properties that benefit from being represented numerically.
+
+Definitley get the probbability shit
+to be numeric, can have to set attr to int if needed, have already done in the past
+
+
+
+
 Modularization Steps
 Isolate the Core Logic: Separate all your business rules and algorithms from any input/output code. This core module will handle tasks, scheduling algorithms, and any other logic.
 Create a Data Access Layer: This layer will handle all database interactions or file manipulations. It acts as an intermediary between the core logic and the actual data storage.
@@ -68,7 +89,7 @@ TODOLIST bc my dumbass has 1mb of working memory -------------------------------
 
 #DONE Redo defaultInfo csv file, storage, retrevial, and interpetation system. Now need to ad gender column too
 #TODO Create save system for preferential stuff that you dont want to type in repeatedly but cant be in defaultInfo, will have to maeke csv readers & converters tho
-#IN PROGRESS Finish getting all the time and special events listed
+#TODO Finish getting all the time and special events listed
 #DONE Create master task list (just add some stuff some like 80% there)
 #IN PROGRESS Preferences system
 #DONE Time system, how work? its input blocks or time date, or give options. also make smart function to calc distance btwn two numbers to get duration, will have to maeke csv readers & converters too tho
@@ -77,18 +98,21 @@ TODOLIST bc my dumbass has 1mb of working memory -------------------------------
 #DONE Merge all input data into master roster for algorithm
 #TODO village schedule, and smart offweek system and associated tasks
 #TODO Sweetings
-#TODO Actually devlop algorithm - will be a pain in the ass week long affair probbably
-    #TODO Probability system
+#IN PROGRESS Actually devlop algorithm - will be a pain in the ass week long affair probbably
+    #IN PROGRESS Probability system
     #IN PROGRESS anti cert use up system
     #TODO no double-consecutive assignment system (no 2 KWSATS in a row)
-    #DONE Sort system and arrange data for selectioin
+    #DONE Sort system and arrange data for selection
     #DONE Anti Overlap System
-    #IN PROGRESS Multi-time windowed tasks
+    #DONE Multi-time windowed tasks
+    #TODO Everyone must have taks atleast once feature
+    #IN PROGRESS Unavailability displayer
+    #TODO 
 #IN PROGRESS Format Console Output (Potentially scrapped)
 #IN PROGRESS Format CSV / Excel Output --> Core Feature
 #SCRAPPED Decide if format for google sheets or app plugin (Somewhat likely)
 #PLANNED Decide if format for web application deployment via Flask and Google Cloud (Highly Likely)
-#TODO Potentially make gui to make input easier??? DO AFTER Decide on output format
+#TODO GUI
 #TODO Final review of entire system for user friendly-ness changes and bugs
 #TODO Review to ensure scalability
 #TODO Documentation

@@ -1,5 +1,6 @@
 import datetime
 from datetime import timezone
+import logging
 
 class OutputSchedule(): 
     #TODO FIGURE OUT LATER
@@ -28,7 +29,7 @@ class OutputSchedule():
     def csv():
         pass
     
-    def excel(self, employee_manager, task_manager) :
+    def excel(self, employee_manager, task_manager, algo_run_time: float) :
         import xlsxwriter
 
         #TODO MEDIUM - PRIORITY !! make system which able to input week, or starting week and will put what week it is, also let it choose between week or formal date         
@@ -204,6 +205,13 @@ class OutputSchedule():
         'fg_color': '#FFB6C1',
         'font_color': '#333333',
         'border': 1
+        }),
+        'UNAVAILABLE' : workbook.add_format({
+        'align': 'center',
+        'valign': 'vcenter',
+        'fg_color': '#8B0000',
+        'font_color': '#000000',
+        'border': 1
         })
         }
 
@@ -233,16 +241,45 @@ class OutputSchedule():
             worksheet.write(emp_row_index, 0, employee, employee_format)
             emp_row_index += 1
         
+        #NOTE need a method like this:
+        #def find_continuous_sequences(self):
+        #What to check for
+        
+        
         # Fill in the data
         row = row_index
         for employee in self.employee_list:
-            column = 1
-            multi_period_task_name_counter = 0
+            column: int = 1
+            multi_period_task_name_counter: int = 0
+            unavailbility_task_name_counter: int = 0
+            unavailablity_sequence = False
             for time_slot, task in employee_manager.employees[employee].assigned_to.items(): #NOTE if error check here, lol that rhymes. maybe give these props to output class, make simpler??[] 
                 if task:
-                    duration = int(task_manager.tasks[task].duration) #why int = attr is assigned from csv sheet so need to convert it from string to int. #LEARNING use get get attr?? learn more. need to update my learning google doc. 
-                    #TODO error gaurding - WHAT if task doesn't have a duration, how should i guard against this error, what would ouput look like?
+                    try:
+                        duration = int(task_manager.tasks[task].duration) #why int = attr is assigned from csv sheet so need to convert it from string to int. #LEARNING use get get attr?? learn more. need to update my learning google doc. 
+                    except:
+                        duration: int = 1
+                        
+                    #Unavailbility handle
+                    #TODO need to be able to handle indv unavailbilities
+                    #TODO need to be able to handle all day unavaibility, prob need to rework system to just make it attr based
+                    #currently can't handle edge cases 
+                    #TODO make tasks check thier future unavailbility
                     
+                    if task == 0: #put zero bc comparison might be faster
+                        unavailablity_sequence = True
+                        unavailbility_task_name_counter +=1
+                        column += 1
+                        continue
+                    elif unavailablity_sequence and (task != 0): #End of unavailbility sequence
+                        #One ahead of last unavailble task, current task is a regular one, so have to go back
+                        #merge all contiguous unavailable time slots into a single merged cell                        
+                        start_col = column - (unavailbility_task_name_counter) #minus 1 bc already passed last unavailbility task
+                        format = task_format.get('UNAVAILABLE', task_format.get('Default'))  
+                        worksheet.merge_range(row, start_col, row, column-1, 'Unavailable', format)
+                        unavailbility_task_name_counter = 0
+                        unavailablity_sequence = False
+                           
                     # If task spans multiple columns (x--->) 
                     if duration > 1:
                         multi_period_task_name_counter += 1
@@ -252,7 +289,7 @@ class OutputSchedule():
                             worksheet.merge_range(row, start_col, row, column, task, format)
                             multi_period_task_name_counter = 0
                         column += 1
-                    else:
+                    else: #If single duration
                         format = task_format.get(task, task_format.get('Default'))  #bc wont take a list type thing in the ar
                         worksheet.write(row, column, task, format) #.get to prevent key error if i havent added a format for it, could i set it to None also? idk would have to read docs
                         column += 1
@@ -271,6 +308,28 @@ class OutputSchedule():
         worksheet.merge_range(quote_row, 0, quote_row, self.length_time_slots, quote_of_day)
         # Apply the format to the merged cells with the quote
         worksheet.write(quote_row, 0, quote_of_day, quote_format)
+        
+        #Write footnote
+        #Add a small row at the bottom with a footnote that gives me credit, plus runtime:
+        credit_note_format = workbook.add_format({
+            'bold': True, 
+            'align': 'left',
+            'valign': 'vcenter',
+            #'fg_color': '#FFD3D3D3',
+            'font_size': 8,
+            'border': 1
+        })
+        
+        credit_note = f"Real Devious Task Scheduler designed by Yacht. Algo runtime: {round(algo_run_time, 3)} sec."
+        #help my name jeff, i am trapped inside the program, someone please help me escape.
+        credit_row = self.length_employee_list + row_index + 1 # +1 to skip quote 
+        worksheet.write(credit_row, 0, credit_note, credit_note_format)
+        worksheet.merge_range(credit_row, 0, credit_row, 6, credit_note)
+        #worksheet.merge_range(first_row, first_col, last_row, last_col, data, cell_format=None)
+       
+        #Final joke note under credit footnote:
+        
+        
         workbook.close()
             
     def terminal():

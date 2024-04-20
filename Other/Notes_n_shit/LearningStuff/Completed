@@ -6,4 +6,7 @@ Completed Tasks List:
 #DONE, aslo make (column values to tasks csv to parameter var names for task class) them keyword for crying out loud so dont have to deal with this shit
 #DONE to break down function more, and have better single responsibility may I should split
 #DONE wonder if i can sort obj and durations together via dict, then just get the keys and make list and it would be faster?
+#DONE, originally was problem bc check against windowed and windowed wansnt getting updated unless queue prematurely full, so have add to that list here
+#DONE LEARNING CONCEPT - SOLVED (looked at another csv without \ufeff) Its because I needed to give a encoding parameter to the open() func. why is \ufeff a thing.
+            employee_names.append(name) #add names to list
 

@@ -1,6 +1,7 @@
-from backend.data.file_manager import intialCSVToDataStructures
-from config.settings import swat_employee_info_csv
+from backend.data.file_manager import inital_csv_to_data_structures
+from config.settings import SWAT_EMPLOYEE_INFO_CSV
 
-employeeNamesList, employeeGenderList = intialCSVToDataStructures(swat_employee_info_csv)
+#TODO reasses this intermediate file later
+employee_names, employee_genders = inital_csv_to_data_structures(SWAT_EMPLOYEE_INFO_CSV)
 
 

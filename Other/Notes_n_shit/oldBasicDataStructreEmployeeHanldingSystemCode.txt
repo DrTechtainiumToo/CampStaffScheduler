@@ -1,10 +1,6 @@
 
 
 OLD CSV CONVERTER STRUCTURES:
-
-
-
-
                 """defaultTasksDictionary[row['TaskVariableName']] = TaskManager.Task(
                     task_name = row['TaskName'],
                     task_frequency = row['Frequency'],

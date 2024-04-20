@@ -2,9 +2,9 @@ __author__ = "Andrew Dybala"
 __copyright__ = "Copyright Restricted"
 __credits__ = ["Andrew Dybala", "GPT4 as assistant"]
 __license__ = "License Name and Info"
-__version__ = "1.3.2"
+__version__ = "1.3.5"
 __maintainer__ = "Andrew Dybala"
-__email__ = "andrew@dybala.com"
+__email__ = "drtechtainium@gmail.com"
 __status__ = "In development"
 __compiler__ = "Python 3.12.0"
 
@@ -20,7 +20,6 @@ from config import settings, utility
 import asyncio
 import os
 import logging
-
 
 def main(): 
     #does execution logic

@@ -1,19 +1,10 @@
 # for formatting, black {source_file_or_directory}
 
-# aslo very interesting
-# https://github.com/Textualize/textual
-
-#https://www.youtube.com/watch?v=JrGFQp9njas
 
 from config.settings import (
-    get_next_day,
-    get_date_auto,
-    days,
-    daysKeyValueInverse,
-    noAnswers,
-    yesAnswers,
-    maleAnswers,
-    femaleAnswers,
+    GET_NEXT_DAY,
+    INTERFACE_TYPE,
+    MAX_ENTRY_ATTEMPTS,
 )
 from config.utility import (
     end_time_log_cap, 
@@ -24,16 +15,16 @@ from backend.core.time_processes import (
     get_day_time_slots,
     timeSlotStandardizer,
 )
-from backend.core.process import employeeNamesList, employeeGenderList
+from backend.core.process import (
+    employee_names, 
+    employee_genders
+)
 from backend.core.employees import (
     EmployeeManager,
     EmployeeAvailabilityLogic,
-    Employee,
     instantiate_employees,
 )
 from backend.core.tasks import (
-    TaskManager,
-    TaskDataConverter,
     TaskRecommender,
     instantiate_tasks,
 )
@@ -45,7 +36,6 @@ from interface.terminal.terminal_ui_logic import (
     modify_schedule_ui,
     user_decide_modify_times_ui,
     EmployeeAvailabilityUI,
-    describe_dynamic_time_slot_qeues
 )
 from backend.core.scheduler import instantiate_and_run_scheduler
 from backend.core.output_schedule import OutputSchedule
@@ -96,12 +86,11 @@ def printIntroSequence():
     print(
         "\n-----------------------------------------------------------------------------------------------"
     )
-    # time.sleep(0.5) #alt way to wait
 
 printIntroSequence()
 
 # Get day ---------------------
-date_value = get_date_value_ui(get_next_day, get_date_auto, max_entry_attempts=3)
+date_value = get_date_value_ui(GET_NEXT_DAY, INTERFACE_TYPE, max_entry_attempts=MAX_ENTRY_ATTEMPTS)
 day_name = get_day_name(date_value)
 day_time_slots = get_day_time_slots(date_value)
 print(f"Will generate a schedule for {day_name}.\n")
@@ -114,10 +103,10 @@ else:
     print("Times confirmed.")
 
 # -------- standardize the timeslots
-dayTimeSlotsKeysList = list(
+time_slot_labels = list(
     day_time_slots[0].keys()
-)  # for when i just want to diplay the keys / dates. will make easier to change stuff later too. BEWARE: Is static tho and does not updates with the acutaly DICT
-dayTimeSlotsStandardizedNtS, dayTimeSlotsStandardizedStN = timeSlotStandardizer(dayTimeSlotsKeysList)
+)
+index_to_time_slot_map, time_slot_to_index_map = timeSlotStandardizer(time_slot_labels)
 
 # ----------- Employees ---------------------
 
@@ -127,9 +116,9 @@ employee_manager = EmployeeManager()  # Assuming this is already defined
 availability_logic = EmployeeAvailabilityLogic(employee_manager)
 availability_ui = EmployeeAvailabilityUI(availability_logic)
 employee_manager = instantiate_employees(
-    employee_manager, dayTimeSlotsKeysList, employeeNamesList, employeeGenderList
+    employee_manager, time_slot_labels, employee_names, employee_genders
 )
-availability_ui.user_input_employee_unavailabilities(dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS)
+availability_ui.user_input_employee_unavailabilities(time_slot_labels, time_slot_to_index_map, index_to_time_slot_map)
 
 # --------------------------------------- Tasks User Input
 
@@ -138,17 +127,17 @@ additional_tasks = user_adds_additonal_tasks_ui() #move into task reccomender (t
 #actually maybe make it a feature in the modification that can add more??
 #and rename class to be like task editing etc
 
-task_manager, defaultTasksDictionary, defaultTasksVarNamesList = instantiate_tasks(
+task_manager, default_tasks_dictionary, defaultTasksVarNamesList = instantiate_tasks(
     additional_tasks,
-    dayTimeSlotsKeysList
+    time_slot_labels
     )
 
 task_ui = TaskUI(task_manager)
 
 task_recommender = TaskRecommender(day_name)
-task_recommendation_ui = TaskRecommendationUI(task_recommender, dayTimeSlotsKeysList)
+task_recommendation_ui = TaskRecommendationUI(task_recommender, time_slot_labels)
 
-task_recommender.recommend_tasks(defaultTasksDictionary)
+task_recommender.recommend_tasks(default_tasks_dictionary)
 task_recommendation_ui.edit_selected_tasks(defaultTasksVarNamesList) #maybe change to edit reccomended tasks?? IDK
 task_recommender.handle_missing_details(task_recommendation_ui.collect_missing_details)
 
@@ -158,9 +147,9 @@ daysTasks = [tasks_dictionary] #keep so can add more stuff if needed
 start_algo = time.perf_counter()
 # -------------------------------- Scheduling algo
 instantiate_and_run_scheduler(
-    dayTimeSlotsStandardizedStN, 
-    dayTimeSlotsStandardizedNtS, 
-    dayTimeSlotsKeysList, 
+    time_slot_to_index_map, 
+    index_to_time_slot_map, 
+    time_slot_labels, 
     daysTasks, 
     tasks_dictionary, 
     task_manager, 
@@ -170,20 +159,22 @@ instantiate_and_run_scheduler(
 #TODO learn how to use timeit 
 # ------------------------------------ Output 
 end_algo = time.perf_counter()
+algo_run_time = end_algo-start_algo
 
 start_excel = time.perf_counter()
-output_schedule = OutputSchedule(dayTimeSlotsKeysList,employeeNamesList,employee_manager.employees)
-output_schedule.excel(employee_manager, task_manager)
+
+output_schedule = OutputSchedule(time_slot_labels, employee_names, employee_manager.employees)
+output_schedule.excel(employee_manager, task_manager, algo_run_time)
+
 end_excel = time.perf_counter()
 
 end_time_log_cap()
-algo_res = end_algo-start_algo
 excel_res = end_excel-start_excel
-print("Algo:", (algo_res))
+print("Algo:", (algo_run_time))
 print("Excel:", (excel_res))
 print("Program finished")
 
 profiler.disable()
 stats = pstats.Stats(profiler)
-profiler.print_stats(sort='cumtime')
+#profiler.print_stats(sort='cumtime')
 stats.dump_stats('profile.prof')

@@ -199,12 +199,9 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
                         )
                         return chosen_name_local
                         
-
                     # also interesting, a suggestion by GPT4 - employees_with_req_traits = set(employees_with_req_traits_local.keys()) & set(avail_employees_in_period.keys()) - set(assigned_people.keys())
 
-                    if (
-                        employees_with_req_traits
-                    ):  # check if already assigned or unavailable
+                    if employees_with_req_traits:  # check if already assigned or unavailable
                         while True:
                             chosen_name = (
                                 choose1()
@@ -250,11 +247,9 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
                 
                 #special process for windowed tasks -> moves task to next queue acc to freq attr
                 if task_name in self.windowed_tasks_list:
-                    #DONE, originally was problem bc check against windowed and windowed wansnt getting updated unless queue prematurely full, so have add to that list here
                     required_assignments = int(task_manager.tasks[task_name].frequency) 
                     current_assignments = sum(1 for people in task_manager.tasks[task_name].assigned_to.values() if people) #GPT had to help me on this one
                     if current_assignments < required_assignments:
-                        #TODO make it skip certain times such as lunch, dinner, breakfast? or not nessecary
                         next_queue_key = dayTimeSlotsStandardizedNtS[self.time_slot_num + 1]
                         Schedule.dynamicTimeSlotQueuesDict[next_queue_key].windowed_tasks_list.append(task_name)
                         Schedule.dynamicTimeSlotQueuesDict[next_queue_key].queue.append(task_name)

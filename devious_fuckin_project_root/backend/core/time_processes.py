@@ -1,20 +1,20 @@
 import time
 import datetime
 from datetime import timezone
-from config.settings import days, daysKeyValueInverse, normalDayTimeSlots, wenSpecialTimeslots, friSpecialTimeslots, satSpecialTimeslots, sunSpecialTimeslots, dumbMeme1
+from config.settings import DAYS, DAYS_KEY_VALUE_INVERSE, NORMAL_DAY_TIME_SLOTS, WEN_SPECIAL_TIMESLOTS, FRI_SPECIAL_TIMESLOTS, SAT_SPECIAL_TIMESLOTS, SUN_SPECIAL_TIMESLOTS, DUMB_MEME_1
 from config.utility import timer
 import re
 from colorama import Fore, Style
 from typing import Dict, List, Any
 
 datesTimeSlots = {
-    1:normalDayTimeSlots,
-    4:normalDayTimeSlots,
-    2:normalDayTimeSlots,
-    3:wenSpecialTimeslots,
-    5:friSpecialTimeslots,
-    6:satSpecialTimeslots,
-    7:sunSpecialTimeslots
+    1:NORMAL_DAY_TIME_SLOTS,
+    4:NORMAL_DAY_TIME_SLOTS,
+    2:NORMAL_DAY_TIME_SLOTS,
+    3:WEN_SPECIAL_TIMESLOTS,
+    5:FRI_SPECIAL_TIMESLOTS,
+    6:SAT_SPECIAL_TIMESLOTS,
+    7:SUN_SPECIAL_TIMESLOTS
     }
 
 
@@ -32,13 +32,13 @@ def program_auto_get_date_value(get_next_day = False):
 def validate_user_date_input(dateUserEntered):
     """Checks if user input is acceptable
     Returns: int : date value"""
-    if dateUserEntered.lower() in days: #account for non-numeric input
-        dateUserEntered = days[dateUserEntered] #convert any string input into int
+    if dateUserEntered.lower() in DAYS: #account for non-numeric input
+        dateUserEntered = DAYS[dateUserEntered] #convert any string input into int
         return dateUserEntered
     else:
         try: 
             date_value = int(dateUserEntered) #int bc keys are int, but user input is not
-            if date_value in daysKeyValueInverse.keys(): #if numeric input, check if valid
+            if date_value in DAYS_KEY_VALUE_INVERSE.keys(): #if numeric input, check if valid
                 return date_value
             else:
                 return False
@@ -62,12 +62,12 @@ def play_joke_on_user():
         print("\nJK! I'm just making you wait!\n")
         time.sleep(1) 
         print("")
-        print(dumbMeme1)
+        print(DUMB_MEME_1)
         print("\n\nPROGRAM TERMINATING, its all your fault.")
         exit()
      
 def get_day_name(dateValue):
-    dayName = daysKeyValueInverse[dateValue]
+    dayName = DAYS_KEY_VALUE_INVERSE[dateValue]
     return dayName
 
 def get_day_time_slots(dateValue):
@@ -118,28 +118,26 @@ def remove_time_slot(day_time_slots, time_to_remove):
         del day_time_slots[time_to_remove]
     return day_time_slots
 
-def timeSlotStandardizer(dayTimeSlotsKeysList: List[str]):
-    """ Standardizes timeslots values and makes ref dictionaries. Takes the "dayTimeSlots" var. 
+def timeSlotStandardizer(dayTimeSlotsKeysList: list[str]) -> tuple[dict[int, str], dict[str, int]]:
+    """ Standardizes timeslots values and makes ref dictionaries from a list of time slots.
     Args:
-        time_slots_of_the_day (Type: List): Input should be a list with dictionaries. Example: normalDayTimeSlots = [{'7:00': True, '7:45': True, '9:15': True, '9:50': True, '10:00': True, '11:00': True, '11:45': True, '1:45': True, '2:45': True, '3:45': True, '4:45': True, '5:20': True, '6:30': True, '7ish': 'NG', '8ish': 'Sweeting', '9ish': 'NightChore'}] #what do when have too special events at the same time??? such as NG and Playtime
+        dayTimeSlotsKeysList (List[str]): Input should be a list of time slot strings.
+    Returns:
+        Tuple[Dict[int, str], Dict[str, int]]: A tuple containing two dictionaries:
+            - First dictionary maps indices to time slot strings. (NtS)
+            - Second dictionary maps time slot strings to indices. (StN)
     """
     
-    #first have to make a ref book to convert the stuff into in, Makes a list of the times / keys of dayTimeSlots
-    num_of_time_slots: int = len(dayTimeSlotsKeysList)-1 #WHY -1 len gives me one more than index number, so keep in mind when using len to go thru indexs
-
-    #put times as values, and ascending number as key (NtS)- Numbers to Strings
-    numbers_to_strings: Dict[int, str] = {}
-    i: int = 0
-    while i <= num_of_time_slots:
+    num_of_time_slots: int = len(dayTimeSlotsKeysList) - 1 #WHY -1 len gives me one more than index number, aka no start at 0.
+    
+    # Maps indices to time slots (Number to String) (NtS)
+    numbers_to_strings: dict[int, str] = {}
+    for i in range(num_of_time_slots+1):
         numbers_to_strings.update({i:dayTimeSlotsKeysList[i]})
-        i+=1
 
     # put numbers as values, and times as key (StN)- Strings to Numbers
-    strings_to_numbers: Dict[str, int] = {}
-    i:int = 0
-    while i <= num_of_time_slots:
-        strings_to_numbers.update({dayTimeSlotsKeysList[i]:i})
-        i+=1
+    strings_to_numbers: dict[str, int] = {time: num for num, time in enumerate(dayTimeSlotsKeysList)}
+    
     return numbers_to_strings, strings_to_numbers 
 
 def fill_time_slots_inbetween_A_and_B(timeA,timeB,dayTimeSlotsStandardizedStN,dayTimeSlotsStandardizedNtS):

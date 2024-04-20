@@ -22,16 +22,16 @@ from backend.core.time_processes import (
     remove_time_slot,
 )
 from config.settings import (
-    get_next_day,
-    get_date_auto,
-    days,
-    daysKeyValueInverse,
-    noAnswers,
-    yesAnswers,
-    maleAnswers,
-    femaleAnswers,
+    GET_NEXT_DAY,
+    INTERFACE_TYPE,
+    DAYS,
+    DAYS_KEY_VALUE_INVERSE,
+    NO_ANSWERS,
+    YES_ANSWERS,
+    MALE_ANSWERS,
+    FEMALE_ANSWERS,
 )
-from backend.core.process import employeeNamesList, employeeGenderList
+from backend.core.process import employee_names, employee_genders
 from config.utility import xyz_input_auto_completer
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
@@ -60,7 +60,7 @@ def get_date_value_ui(get_date_auto=False, get_next_day=False, max_entry_attempt
                 return date_value  # acceptable value found
         play_joke_on_user()
 
-def employee_name_input_auto_completer(promptString, names_list):
+def employee_name_input_auto_completer(prompt_string, names_list):
     """
     Prints out whatever prompt is given in the prompt string, (if nothing given then prints nothing). Then auto completes the user input with an employee name from employeeNamesList.
     It then automatically capitalizes the employee name. Finally the function returns the employee name (capitalized).
@@ -75,13 +75,13 @@ def employee_name_input_auto_completer(promptString, names_list):
     """
     
     #if no text given to function, makes prompt blank
-    if promptString == False:
-        promptString = ""
+    if prompt_string == False:
+        prompt_string = ""
     
     # Define a list of autocomplete words.
-    employee_Name_Completer = WordCompleter(names_list,ignore_case=True) #WHY ignore_care=True, allowing case-insensitive input bc employee names list is capitalized, but dont want to make user have to capitalize input to get auto suggestion
+    employee_name_completer = WordCompleter(names_list,ignore_case=True) #WHY ignore_care=True, allowing case-insensitive input bc employee names list is capitalized, but dont want to make user have to capitalize input to get auto suggestion
     # Use the completer in the prompt.
-    user_input = prompt(promptString, completer=employee_Name_Completer)
+    user_input = prompt(prompt_string, completer= employee_name_completer)
     
     capitalized_input = user_input.capitalize() #WHY - have input auto convert to Capital case, bc names in employeeName list and other data structs are capitalized
     #print('You entered:', capitalized_input)
@@ -94,7 +94,7 @@ class EmployeeAvailabilityUI:
     def prompt_employee_unavailability(self, dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS):
         while True:
             print("\n\nWho is unavailable?\n")
-            employee_name = employee_name_input_auto_completer("Enter employee name: ", employeeNamesList)
+            employee_name = employee_name_input_auto_completer("Enter employee name: ", employee_names)
             if self.validate_employee_name(employee_name):
                 break
             print("Invalid employee name. Please check and try again.")
@@ -107,7 +107,7 @@ class EmployeeAvailabilityUI:
     def validate_employee_name(self, name):
         # Implement validation logic, e.g., checking against a list of employee names
         return (
-            name in employeeNamesList
+            name in employee_names
         )  # This list would be part of your overall employee management system
 
     def collect_unavailability_times(self, employee_name, dayTimeSlotsKeysList):
@@ -129,21 +129,21 @@ class EmployeeAvailabilityUI:
 
     def validate_time_format(self, time_str):
         # Validate time format here, returning True if valid
-        return bool(re.match(r"\d{1,2}(:\d{2})?\s*(am|pm)", time_str, re.IGNORECASE))
+        return bool(re.match(r"\d{1,2}(:\d{2})?\s*(am|pm)", time_str, re.IGNORECASE)) #GPT helped me on this one
     
     #TODO SUPER IMPORTANT!!!!!!!!!!!!!!! MAKE THE UNAVAILBILITES LIKE THE TIME OCCURINGS -inclusive, otherwise will cause problems
     def user_input_employee_unavailabilities(self, dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS):
         anyoneUnavailable = input(
             "\nIs anyone unavailable today?\n\ny or n? \n\nUser: "
         )
-        if anyoneUnavailable in noAnswers:
+        if anyoneUnavailable in NO_ANSWERS:
             print("\nConfirmed: No unavailabilites.")
         else:
             self.prompt_employee_unavailability(dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS)
             while True:
                 print("\nIs anyone else unavailable?\n\nY or N?\n")
                 anyoneElse = input("\nUser: ")
-                if anyoneElse in noAnswers:
+                if anyoneElse in NO_ANSWERS:
                     print("\nConfirmed: no one else is unavailable.\n")
                     break
                 else:
@@ -264,7 +264,7 @@ def user_adds_additonal_tasks_ui(): #TODO GO THRU AND FIX
     # BUG ADD FUNCTIONALITY IN AFTER DEV | additionalTasksTF = input("\nAre there any additional tasks you want to add for the day? Y or N? ")
     additionalTasksTF = "N"  # TODO remove after dev
     taskDictLocal = {}
-    while additionalTasksTF in yesAnswers:
+    while additionalTasksTF in YES_ANSWERS:
         print(
             "(SYSTEM LIMITATION) PLEASE NOTE: The all instances of this task will have the same duration and min number of people required. If this is a problem create a seperate task for each instance where the min number of people or the duration changes.\nUnfortunately there is no solution for this yet."
         )
@@ -300,30 +300,30 @@ def user_adds_additonal_tasks_ui(): #TODO GO THRU AND FIX
         )  # Figure out importance scale and how will work
 
         userAssignees = input("Is the task preassigned to someone(s)? y/n: ")
-        if userAssignees in yesAnswers:
+        if userAssignees in YES_ANSWERS:
             print(
                 "Seperate each with a comma.\nExample: Terry, Bevis, Butthead, Jacob, ThatAssholeOverThere"
             )
             userAssignees = list(
                 input("To whom: ")
             )  # TODO make it compatible with multiple names, CHECK IF ERROR IN ALGO, maybe need to make it a list by default
-        elif userAssignees in noAnswers:
+        elif userAssignees in NO_ANSWERS:
             userAssignees = 0  # TODO may need to change data value type
 
         userGenderSpecific = input("Is the task Gender Specific? y/n: ")
-        if userGenderSpecific in yesAnswers:
+        if userGenderSpecific in YES_ANSWERS:
             userGenderSpecific = input(
                 "To which gender: "
             )  # DONE: able to have list to take diff spellings of male or female and standardize the result
-            if userGenderSpecific in maleAnswers:
+            if userGenderSpecific in MALE_ANSWERS:
                 userGenderSpecific = "Male"
-            elif userGenderSpecific in femaleAnswers:
+            elif userGenderSpecific in FEMALE_ANSWERS:
                 userGenderSpecific = "Female"
-        elif userGenderSpecific in noAnswers:
+        elif userGenderSpecific in NO_ANSWERS:
             userGenderSpecific = 0  # TODO may need to change data value type
 
         user_time_window = input("Is there a time window to schedule this y/n?: ")
-        if user_time_window in yesAnswers:
+        if user_time_window in YES_ANSWERS:
             user_time_window = "Yes"
             #earliest_start = input( - 
                 #"don't schedule before x time, if none then type NONE"
@@ -367,7 +367,7 @@ def user_adds_additonal_tasks_ui(): #TODO GO THRU AND FIX
         additionalTasksTF = input(
             "Are there any additionally tasks you want to add for the day? Y or N?\n\nUser: "
         )
-    if additionalTasksTF in noAnswers:
+    if additionalTasksTF in NO_ANSWERS:
         print("No extra tasks! YIPPIE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     return taskDictLocal
 
@@ -517,7 +517,7 @@ class TaskRecommendationUI:
         print(self.recommendation_logic.selected_tasks_var_names_list)
 
         decision = input("\nWould you like to edit them? y/n\n(Note: You can add custom tasks later): ")
-        if decision.strip() in yesAnswers:
+        if decision.strip() in YES_ANSWERS:
             self.modify_tasks_interface(master_task_dict_names_list)
         else:
             print("Selected basic tasks confirmed.\n\n")

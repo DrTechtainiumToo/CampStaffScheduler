@@ -1,3 +1,6 @@
+
+-------------------------------------------------
+
 Task Population and Sorting
 Populating the Queue:
 Finding Tasks: For each given time slot, tasks are identified that have a start time matching the time slot (find_tasks_in_time_slot). This involves filtering tasks where the current time slot equals the task's start time as indexed by start_times_iter.
@@ -27,6 +30,7 @@ Start
                   |--> Select Employees
                   |--> Assign Employees to Task
                   |--> Update Task and Employee Data
+            | -> 
       |--> Roll over remaining windowed tasks to the end of the next time period's qeues
       |--> Warning message and log non-windwoed tasks that were unable to be scheduled in period
 | --> Notify user if any tasks unable to schedule

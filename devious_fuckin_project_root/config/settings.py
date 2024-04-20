@@ -1,44 +1,46 @@
 #Gobal Variables and Basic Information + any future settings
-# # settings.py
-
-
-#settings
-get_date_auto = False
-get_next_day = False
-interface_type = "terminal" #option 2 is web
-
-#File locations
 #TODO name and make system later, plus converter for different types and universal storage, retrieval and update system
-#Thanks GPT for the f string suggestion, its a good idea.
-devious_fuckin_project_root = "devious_fuckin_project_root/backend/data" #path to project
-csv_data_folder = "CSV Data Folder"
-swat_night_chores_info_csv = f"{devious_fuckin_project_root}/{csv_data_folder}/SWATNightChoresInfo.csv"
-swat_scheduler_special_tasks_list_csv = f"{devious_fuckin_project_root}/{csv_data_folder}/SWATSchedulerSpecialTasksList.csv"
-swat_employee_info_csv = f"{devious_fuckin_project_root}/{csv_data_folder}/SWATEmployeeInfo.csv"
-swat_basic_tasks_list_for_scheduler_csv = f"{devious_fuckin_project_root}/{csv_data_folder}/SWATBasicTasksListForScheduler.csv"
 
-# Global constants ----------------------
-yesAnswers = ["Y","Yes","yes","y","YES","ye","Ye","YE"]
-noAnswers = ["N","No","no","n",'NO']
-maleAnswers = ["Male","male","men","Men","boys","Boys","Man","man","Boy","boy","Males","males"]
-femaleAnswers = ["Female", "female", "Women","women","woman","Woman","Females", "females","Girl","girl","Girls","girls"]
 
-# Days mapping
-days = {'monday': 1, 'tuesday': 2, 'wednesday': 3, 'thursday': 4, 'friday': 5, 'saturday': 6, 'sunday': 7, 'mon': 1,
+# Settings for application behavior
+MAX_ENTRY_ATTEMPTS = 3 #Max user input attempts for day in getting day value sequence, else goes to meme
+INTERFACE_TYPE = False
+GET_NEXT_DAY = False
+GET_DATE_AUTO = "terminal" #option 2 is web
+
+# Output config settings
+#TODO add here
+
+# File locations and paths
+PROJECT_ROOT = "devious_fuckin_project_root/backend/data" #path to project
+CSV_DATA_FOLDER = "CSV Data Folder"
+SWAT_NIGHT_CHORES_INFO_CSV = f"{PROJECT_ROOT}/{CSV_DATA_FOLDER}/SWATNightChoresInfo.csv"
+SWAT_SCHEDULER_SPECIAL_TASKS_LIST_CSV = f"{PROJECT_ROOT}/{CSV_DATA_FOLDER}/SWATSchedulerSpecialTasksList.csv"
+SWAT_EMPLOYEE_INFO_CSV = f"{PROJECT_ROOT}/{CSV_DATA_FOLDER}/SWATEmployeeInfo.csv"
+SWAT_BASIC_TASKS_LIST_FOR_SCHEDULER_CSV = f"{PROJECT_ROOT}/{CSV_DATA_FOLDER}/SWATBasicTasksListForScheduler.csv"
+
+# Response constants ----------------------
+YES_ANSWERS = ["Y","Yes","yes","y","YES","ye","Ye","YE"]
+NO_ANSWERS = ["N","No","no","n",'NO']
+MALE_ANSWERS = ["Male","male","men","Men","boys","Boys","Man","man","Boy","boy","Males","males"]
+FEMALE_ANSWERS = ["Female", "female", "Women","women","woman","Woman","Females", "females","Girl","girl","Girls","girls"]
+
+# Mapping days to numerical identifiers and vice versa
+DAYS = {'monday': 1, 'tuesday': 2, 'wednesday': 3, 'thursday': 4, 'friday': 5, 'saturday': 6, 'sunday': 7, 'mon': 1,
         'tues': 2, 'tue': 2, 'wed': 3, 'thurs': 4, 'thur': 4, 'fri': 5, 'sat': 6, 'sun': 7, 'm': 1, 'w': 3, 'f': 5,
         's': 6, 'su': 7}
-daysKeyValueInverse = {1: "Monday", 2: "Tuesday", 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday'}
+DAYS_KEY_VALUE_INVERSE = {1: "Monday", 2: "Tuesday", 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday'}
 
-#Time values mapping - so can easily change the default options
-normalDayTimeSlots = [{'7:00am': True, '7:45am': True, '9:15am': True, '9:50am': True, '10:00am': True, '11:00am': True, '11:45am': True, '1:45pm': True, '2:45pm': True, '3:45pm': True, '4:45pm': True, '5:30pm': True, '6:30pm': True, '7:00pm': False, '8:00pm': False, '9:00pm': False}] #'7ishpm': False, '8ishpm': False, '9ish': False #'7ish': 'NG', '8ish': 'Sweeting', '9ish': 'NightChore' #what do when have too special events at the same time??? such as NG and Playtime
-wenSpecialTimeslots = ['7:00', '7:45', '9:15', '9:50', '10:00', '11:00', '11:45', '1:45', '2:45', '3:45', '4:45', '5:20', 'TIME DOES NOT EXIST', 'TIME DOES NOT EXIST',  'TIME DOES NOT EXIST', '9is MAYBE'] #'TIME DOES NOT EXIST', 'TIME DOES NOT EXIST',  'TIME DOES NOT EXIST', '9is MAYBE' #can merge TIME DOES NOT EXIST and fromatting later, this is mainly all just formatted so the ;ogram can interpret it, will format for export seperatley
-tuesSpecialTimeslots = ['7:00', '7:45', '9:15', '9:50', '10:00', '11:00', '11:45', '1:45', '2:45', '3:45', '4:45', '5:30', '6:30', '7:15',  '8ish', '9:00']
-friSpecialTimeslots = [] # type: ignore
-satSpecialTimeslots = [] # type: ignore
-sunSpecialTimeslots = [] # type: ignore
+# Time slot configurations
+NORMAL_DAY_TIME_SLOTS = [{'7:00am': True, '7:45am': True, '9:15am': True, '9:50am': True, '10:00am': True, '11:00am': True, '11:45am': True, '1:45pm': True, '2:45pm': True, '3:45pm': True, '4:45pm': True, '5:30pm': True, '6:30pm': True, '7:00pm': False, '8:00pm': False, '9:00pm': False}] #'7ishpm': False, '8ishpm': False, '9ish': False #'7ish': 'NG', '8ish': 'Sweeting', '9ish': 'NightChore' #what do when have too special events at the same time??? such as NG and Playtime
+WEN_SPECIAL_TIMESLOTS = ['7:00', '7:45', '9:15', '9:50', '10:00', '11:00', '11:45', '1:45', '2:45', '3:45', '4:45', '5:20', 'TIME DOES NOT EXIST', 'TIME DOES NOT EXIST',  'TIME DOES NOT EXIST', '9is MAYBE'] #'TIME DOES NOT EXIST', 'TIME DOES NOT EXIST',  'TIME DOES NOT EXIST', '9is MAYBE' #can merge TIME DOES NOT EXIST and fromatting later, this is mainly all just formatted so the ;ogram can interpret it, will format for export seperatley
+TUES_SPECIAL_TIMESLOTS = ['7:00', '7:45', '9:15', '9:50', '10:00', '11:00', '11:45', '1:45', '2:45', '3:45', '4:45', '5:30', '6:30', '7:15',  '8ish', '9:00']
+FRI_SPECIAL_TIMESLOTS = [] # type: ignore
+SAT_SPECIAL_TIMESLOTS = [] # type: ignore
+SUN_SPECIAL_TIMESLOTS = [] # type: ignore
 
-#Other ---
-dumbMeme1 = "Here dem lyrics!\n\n\n\
+# Other constants (humorous placeholder text)
+DUMB_MEME_1 = "Here dem lyrics!\n\n\n\
 It's like I dont care about nothing man...\n\
 Roll another blunt...\n\
 Ooohh\n\
