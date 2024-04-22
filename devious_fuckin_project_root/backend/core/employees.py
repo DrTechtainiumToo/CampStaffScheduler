@@ -28,7 +28,9 @@ class EmployeeManager:
         #note typically the function runtime for 23 employees on a monday is around 0.000029 seconds. 
         #Or 0.00000126086sec per employee.
 
-    #TODO reset all references
+    #TODO consider to set employee (assigned or something to indicate unavailable bc assigned, but not nessecarily being unavaible for anything that period.
+    #jsut a technicaly distinguishment to make code make more sense and sitinguish it from set_and_assign_employee_availability
+    #Maybe also rethink system, idk its simple and good as is.  
     def set_employee_availability(self, employee_name, unavailable_time_slots: list[str]):
         """Sets employee availbility
         Args:
@@ -36,16 +38,14 @@ class EmployeeManager:
         """
         employee = self.employees[employee_name]
         if employee:
-            employee.set_unavailability(unavailable_time_slots) #Employee??????? 
-            #For output, just directly assigns an employee a task named Unavailable, thus not have to go thru algo. (not a task obj, just puts a str named unavailable into assigned tasks)
-    
-    #TODO reset all references
-    def set_and_assign_employee_availability(self, employee_name, unavailable_time_slots: list[str], time_slot_to_index_map, index_to_time_slot_map):
+            employee.set_unavailability(unavailable_time_slots)
+            #For output, just directly assigns an employee a task defined by unavaibility constant, thus not have to go thru algo. (not a task obj, just puts a str named unavailable into assigned tasks)
+
+    def set_and_assign_employee_availability(self, employee_name, unavailable_time_slots: list[str]):
         """Sets employee availbility, plus adds the unavailability task to assigned tasks for schedule ouput.
         Args:
             unavailable_time_slots (list): List of unavailable timeslots, they must be valid timeslots in the timeslots for the day tho...
         """
-        #NOTE GLOBAL VAR-unsure if acceptable? UNAVAILABILITY_TASK = 0
         employee = self.employees[employee_name]
         if employee:
             employee.set_unavailability(unavailable_time_slots) #Employee??????? 
@@ -113,8 +113,6 @@ class Employee:
         for time_slot in time_slots:
             self.availability[time_slot] = True
             
-    #TODO update this later to be more front end backend seperated, esp with print statement
-    #make frontend responsible for validation
     def set_unavailability(self, unavailable_times: list[str]) -> None:
         #modifies availability list, and 
         for time_slot in unavailable_times:
@@ -139,6 +137,7 @@ class Employee:
             time_slot (str): 7:00am etc
             task (str): TaskVarName
         """
+        
         #TODO DONE fix later for multiple for times assign to timeslot
         if isinstance(time_slot, list):
             for slot in time_slot:
@@ -152,8 +151,7 @@ class EmployeeAvailabilityLogic:
 
     def set_employee_availability(self, employee_name, unavailable_times, time_slot_to_index_map, index_to_time_slot_map):
         """Sets the unavailability times for a specified employee."""
-        #self.employee_manager.set_employee_availability(employee_name, unavailable_times, time_slot_to_index_map, index_to_time_slot_map)
-        self.employee_manager.set_and_assign_employee_availability(employee_name, unavailable_times, time_slot_to_index_map, index_to_time_slot_map)
+        self.employee_manager.set_and_assign_employee_availability(employee_name, unavailable_times)
 
                       
     def multi_time_input_detector_and_converter_employee_unavailability(self, input_str: list[str], times_list: list[str], time_slot_to_index_map, index_to_time_slot_map) -> list[str]: #dayTimeSlotsKeysList

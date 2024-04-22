@@ -3,7 +3,7 @@ from datetime import timezone
 import xlsxwriter
 
 #NOTE REMEMBER to print it has to be assigned to each period and have the proper duration, will help with #Debuging
-assigned = {"7:00am": "KSWAT1", "7:45am": "KSWAT1", "9:15am": "KSWAT1", "9:50am": "KSWAT1", "10:00am": "HALFSTAFF", "11:00am": None, "11:45am": "Something", '1:45pm': 'Something'}
+assigned = {"7:00am": "KSWAT1", "7:45am": "KSWAT1", "9:15am": "KSWAT1", "9:50am": "KSWAT1", "10:00am": "Unavailable", "11:00am": None, "11:45am": "Something", '1:45pm': 'Something'}
 task_durs = {"KSWAT1": 4, "HALFSTAFF": 1, "Something": 2}
 employee_list = ["Huey", "Granddad", "Wuncler"]
 

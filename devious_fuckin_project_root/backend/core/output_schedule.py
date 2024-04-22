@@ -1,8 +1,10 @@
 import datetime
 from datetime import timezone
 import logging
-from config.settings import UNAVAILABILITY_TASK, GET_NEXT_DAY
+#from config.settings import
 from backend.core.time_processes import get_current_week
+from typing import Any
+
 
 class OutputSchedule(): 
     #TODO FIGURE OUT LATER
@@ -28,10 +30,7 @@ class OutputSchedule():
         #Thus easy to change lgoic for all output forms rather than have to do each one.
         pass
     
-    def csv():
-        pass
-    
-    def excel(self, employee_manager, task_manager, algo_run_time: float) :
+    def excel(self, employee_manager, task_manager, algo_run_time: float, GET_NEXT_DAY: bool, WEEK_COUNT_START_REF_DAY: str, UNAVAILABILITY_TASK: Any) -> None:
         import xlsxwriter
 
         #TODO MEDIUM - PRIORITY !! make system which able to input week, or starting week and will put what week it is, also let it choose between week or formal date         
@@ -41,24 +40,26 @@ class OutputSchedule():
         #TODO make times_slot cubes a lil bigger, find out how sheets print and let that determine
         #TODO make standard color fill for the borders and stuff, #can use settings sutf esle #TODO make defaults for reset and stuff.
         #TODO MEDIUM - HARD (2-3horus) figure out prinitng paramteres and let it adjust box size based on that FIRST PRORITY
-        
+        #TODO 
+         
         #NOTE #Debuging REMEMBER to print it has to be assigned to each period and have the proper duration
        
         if GET_NEXT_DAY:
             one_day = datetime.timedelta(days=1)
             current_day = datetime.datetime.now(timezone.utc).astimezone()
-            formatted_date_month_day_weekday = (current_day + one_day).strftime("%A") #%b %d,
+            day = (current_day + one_day).strftime("%A") #%b %d,
         else:
-            formatted_date_month_day_weekday = datetime.datetime.now(timezone.utc).astimezone().strftime(" &A") #WHY - Str(), because the xlsxwriter cannot take anyhting but a string or float, so cant assign to a cell. So make sure it is a str.
+            day = datetime.datetime.now(timezone.utc).astimezone().strftime("%A")
             #WHY - strftime(), because the xlsxwriter cannot take anyhting but a string or float, so cant assign to a cell. So make sure it is a str.
+        week_number_day: str = get_current_week(WEEK_COUNT_START_REF_DAY, GET_NEXT_DAY) + " " + day
             
-        file_title = f"SWAT Schedule {formatted_date_month_day_weekday}.xlsx" #%b - abrv month, %d -num date in month, %a - weekday abr name (depedns on region)
+        file_title = f"SWAT Schedule {week_number_day}.xlsx" #%b - abrv month, %d -num date in month, %a - weekday abr name (depedns on region)
         title = 'SCHEDULE'
         quote_of_day = "Quote of the day"
         
         # Create a workbook and add a worksheet.
         workbook = xlsxwriter.Workbook(file_title)
-        worksheet = workbook.add_worksheet(f"SWAT Schedule {formatted_date_month_day_weekday}")
+        worksheet = workbook.add_worksheet(f"SWAT Schedule {week_number_day}")
         
         # Define formats
         schedule_axis_fill_color ='#404040'
@@ -111,7 +112,6 @@ class OutputSchedule():
             'bold': True,
             #'border': 1
         })
-        #make a .CSV and autoconver values, also find work around for KSWAT and such.
         
         #TODO put these in settings file, no magic shit
         task_format = {
@@ -215,14 +215,14 @@ class OutputSchedule():
         UNAVAILABILITY_TASK : workbook.add_format({ #unavailable
         'align': 'center',
         'valign': 'vcenter',
-        'fg_color': '#8B0000',
+        'fg_color': '#d80000',
         'font_color': '#000000',
         'border': 1
         })
         }
 
         #Write Date Label - Always in the top left corner
-        worksheet.write(0, 0, formatted_date_month_day_weekday.upper(), date_label_format)
+        worksheet.write(0, 0, week_number_day.upper(), date_label_format)
         
         # Column and Row indexes ----------------
         #NOTE - REMEMBER: Excel Rows/Columns are Zero based
@@ -248,8 +248,7 @@ class OutputSchedule():
             emp_row_index += 1
 
         #TODO make tasks check thier future unavailbility
-        #Put in programming notes
-         
+        
         #Pre-checks: Move simpler, more frequently true conditions to the beginning of your conditional checks.
         
         # Fill in the data
@@ -259,64 +258,69 @@ class OutputSchedule():
         #WHY what if I just appended a None value to the next_slots list so that it technically has the same length but accurately represents that there is no next slot?
         next_time_slots = time_slots[1:] + [None] # Make lists same lenght, append None to represent that there is no next slot for the last item        
         
+        def merge_unavailability_cells(UNAVAILABILITY_TASK, unavailbility_duration, column, row) -> tuple[int, bool]:
+            #get() on next time slot to assign default value so that if last task of day, can pass elif statement, thus not needing an extra one for just end of the day situtations
+            start_col = column - unavailbility_duration
+            format = task_format.get(UNAVAILABILITY_TASK, task_format.get('Default'))  
+            worksheet.merge_range(row, start_col, row, column-1, 'Unavailable', format)
+            unavailbility_task_counter = 0
+            unavailablity_sequence = False
+            
+            return unavailbility_task_counter, unavailablity_sequence
+            
         #TODO functionize and modularize the loop
         for employee in self.employee_list:
             column = 1
             multi_period_task_counter = 0
-            unavailbility_task_counter = 0
+            unavailbility_duration = 0
             unavailablity_sequence = False
             
             #for time_slot, task in employee_manager.employees[employee].assigned_to.items(): #NOTE if error check here, lol that rhymes. maybe give these props to output class, make simpler??[] 
             tasks = list(employee_manager.employees[employee].assigned_to.values())
             for time_slot, next_time_slot, task in zip(time_slots, next_time_slots, tasks):
-                if task:
-                    if task == 0: # 0 = unvailability
-                        duration: int = 1
-                    else:
-                        try:
-                            duration = int(task_manager.tasks[task].duration) #why int = attr is assigned from csv sheet so need to convert it from string to int. #LEARNING use get get attr?? learn more. need to update my learning google doc. 
-                        except ValueError:
-                            duration: int = 1 #Fallback duration
-                            logging.warning(f"At excel schedule output for {employee} for {time_slot} timeslot {task} was not able to get a value, assigned 1 as a default.")
-                    
-                    if task == UNAVAILABILITY_TASK:
+                format = task_format.get(task, task_format.get('Default'))
+                
+                if task == UNAVAILABILITY_TASK:
+                    #part of sequence
+                    if next_time_slot and employee_manager.employees[employee].assigned_to[next_time_slot] == UNAVAILABILITY_TASK:
                         unavailablity_sequence = True
-                        unavailbility_task_counter +=1
-                        format = task_format.get(task, task_format.get('Default'))
+                        unavailbility_duration +=1
+                        column += 1
+                        continue #skip rest of loop for efficency
+                    #If sequence ends (bc no more unavails or end of day), or standalone unavailability, 
+                    elif unavailablity_sequence or next_time_slot is None:
+                        unavailbility_duration, unavailablity_sequence = merge_unavailability_cells(UNAVAILABILITY_TASK, unavailbility_duration, column, row)
+                        column += 1
+                        continue
+                    else: #single unavailability
                         worksheet.write(row, column, task, format)
                         column += 1
                         continue
-                    elif unavailablity_sequence and next_time_slot is not None and employee_manager.employees[employee].assigned_to.get(next_time_slot, 0) != UNAVAILABILITY_TASK: #merge all contiguous unavailable time slots into a single merged cell                                                #One ahead of last unavailble task, current task is a regular one, so have to go back
-                        #get() on next time slot to assign default value so that if last task of day, can pass elif statement, thus not needing an extra one for just end of the day situtations
-                        start_col = column - unavailbility_task_counter
-                        format = task_format.get(0, task_format.get('Default'))  
-                        worksheet.merge_range(row, start_col, row, column-1, 'Unavailable', format)
-                        unavailbility_task_counter = 0
-                        unavailablity_sequence = False
-                    elif unavailablity_sequence and next_time_slot is None: #is last time_slot and need to merge 
-                        start_col = column - unavailbility_task_counter
-                        format = task_format.get(0, task_format.get('Default'))  
-                        worksheet.merge_range(row, start_col, row, column-1, 'Unavailable', format)
-                        unavailbility_task_counter = 0
-                        unavailablity_sequence = False
-                        
+                
+                elif task:
+                    try:
+                        duration = int(task_manager.tasks[task].duration) #why int = attr is assigned from csv sheet so need to convert it from string to int. #LEARNING use get get attr?? learn more. need to update my learning google doc. 
+                    except ValueError:
+                        duration: int = 1 #Fallback duration
+                        logging.warning(f"At excel schedule output for {employee} for {time_slot} timeslot {task} was not able to get a value, assigned 1 as a default.")
+                    
                     # If task spans multiple columns (x--->) 
                     if duration > 1:
                         multi_period_task_counter += 1
                         if multi_period_task_counter == duration:
                             start_col = column - (duration-1) #minus one bc duration count is inclusive, we have to account for timeslot we are in as part of it
-                            format = task_format.get(task, task_format.get('Default'))  
                             worksheet.merge_range(row, start_col, row, column, task, format)
                             multi_period_task_counter = 0
                         column += 1
                     else: #If single duration
-                        format = task_format.get(task, task_format.get('Default'))  #bc wont take a list type thing in the ar
                         worksheet.write(row, column, task, format) #.get to prevent key error if i havent added a format for it, could i set it to None also? idk would have to read docs
                         column += 1
-                else:
-                    worksheet.write(row, column, task) #just puts blank
-                    column += 1  # Skip if no task
-            row += 1
+                        
+                else: # If no task assigned, skip
+                    worksheet.write(row, column, task) #just puts blank format
+                    column += 1 
+                    
+            row += 1 # Move to the next row for the next employee
         
         #Write Title    #merge_range(first_row, first_col, last_row, last_col, data[, cell_format])
         worksheet.merge_range(row_index-3, column_index,row_index-2,self.length_time_slots, title)

@@ -282,4 +282,4 @@ def get_current_week(m_d_ref_date: str, GET_NEXT_DAY: bool) -> str:
     # Calculate full weeks and adjust for week count starting at 1
     week =  math.floor(dist_btwn.total_seconds() / 604800) + 1
 
-    f'Week {week}'
+    return f'Week {week}'

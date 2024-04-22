@@ -3,8 +3,10 @@
 
 from config.settings import (
     GET_NEXT_DAY,
-    INTERFACE_TYPE,
+    GET_DATE_AUTO,
     MAX_ENTRY_ATTEMPTS,
+    WEEK_COUNT_START_REF_DAY,
+    UNAVAILABILITY_TASK,
 )
 from config.utility import (
     end_time_log_cap, 
@@ -90,7 +92,7 @@ def printIntroSequence():
 printIntroSequence()
 
 # Get day ---------------------
-date_value = get_date_value_ui(GET_NEXT_DAY, INTERFACE_TYPE, max_entry_attempts=MAX_ENTRY_ATTEMPTS)
+date_value = get_date_value_ui(get_date_auto=GET_DATE_AUTO, get_next_day=GET_NEXT_DAY, max_entry_attempts=MAX_ENTRY_ATTEMPTS)
 day_name = get_day_name(date_value)
 day_time_slots = get_day_time_slots(date_value)
 print(f"Will generate a schedule for {day_name}.\n")
@@ -116,7 +118,10 @@ employee_manager = EmployeeManager()  # Assuming this is already defined
 availability_logic = EmployeeAvailabilityLogic(employee_manager)
 availability_ui = EmployeeAvailabilityUI(availability_logic)
 employee_manager = instantiate_employees(
-    employee_manager, time_slot_labels, employee_names, employee_genders
+    employee_manager, 
+    time_slot_labels, 
+    employee_names, 
+    employee_genders
 )
 availability_ui.user_input_employee_unavailabilities(time_slot_labels, time_slot_to_index_map, index_to_time_slot_map)
 
@@ -160,11 +165,17 @@ instantiate_and_run_scheduler(
 # ------------------------------------ Output 
 end_algo = time.perf_counter()
 algo_run_time = end_algo-start_algo
-
 start_excel = time.perf_counter()
 
 output_schedule = OutputSchedule(time_slot_labels, employee_names, employee_manager.employees)
-output_schedule.excel(employee_manager, task_manager, algo_run_time)
+output_schedule.excel(
+    employee_manager,
+    task_manager, 
+    algo_run_time,
+    GET_NEXT_DAY, 
+    WEEK_COUNT_START_REF_DAY,
+    UNAVAILABILITY_TASK,
+)
 
 end_excel = time.perf_counter()
 

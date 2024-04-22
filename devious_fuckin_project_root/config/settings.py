@@ -12,13 +12,13 @@ GET_DATE_AUTO =  True
 WEEK_COUNT_START_REF_DAY = '4/21'
 """must be m/d, must be a sunday, allow user to set a base datetime object, will be used as a date for the program to reference what week of camp it is."""
 
-
 # Output config settings
 #TODO add here
 
 #Settings for internal behavior
-UNAVAILABILITY_TASK = 0 #The value of the 'unavailable task
-
+UNAVAILABILITY_TASK = 'Unavailable' #The value of the 'unavailable task
+#Note the unavailability value cant be int, gets changed in the program for some reason
+#maybe bc its a constant?
 
 #TODO maybe in the future
 #ATTR var names & behaviors???
