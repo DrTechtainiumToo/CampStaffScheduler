@@ -1,11 +1,23 @@
 import time
 import datetime
-from datetime import timezone
-from config.settings import DAYS, DAYS_KEY_VALUE_INVERSE, NORMAL_DAY_TIME_SLOTS, WEN_SPECIAL_TIMESLOTS, FRI_SPECIAL_TIMESLOTS, SAT_SPECIAL_TIMESLOTS, SUN_SPECIAL_TIMESLOTS, DUMB_MEME_1
+from datetime import timezone, timedelta
+from config.settings import (
+    DAYS,
+    DAYS_KEY_VALUE_INVERSE,
+    NORMAL_DAY_TIME_SLOTS,
+    WEN_SPECIAL_TIMESLOTS,
+    FRI_SPECIAL_TIMESLOTS,
+    SAT_SPECIAL_TIMESLOTS,
+    SUN_SPECIAL_TIMESLOTS,
+    DUMB_MEME_1,
+    GET_NEXT_DAY,
+    WEEK_COUNT_START_REF_DAY
+    )
 from config.utility import timer
 import re
 from colorama import Fore, Style
 from typing import Dict, List, Any
+import math
 
 datesTimeSlots = {
     1:NORMAL_DAY_TIME_SLOTS,
@@ -240,3 +252,34 @@ def seek_valid_time_slot(input_time_str: str, times_list: list[str]) -> str: #WH
     else:
         error_message = "ERROR | multi time converter, finding valid time slot to calc diff | No matching timeslot found. Check input, or timeSlots list, see if AM/PM issue or formatting"
         return error_message
+    
+def get_current_week(m_d_ref_date: str, GET_NEXT_DAY: bool) -> str:
+    """Returns a string indicating the number of full weeks since the given 'month_day_ref_date' of the current year until today.
+    Assumes weeks start on Sunday. If today is Saturday and get_next_day is true, calculates from the next day (Sunday).
+    The first week is counted as 'Week 1'.
+    
+    Args:
+    month_day_ref_date (str): The reference date in 'MM/DD' format, e.g., '03/31'.
+    GET_NEXT_DAY (bool): Flag to adjust calculation start if today is Saturday.
+
+    Returns:
+    str: A string in the format 'Week X', where X is the number of full weeks"""
+
+    todays_date = datetime.datetime.now()
+    #Create the reference date string by appending the current year to the given month and day
+    ref_date_string = m_d_ref_date + "/" + str(todays_date.year)
+    ref_date = datetime.datetime.strptime(ref_date_string, "%m/%d/%Y")
+
+    if GET_NEXT_DAY and todays_date.weekday() == 5: # Saturday
+        todays_date = todays_date + timedelta(days=1) # Move to sunday
+
+    dist_btwn =  todays_date - ref_date
+
+    # To adjust the week start to Sunday: (python thinks they start on monday)
+    day_adjustment = (ref_date.weekday() + 1) % 7 #calc days to add to make it sunday
+    dist_btwn += datetime.timedelta(days=day_adjustment)
+
+    # Calculate full weeks and adjust for week count starting at 1
+    week =  math.floor(dist_btwn.total_seconds() / 604800) + 1
+
+    f'Week {week}'

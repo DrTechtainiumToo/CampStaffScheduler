@@ -10,13 +10,17 @@ Then can use IDs to ref shit would be pretty fast to:
 Task and Employee IDs: If tasks or employees are referenced by string identifiers that are convertible to numeric IDs (e.g., UUIDs to integers), this conversion can also improve lookup and sorting performance.
 
 Time Slots as Numbers: Converting dayTimeSlotsStandardizedStN (string-to-number) and dayTimeSlotsStandardizedNtS (number-to-string) into purely numerical representations can streamline operations involving time slots. For instance, calculating the next or previous time slot becomes a simple numerical operation rather than a string manipulation task.
-
-
 maybe:
 Handling Mixed Types: If you need to maintain human-readable formats (like strings for task names), consider using enums or similar constructs for frequently accessed properties that benefit from being represented numerically.
 
 Definitley get the probbability shit
 to be numeric, can have to set attr to int if needed, have already done in the past
+
+#Unavailbility handle
+#TODO need to be able to handle indv unavailbilities
+#TODO need to be able to handle all day unavaibility, prob need to rework system to just make it attr based
+#currently can't handle edge cases 
+#TODO make tasks check thier future unavailbility
 
 
 

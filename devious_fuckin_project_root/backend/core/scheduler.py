@@ -1,57 +1,55 @@
-import time
 from config.utility import timer
 import random
 from backend.core.tasks import TaskManager
 from backend.core.employees import EmployeeManager, Employee
 import logging
 from typing import Any
-test_type: int = 5
 
 class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj if inst then will refer to inst? what if multiple
     def __init__(self) -> None:
-        self.dynamicTimeSlotQueuesDict: dict[str, Schedule.dynamicTimeSlotQueue] = {}
+        self.time_slot_task_queues: dict[str, Schedule.DynamicTimeSlotQueue] = {}
         self.failed_to_schedule: list[str] = []
         # wut if just used a class attr for tasks_dict and set it for all the queues to ref?
 
     def generate_schedule(self,
-        dayTimeSlotsStandardizedStN: dict[str, int], 
-        dayTimeSlotsStandardizedNtS: dict[int, str], 
-        dayTimeSlotsKeysList: list[str], 
-        daysTasks: list[dict], 
+        time_slot_to_index_map: dict[str, int], 
+        index_to_time_slot_map: dict[int, str], 
+        time_slot_labels: list[str], 
+        days_tasks: list[dict], 
         tasks_dict: dict[str, TaskManager.Task], 
         task_manager: TaskManager, 
         employee_manager: EmployeeManager,
-        schedule: Any) -> None:
+        current_schedule: Any) -> None:
         # would having length of day be predefined actually give notacible improv???? no
-        self.generate_dynamic_time_slot_qeues_for_day(dayTimeSlotsKeysList, daysTasks, tasks_dict, dayTimeSlotsStandardizedStN)
+        self.generate_time_slot_queues(time_slot_labels, days_tasks, tasks_dict, time_slot_to_index_map)
         
-        for qeue in self.dynamicTimeSlotQueuesDict:
-            self.dynamicTimeSlotQueuesDict[qeue].assign_tasks(
-                dayTimeSlotsStandardizedStN,
-                dayTimeSlotsStandardizedNtS,
+        for queue in self.time_slot_task_queues:
+            self.time_slot_task_queues[queue].assign_tasks(
+                time_slot_to_index_map,
+                index_to_time_slot_map,
                 task_manager,
                 employee_manager,
-                schedule
+                current_schedule
             )
         # run all the queues until finished
 
-    def generate_dynamic_time_slot_qeues_for_day(self, 
-        dayTimeSlotsKeysList: list[str], 
-        daysTasks: list[dict], 
+    def generate_time_slot_queues(self, 
+        time_slot_labels: list[str], 
+        days_tasks: list[dict], 
         tasks_dict: dict[str, Any],
-        dayTimeSlotsStandardizedStN: dict[str, int]) -> None:
+        time_slot_to_index_map: dict[str, int]) -> None:
         
         # original generation of timeslots and assign to dict, plus populating the queues, #INITALIZATION OF VALUES
-        for time_slot in dayTimeSlotsKeysList:
-            self.dynamicTimeSlotQueuesDict[time_slot] = Schedule.dynamicTimeSlotQueue(time_slot, daysTasks, dayTimeSlotsStandardizedStN)
-            self.dynamicTimeSlotQueuesDict[time_slot].populate_queue(tasks_dict)
+        for time_slot in time_slot_labels:
+            self.time_slot_task_queues[time_slot] = Schedule.DynamicTimeSlotQueue(time_slot, days_tasks, time_slot_to_index_map)
+            self.time_slot_task_queues[time_slot].populate_queue(tasks_dict)
 
-    class dynamicTimeSlotQueue:
-        def __init__(self, time_slot_name: str, daysTasks: list[dict], dayTimeSlotsStandardizedStN: dict[str, int]) -> None:
+    class DynamicTimeSlotQueue:
+        def __init__(self, time_slot_name: str, days_tasks: list[dict], time_slot_to_index_map: dict[str, int]) -> None:
             self.queue: list[str] = []
-            self.daysTasks: list[dict] = daysTasks
+            self.days_tasks: list[dict] = days_tasks
             self.time_slot: str = time_slot_name
-            self.time_slot_num: int = dayTimeSlotsStandardizedStN[time_slot_name]
+            self.time_slot_num: int = time_slot_to_index_map[time_slot_name]
             self.length: int = 0 # num tasks in queue #updated at qeue population
             self.windowed_tasks_list: list[str] = [] #TODO figure out what to do with this, also add old tasks to front, refactor by due? date??
             self.remaining_tasks: list[str] = []
@@ -59,21 +57,21 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
             
         @timer
         def populate_queue(self, tasks_dict: dict[str, TaskManager.Task]):  # maybe change to generate later idk, semantics
-            def find_tasks_in_time_slot(daysTasks: list[dict], searchVal: str) -> list[str]:
+            def find_tasks_in_time_slot(days_tasks: list[dict], searchVal: str) -> list[str]:
                 """Only dicts inside the input list!"""
-                activitesThatMeetCriteria: list[str] = []
-                for dataGrouping in daysTasks:  # takes care of facts that the daysTasks is a list and tasks are in [0], aka daysTasks = [tasks to acess]
-                    for key, instance in dataGrouping.items(): #NOTE why is key constant? 
+                tasks_with_start_time: list[str] = []
+                for iterable in days_tasks:  # takes care of facts that the days_tasks is a list and tasks are in [0], aka days_tasks = [tasks to acess]
+                    for key, instance in iterable.items(): #NOTE why is key constant? 
                         # Assuming each value has a 'start_time' list and a 'start_times_iter' attribute bc iter is assigned 0 for all objs, and startime should be filled, esp since validated all task details earlier in program.
                         if (instance.start_time and 0 <= instance.start_times_iter < len(instance.start_time)):  #NOTE even needed, literally just doing an abstract version of code below. #to account for the fact that there may be multiple start times and are comparing to the right startime.
                             # Compare searchVal with the current start_time value
                             if (searchVal == instance.start_time[instance.start_times_iter]):
                                 instance.start_times_iter += 1
-                                activitesThatMeetCriteria.append(key)
+                                tasks_with_start_time.append(key)
                             #else: logging.warning(f"ERROR | {searchVal} not in {key}'s startime: {instance.start_time[instance.start_times_iter]}")
                         #else: logging.warning(f"ERROR | len instance.start_times_iter: {instance.start_times_iter}")
                     #else: logging.warning(f"ERROR | prob an empty list or startime is out of bounds at: for key, instance in dataGrouping.items()")
-                return activitesThatMeetCriteria
+                return tasks_with_start_time
             
             # PROBLEM, what if the duration or num of people is dynamically generated at assignment bc it depends on what other things have been added. in part what tier is for too
             def sort_tasks_by_duration(tasks: list[str]) -> list[str]:
@@ -95,7 +93,7 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
                     if "Yes" == getattr(tasks_dict[task], "window"):
                         self.windowed_tasks_list.append(task)
 
-            tasks_matching_start_time = find_tasks_in_time_slot(self.daysTasks, self.time_slot)
+            tasks_matching_start_time = find_tasks_in_time_slot(self.days_tasks, self.time_slot)
             tasks_by_duration = sort_tasks_by_duration(tasks_matching_start_time)
             tasks_by_tier = sort_tasks_by_tier(tasks_by_duration)
             collect_windowed_tasks(tasks_by_tier)
@@ -104,8 +102,8 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
         @timer
         def assign_tasks(
             self,
-            dayTimeSlotsStandardizedStN: dict[str, int],
-            dayTimeSlotsStandardizedNtS: dict[int, str],
+            time_slot_to_index_map: dict[str, int],
+            index_to_time_slot_map: dict[int, str],
             task_manager: TaskManager,
             employee_manager: EmployeeManager,
             Schedule: Any,
@@ -114,7 +112,7 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
             avail_employees_in_period = employee_manager.get_available_employees(self.time_slot)
 
             @timer
-            def assign_task(task_name: str):
+            def assign_task(task_name: str, index_to_time_slot_map):
                 assigned_people: dict[str, Any] = {}
                 # TODO evantually redo this and figure out how to implement how many certs you need. Also maybe make a table with prelisted number of people with certs, might be faster
 
@@ -153,41 +151,38 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
                         time_slots, name
                     )
                     del avail_employees_in_period[name]
-                    if (
-                        employees_with_req_traits
-                    ):  # bc otherwise will delete an empty dict and cause an error
+                    if (employees_with_req_traits):  # bc otherwise will delete an empty dict and cause an error
                         del employees_with_req_traits[name]
 
                 def calculate_time_slots_for_duration(task_name: str) -> list[str]:
-                    # Get the task object (assuming you have a way to access it via task_name)
-                    # thanks chatGPT, bc i was to lazy / tired, its 8:42pm to write this out myself, easier to just describe, well I actually did end up have to make a decent amount of changes
-                    duration = int(
-                        task_manager.tasks[task_name].duration
-                    )  # WHY int - Ensure duration is an integer bc dictionary to convert value will onyl take integer
-
-                    if duration > 1:  # TODO remind myself what this does again exactly
+                    """Returns a list of time slot identifiers based on the duration of a task"""
+                    duration = int(task_manager.tasks[task_name].duration) 
+                    # WHY int - Ensure duration is an integer bc dictionary to convert value will onyl take integer
+                    #also if put back string, it would compare # characters in if function below.
+                    
+                    if duration > 1:
                         # Check the duration of the task
-
-                        # FORGET FOR NOW - think unessecary WHY - subtract one, subtracting 1 from the task's duration accounts for including the starting time slot as part of the duration. This adjustment helps to ensure the task is scheduled for the correct number of time slots, starting from the initial slot.
-                        # duration -= 1
 
                         # Calculate numeric timekey values for the duration of the task
                         duration_slots_numeric: list[int] = [self.time_slot_num + i for i in range(duration)] # good list comprehension
 
                         # Convert numeric values back to string representations
                         duration_slots_strings: list[str] = [
-                            dayTimeSlotsStandardizedNtS[num]
+                            index_to_time_slot_map[num]
                             for num in duration_slots_numeric
-                            if num in dayTimeSlotsStandardizedNtS
+                            if num in index_to_time_slot_map
                         ]
 
                         return duration_slots_strings
                     else:
-                        # If duration is 1, return the current time slot in a list, #TODO update why a list? bc converter only takes lists?
+                        # If duration is 1, return the current time slot in a list 
+                        # #TODO update why a list? bc converter only takes lists?
                         return [self.time_slot]
 
                 def assign_employees_to_task(
-                    employees_with_req_traits: Any, task_name: str, time_slots: list[str]
+                    employees_with_req_traits: Any,
+                    task_name: str,
+                    time_slots: list[str],
                 ) -> None:
                     # TODO write logic for TASKS THAT ARE DEPENDENT ON NUMBER OF EMPLOYEES BASED ON OTHER TASKS
                     # TODO once get code for how many certs to assign, then make it count until it has fulfilled it.
@@ -203,9 +198,7 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
 
                     if employees_with_req_traits:  # check if already assigned or unavailable
                         while True:
-                            chosen_name = (
-                                choose1()
-                            )  # find someone who isn't been assigned or unavailable
+                            chosen_name = (choose1()) # find someone who isn't been assigned or unavailable
                             if (
                                 chosen_name not in assigned_people
                                 and chosen_name not in avail_employees_in_period
@@ -239,10 +232,11 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
                     # check if in avail employees for period, would slow down if didnt have to but dict means fast look up.
                     # temp prinout to see if assigning to tasks:
                 
-                time_slots = calculate_time_slots_for_duration(task_name)
+                
+                time_slots_for_task = calculate_time_slots_for_duration(task_name) #Time slot range for task
                 employees_with_req_traits = generate_list_of_eligible_employees()
                 assign_employees_to_task(
-                    employees_with_req_traits, task_name, time_slots
+                    employees_with_req_traits, task_name, time_slots_for_task
                 )
                 
                 #special process for windowed tasks -> moves task to next queue acc to freq attr
@@ -250,9 +244,9 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
                     required_assignments = int(task_manager.tasks[task_name].frequency) 
                     current_assignments = sum(1 for people in task_manager.tasks[task_name].assigned_to.values() if people) #GPT had to help me on this one
                     if current_assignments < required_assignments:
-                        next_queue_key = dayTimeSlotsStandardizedNtS[self.time_slot_num + 1]
-                        Schedule.dynamicTimeSlotQueuesDict[next_queue_key].windowed_tasks_list.append(task_name)
-                        Schedule.dynamicTimeSlotQueuesDict[next_queue_key].queue.append(task_name)
+                        next_queue_key = index_to_time_slot_map[self.time_slot_num + 1]
+                        Schedule.time_slot_task_queues[next_queue_key].windowed_tasks_list.append(task_name)
+                        Schedule.time_slot_task_queues[next_queue_key].queue.append(task_name)
                         
                     #else just stays in this queue like normal, doesn't go to next stage
                     #NOTE Moved out of update data bc otherwise ever person assigned goes thru this and adds a duplicate to next queue
@@ -268,11 +262,11 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
                 self.remaining_tasks = filtered
                 next_time_slot_index: int = self.time_slot_num + 1
                 try:
-                    next_time_slot_key: str = dayTimeSlotsStandardizedNtS[next_time_slot_index]
-                    Schedule.dynamicTimeSlotQueuesDict[next_time_slot_key].queue.extend(self.remaining_tasks)
-                    Schedule.dynamicTimeSlotQueuesDict[next_time_slot_key].windowed_tasks_list.extend(self.remaining_tasks)
+                    next_time_slot_key: str = index_to_time_slot_map[next_time_slot_index]
+                    Schedule.time_slot_task_queues[next_time_slot_key].queue.extend(self.remaining_tasks)
+                    Schedule.time_slot_task_queues[next_time_slot_key].windowed_tasks_list.extend(self.remaining_tasks)
                 except KeyError:
-                    logging.warning(f"At {self.time_slot}: Next time slot does not exist in the schedule. Adding {self.remaining_tasks} to failed tasks.")
+                    logging.warning(f"At {self.time_slot}: Next time slot does not exist in the current_schedule. Adding {self.remaining_tasks} to failed tasks.")
                     Schedule.failed_to_schedule.extend(self.remaining_tasks)
                     
             #prob slowest part of code, well second, after i add in the probbabilites
@@ -281,22 +275,22 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
                     ppl_needed = task_manager.tasks[task].min_num_people_needed
                     if ppl_needed.isdigit():
                         if (len(avail_employees_in_period)+1 >= int(ppl_needed)): 
-                            if getattr(task_manager.tasks[task], "window", None) != "Yes": #if STATIC task
-                                assign_task(task)
-                                #break
-                            elif "Yes" == getattr(task_manager.tasks[task], "window") and ((int(task_manager.tasks[task].duration)) <= task_manager.recalculate_distance_to_deadline(task, self.time_slot, dayTimeSlotsStandardizedStN)): #IF statement before to prevent non windowed from getting distance calced (error)                                
-                                assign_task(task)
+                            if getattr(task_manager.tasks[task], "window", None) != "Yes": #if Non windowed task #TODO make constants for all csv values so can easy change,
+                                #and maybe eventally the attr names themselves
+                                assign_task(task, index_to_time_slot_map)
+                            elif "Yes" == getattr(task_manager.tasks[task], "window") and ((int(task_manager.tasks[task].duration)) <= task_manager.recalculate_distance_to_deadline(task, self.time_slot, time_slot_to_index_map)): #IF statement before to prevent non windowed from getting distance calced (error)                                
+                                assign_task(task, index_to_time_slot_map)
                             else:
-                                logging.warning(f"At {self.time_slot}: Not enough time remaining to schedule {task} because duration would put it past it's deadline. Adding to failed tasks. Or a STATIC task got thru somehow")
+                                logging.warning(f"At {self.time_slot}: Not enough time remaining to current_schedule {task} because duration would put it past it's deadline. Adding to failed tasks. Or a STATIC task got thru somehow")
                                 Schedule.failed_to_schedule.append(task) #TODO deal with later
                                 continue
                         elif task_manager.tasks[task].window: #Only rolls over the windowed tasks NOT the STATIC ones, 
                             roll_over_tasks(task)
-                        else: #STATIC tasks just get ignored, goes to
+                        else: #Non windowed task just get ignored, goes to
                             roll_over_tasks(task) #make sure rest gets captured, before break
                             break
                     else:
-                        assign_task(task) # for uncalulated var / non int attrs
+                        assign_task(task, index_to_time_slot_map) # for uncalulated var / non int attrs
                 else: #Default
                     roll_over_tasks(task) #make sure rest gets captured, before break
                     break
@@ -305,29 +299,29 @@ class Schedule:  # hmm learning concpet diff between ref blueprint and inst obj 
 
 # need to then reorder selected tasks by TIER and duration, how to make sure stuff does not get overwritten twice???????
 # Then go to next criteria or assign to people and set durations. once done set all other durations to blank???? idk
-# recursive function to look through all the lists and shit in the daysTasks and find those that start at time, next duration, then do by tiers
+# recursive function to look through all the lists and shit in the days_tasks and find those that start at time, next duration, then do by tiers
 
 
 @timer
 def instantiate_and_run_scheduler(
-    dayTimeSlotsStandardizedStN: dict[str, int],
-    dayTimeSlotsStandardizedNtS: dict[int, str],
-    dayTimeSlotsKeysList: list[str],
-    daysTasks: list[dict],
+    time_slot_to_index_map: dict[str, int],
+    index_to_time_slot_map: dict[int, str],
+    time_slot_labels: list[str],
+    days_tasks: list[dict],
     tasks_dict: dict[str, TaskManager.Task],
     task_manager: TaskManager,
     employee_manager: EmployeeManager,
 ) -> None:
     
-    schedule = Schedule()
-    schedule.generate_schedule(
-        dayTimeSlotsStandardizedStN,
-        dayTimeSlotsStandardizedNtS,
-        dayTimeSlotsKeysList,
-        daysTasks,
+    current_schedule = Schedule()
+    current_schedule.generate_schedule(
+        time_slot_to_index_map,
+        index_to_time_slot_map,
+        time_slot_labels,
+        days_tasks,
         tasks_dict,
         task_manager,
         employee_manager,
-        schedule
+        current_schedule
     )
 

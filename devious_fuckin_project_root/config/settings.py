@@ -1,15 +1,30 @@
+from datetime import datetime, timezone
+
+# TODO maybe make seocnd file once complete and name it 'defaults' 
 #Gobal Variables and Basic Information + any future settings
 #TODO name and make system later, plus converter for different types and universal storage, retrieval and update system
 
-
 # Settings for application behavior
+INTERFACE_TYPE = "terminal" #option 2 is web
 MAX_ENTRY_ATTEMPTS = 3 #Max user input attempts for day in getting day value sequence, else goes to meme
-INTERFACE_TYPE = False
 GET_NEXT_DAY = False
-GET_DATE_AUTO = "terminal" #option 2 is web
+GET_DATE_AUTO =  True
+WEEK_COUNT_START_REF_DAY = '4/21'
+"""must be m/d, must be a sunday, allow user to set a base datetime object, will be used as a date for the program to reference what week of camp it is."""
+
 
 # Output config settings
 #TODO add here
+
+#Settings for internal behavior
+UNAVAILABILITY_TASK = 0 #The value of the 'unavailable task
+
+
+#TODO maybe in the future
+#ATTR var names & behaviors???
+#Excel/Data file headers so can have conversion program easily be able to deal with hcnage to names and stil map correctly????
+
+
 
 # File locations and paths
 PROJECT_ROOT = "devious_fuckin_project_root/backend/data" #path to project

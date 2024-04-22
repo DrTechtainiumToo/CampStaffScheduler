@@ -1,11 +1,8 @@
 
-from config.settings import NO_ANSWERS, YES_ANSWERS, FEMALE_ANSWERS, MALE_ANSWERS
+from config.settings import UNAVAILABILITY_TASK
 from config.utility import timer
 from backend.core.time_processes import fill_time_slots_inbetween_A_and_B, seek_valid_time_slot
-from prompt_toolkit import prompt
-from prompt_toolkit.completion import WordCompleter
 from typing import Any
-
 
 def get_employee_name_gender_list_from_csv():
     pass
@@ -31,17 +28,29 @@ class EmployeeManager:
         #note typically the function runtime for 23 employees on a monday is around 0.000029 seconds. 
         #Or 0.00000126086sec per employee.
 
+    #TODO reset all references
     def set_employee_availability(self, employee_name, unavailable_time_slots: list[str]):
         """Sets employee availbility
         Args:
             unavailable_time_slots (list): List of unavailable timeslots, they must be valid timeslots in the timeslots for the day tho...
         """
-        unavailable_task: int = 0
         employee = self.employees[employee_name]
         if employee:
             employee.set_unavailability(unavailable_time_slots) #Employee??????? 
             #For output, just directly assigns an employee a task named Unavailable, thus not have to go thru algo. (not a task obj, just puts a str named unavailable into assigned tasks)
-            employee.assign_task(unavailable_time_slots, unavailable_task)
+    
+    #TODO reset all references
+    def set_and_assign_employee_availability(self, employee_name, unavailable_time_slots: list[str], time_slot_to_index_map, index_to_time_slot_map):
+        """Sets employee availbility, plus adds the unavailability task to assigned tasks for schedule ouput.
+        Args:
+            unavailable_time_slots (list): List of unavailable timeslots, they must be valid timeslots in the timeslots for the day tho...
+        """
+        #NOTE GLOBAL VAR-unsure if acceptable? UNAVAILABILITY_TASK = 0
+        employee = self.employees[employee_name]
+        if employee:
+            employee.set_unavailability(unavailable_time_slots) #Employee??????? 
+            #For output, just directly assigns an employee a task named Unavailable, thus not have to go thru algo. (not a task obj, just puts a str named unavailable into assigned tasks)
+            employee.assign_task(unavailable_time_slots, UNAVAILABILITY_TASK)
 
     def get_employee_by_name(self, name):
         return self.employees.get(name)
@@ -141,10 +150,11 @@ class EmployeeAvailabilityLogic:
     def __init__(self, employee_manager):
         self.employee_manager = employee_manager
 
-    def set_employee_unavailability(self, employee_name, unavailable_times):
+    def set_employee_availability(self, employee_name, unavailable_times, time_slot_to_index_map, index_to_time_slot_map):
         """Sets the unavailability times for a specified employee."""
-        self.employee_manager.set_employee_availability(employee_name, unavailable_times)
-    
+        #self.employee_manager.set_employee_availability(employee_name, unavailable_times, time_slot_to_index_map, index_to_time_slot_map)
+        self.employee_manager.set_and_assign_employee_availability(employee_name, unavailable_times, time_slot_to_index_map, index_to_time_slot_map)
+
                       
     def multi_time_input_detector_and_converter_employee_unavailability(self, input_str: list[str], times_list: list[str], time_slot_to_index_map, index_to_time_slot_map) -> list[str]: #dayTimeSlotsKeysList
         # Why did i have it called before???
@@ -199,7 +209,7 @@ class EmployeeAvailabilityLogic:
                 SecondListExpandedValues.extend(time_range_handler(input_str, times_list, time_slot_to_index_map, index_to_time_slot_map))
         #TODO what about single times??????
         else:
-            SecondListExpandedValues.append(input_str) #3:45pm
+            SecondListExpandedValues.extend(input_str) #3:45pm extend() so doesn't double list [[]] the single time, bc the variable is a list
         return SecondListExpandedValues
         #WHY should return a list, then at the place called i can decide how it will be joined / added to other vars based on circumstance.
         

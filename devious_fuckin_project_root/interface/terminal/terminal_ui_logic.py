@@ -1,43 +1,31 @@
 from backend.core.employees import (
     EmployeeManager,
-    EmployeeAvailabilityLogic,
-    Employee
 )
 from backend.core.tasks import (
     TaskManager,
-    TaskDataConverter,
-    TaskRecommender,
     user_adds_additonal_tasks,
-    instantiate_tasks,
 )
 from backend.core.time_processes import (
     program_auto_get_date_value,
     validate_user_date_input,
-    get_day_name,
-    get_day_time_slots,
     play_joke_on_user,
     list_schedule_times,
     insert_time_slot_at_position,
-    timeSlotStandardizer,
     remove_time_slot,
 )
 from config.settings import (
-    GET_NEXT_DAY,
-    INTERFACE_TYPE,
-    DAYS,
-    DAYS_KEY_VALUE_INVERSE,
     NO_ANSWERS,
     YES_ANSWERS,
     MALE_ANSWERS,
     FEMALE_ANSWERS,
 )
-from backend.core.process import employee_names, employee_genders
+from backend.core.process import employee_names
 from config.utility import xyz_input_auto_completer
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 from colorama import Fore, Style
 import re
-from typing import Dict, Any, Type
+from typing import Any, Type
 
 
 def get_date_value_ui(get_date_auto=False, get_next_day=False, max_entry_attempts=int):
@@ -101,7 +89,7 @@ class EmployeeAvailabilityUI:
 
         unavailable_times = self.collect_unavailability_times(employee_name, dayTimeSlotsKeysList)
         unavailable_times = self.availability_logic.multi_time_input_detector_and_converter_employee_unavailability(unavailable_times, dayTimeSlotsKeysList, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS)
-        self.availability_logic.set_employee_unavailability(employee_name, unavailable_times)
+        self.availability_logic.set_employee_availability(employee_name, unavailable_times, dayTimeSlotsStandardizedStN, dayTimeSlotsStandardizedNtS)
         print(f"\nConfirmed: {employee_name} is unavailable at {unavailable_times}.\n")
 
     def validate_employee_name(self, name):

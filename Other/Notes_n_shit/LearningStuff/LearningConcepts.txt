@@ -41,6 +41,22 @@
 
 
 
+#LEARNING CONCEPT: Git commit messages best practices:
+Short (50 chars or less) summary of changes
+
+More detailed explanatory text, if necessary. Wrap it to about 72
+characters or so. In some contexts, the first line is treated as the
+subject of the commit and the rest of the text as the body. The
+blank line separating the summary from the body is critical (unless
+you omit the body entirely); various tools like `log`, `shortlog`
+and `rebase` can get confused if you run the two together.
+
+Further paragraphs come after blank lines.
+
+- Bullet points are okay, too
+- Typically a hyphen or asterisk is used for the bullet, preceded by a
+  single space, with blank lines in between, but conventions vary here
+- Use a hanging indent
 
 
 #LEARNING CONCEPT & CODE snippet efficency

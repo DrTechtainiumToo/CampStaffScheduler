@@ -142,7 +142,7 @@ task_recommendation_ui.edit_selected_tasks(defaultTasksVarNamesList) #maybe chan
 task_recommender.handle_missing_details(task_recommendation_ui.collect_missing_details)
 
 tasks_dictionary, task_names_list = task_recommender.return_selected_tasks_for_day()
-daysTasks = [tasks_dictionary] #keep so can add more stuff if needed
+days_tasks = [tasks_dictionary] #keep so can add more stuff if needed
 
 start_algo = time.perf_counter()
 # -------------------------------- Scheduling algo
@@ -150,7 +150,7 @@ instantiate_and_run_scheduler(
     time_slot_to_index_map, 
     index_to_time_slot_map, 
     time_slot_labels, 
-    daysTasks, 
+    days_tasks, 
     tasks_dictionary, 
     task_manager, 
     employee_manager

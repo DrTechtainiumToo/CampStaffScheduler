@@ -22,7 +22,6 @@ import os
 import logging
 
 def main(): 
-    #does execution logic
     
     interface_type = os.getenv('INTERFACE_TYPE', 'terminal')  # Default to terminal if not set #TODO fix later
     if interface_type.lower() == 'web':
