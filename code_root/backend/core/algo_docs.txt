@@ -1,0 +1,160 @@
+
+-------------------------------------------------
+#NOTE FOR LATER - ASK ISSAC
+#Good cahching opportunity
+#Cache task req for easy acess, ! can cash them at the module level as the req dont change from task to task
+#same with employee names, look at tasking, maybe task names too
+#learn more about caching
+#https://oxylabs.io/blog/python-cache-how-to-use-effectively
+
+#Good approach on how to build out new features
+Detail Out Each Function: Outline what each function should do, its inputs, outputs, and how it fits into the larger task assignment process.
+Start Implementing in Stages: Begin with the foundational elements like data handling and move up to more complex logic like the probabilistic assignments.
+Iterate Based on Feedback: Test each component as you build it and refine your approach based on the results.
+
+
+#DESIGN -------------------------------------
+#NOTE make indv the screening function and prob table gen for each task and take care of all of these what if oh no cases.
+#I just get the data for the cases outside the indv task assignment process, and then those funcitons in the task assignment func can take the data and make the decisions from there on a case by case basis
+
+# The assignment process otherwise is this same
+
+#we jsut modifiying who can be assigned 
+
+#NOTE assume i will formate the certs seperated by commas in key value pairs
+
+#Problem: really this is about tasks with no reqs getting certs assigned who are needed in a task later in the qeue
+#get all task reqs for each task in period
+#sum up all needed certs and reqs
+#-> can also find out if thus solution is possible (but req pre check which would slow down)
+#see if meet, find that need x people of y type, thus need to prioritize them for that task
+#if extra people need to be put on task, then look at what other tasks require (assuming that there are enough people to run them)
+
+# (PROB FUNCTION) then arrange probbabilites based on who should be used for that task (and who can't bc they are needed later)
+# (PROB FUNCTION) multiply probs by PREFS
+
+#NOTE how import prefs
+#key:value, key:value ?
+#need to make name of task dynamic, so if change name dont have to change the preference
+#also FOR LATER what if i delete task? need an ability to auto delete all refs in data
+
+#TODO Still have to implement a way to make sure everyone get assigned certain tasks once, ideally eloquently and optimized but eh
+
+
+Task Population and Sorting
+Populating the Queue:
+Finding Tasks: For each given time slot, tasks are identified that have a start time matching the time slot (find_tasks_in_time_slot). This involves filtering tasks where the current time slot equals the task's start time as indexed by start_times_iter.
+Sorting Tasks:
+By Duration: Tasks are first sorted by duration in descending order (sort_tasks_by_duration), prioritizing longer tasks.
+By Tier: Subsequently, tasks are sorted by their tier to prioritize tasks of higher importance or urgency (sort_tasks_by_tier).
+Handling Special Tasks:
+Windowed Tasks: Tasks that might have flexible scheduling within certain time windows are collected separately (collect_windowed_tasks). This could involve tasks that are not strictly bound to start at the beginning of their time windows but have a preferred duration.
+
+BASIC OVERVIEW ---------------
+Start
+|
+|--> Initialize Schedule
+|     |--> Create Time Slot Queues
+|
+|--> Populate Queues with Tasks
+|     |--> Find Tasks for Each Time Slot
+|     |--> Sort Tasks by Duration
+|     |--> Sort Tasks by Tier
+|     |--> Collect Windowed Tasks
+|
+|--> Assign Tasks For Each Time Period
+      |--> Calculate Availble Employees In Period
+      |--> For Each Task in Queue:
+            |--> Check if still employees availble to assign tasks to in period
+                  |--> Calculate Time Slots Needed
+                  |--> Select Employees
+                  |--> Assign Employees to Task
+                  |--> Update Task and Employee Data
+            | -> 
+      |--> Roll over remaining windowed tasks to the end of the next time period's qeues
+      |--> Warning message and log non-windwoed tasks that were unable to be scheduled in period
+| --> Notify user if any tasks unable to schedule
+End
+
+Scheduling Algorithm Overview
+├── Imports
+│   ├── Standard Libraries (time, random)
+│   ├── Typing (Dict, List, Any)
+│   ├── Task and Employee Management (from backend.core)
+│   └── Utility Functions (timer)
+│
+├── Function: scheduling_algo_prep
+│   └── Purpose: Prepare sorting of tasks for efficiency (to be developed)
+│
+├── Class: Schedule
+│   ├── Attributes:
+│   │   ├── dynamicTimeSlotQueuesDict: Stores queues for each time slot
+│   │   └── failed_to_schedule: Tracks tasks that could not be scheduled
+│   │
+│   ├── Methods:
+│   │   ├── generate_schedule: Orchestrates the scheduling across all queues
+│   │   └── generate_dynamic_time_slot_queues_for_day: Initializes queues for each time slot
+│   │
+│   └── Nested Class: dynamicTimeSlotQueue
+│       ├── Attributes:
+│       │   ├── queue: List of tasks in the queue
+│       │   ├── daysTasks: Tasks distributed across days
+│       │   ├── time_slot: Associated time slot for the queue
+│       │   ├── length: Number of tasks in the queue
+│       │   └── windowed_tasks_list: Tasks that are flexible in timing
+│       │
+│       ├── Methods:
+│       │   ├── populate_queue: Fills the queue based on task starting times and other criteria
+│       │   │   └── Nested Functions for Sorting:
+│       │   │       ├── find_tasks_in_time_slot
+│       │   │       ├── sort_tasks_by_duration
+│       │   │       └── sort_tasks_by_tier
+│       │   │
+│       │   └── assign_tasks: Assigns tasks to available employees based on the time slot
+│       │       └── Sub-functions:
+│       │           ├── calculate_time_slots_for_duration
+│       │           ├── assign_employees_to_task
+│       │           └── update_data
+│       │
+│       └── Helper Functions:
+│           ├── generate_list_of_eligible_employees
+│           └── generate_assignment_probabilities
+│
+└── Function: instantiate_and_run_scheduler
+    └── Calls: Schedule.generate_schedule
+        └── Inputs: Time slot standards, task and employee managers, tasks list
+
+number of employees / (num sum of timeslots btwn breakfast and lunch or lunch and dinner) (unless a counsler, then include night off, but more complicated cus vilbo and other stuff)
+sum of timeslots btwn breakfast and lunch or lunch and dinner
+
+
+
+#Will be good if i need to constraint program
+## Features (also help keep track of foundational constraint logic):
+
+General Availability: Is the employee available during the required times?
+Basic Skill Match: Does the employee have the basic skills needed for the task, even if not the specific certifications?
+
+
+## Individual Screening Function (indv):
+Implement a function to screen individuals for task eligibility based on required certifications and possibly other criteria.
+Handle edge cases ("what if oh no cases") efficiently within these screening functions.
+
+Probabilistic Assignment Table Generation:
+Generate probability tables to decide who should be assigned to which task, taking into account their availability and the requirements of later tasks.
+Modify assignment probabilities based on individual preferences.
+
+Global Requirement Assessment:
+Before assigning tasks, calculate the total requirements for all tasks in a given period to ensure feasibility.
+Use this data to prioritize the assignment of personnel where they are most needed.
+
+Handling Tasks with No Initial Requirements:
+Address the problem of allocating certified personnel to tasks with no requirements, who might be needed for more critical tasks later.
+
+Dynamic Task References:
+Develop a way to refer to tasks that doesn't break if the task's name changes.
+Potentially, add functionality to automatically update or remove references in the database when a task is renamed or deleted.
+
+Preferences and Assignments:
+Implement a system to read and interpret preferences stored in a key:value format.
+Ensure that the task assignment process respects these preferences when possible.

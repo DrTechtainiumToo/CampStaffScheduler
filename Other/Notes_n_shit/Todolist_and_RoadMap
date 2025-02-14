@@ -1,0 +1,163 @@
+TODO File and stuff:
+
+------- RUN DOWN ON PROGRAM AND TODOLIST
+
+Credit to Chat GPT for recommending how I should split up what had been a 2100+ Lines that i had to navigate.
+
+TODOS and overall notes on what is next:
+
+Consider using chainmap on dictionaries so dont have to creat a new one?
+Idk if really applicable tho bc everyhtingis in the functions
+
+#see idea of using transfer functions in menu creation
+
+#TODO get rid of gender specific, need to change gender_req to gender_reqs bc better self explanatory
+#TODO for settings you can have a dictionary of all the vars and the values, even for excel stuff. 
+then can unpack it in the funciton or whatever and get the settings. 
+Atleast a good idea for excel output
+Note:     
+
+EASY-ISH 
+Good idea for future why - 
+Using IDs for employees can simplify the handling of data:
+Unique Identification: Each employee is uniquely identified by an ID, which helps in managing data without errors, such as name duplications.
+Data Linking: Easily link to other data points like certifications, task histories, and preferences stored in different tables or databases.
+Make employee id number (also have auto assign) - seperate thing (make one during program)
+Then can use IDs to ref shit would be pretty fast to:
+Task and Employee IDs: If tasks or employees are referenced by string identifiers that are convertible to numeric IDs (e.g., UUIDs to integers), this conversion can also improve lookup and sorting performance.
+Time Slots as Numbers: Converting dayTimeSlotsStandardizedStN (string-to-number) and dayTimeSlotsStandardizedNtS (number-to-string) into purely numerical representations can streamline operations involving time slots. For instance, calculating the next or previous time slot becomes a simple numerical operation rather than a string manipulation task.
+maybe:
+Handling Mixed Types: If you need to maintain human-readable formats (like strings for task names), consider using enums or similar constructs for frequently accessed properties that benefit from being represented numerically.
+Definitley get the probbability shit
+to be numeric, can have to set attr to int if needed, have already done in the past
+
+
+#TODO current not includisve and need to make a "unavailable all day functionality"
+#TODO make tasks check thier future unavailbility
+
+#BUG where if indicate unavaibillity for min to max time, wont fill the max time bc its exclusive. 
+Solution is to not make it exclusive but that might make it confusing, alteranative bc of rigid time blocks is complicated 
+#GOOD SOLUTION?
+but might make an additional 
+slot at the end to compensate. or just say that any beyond the last time slot is acceptable and assign it the extra timeslot, kinda like it did for the schedule output
+Cons will make validation and ui logic more complicated 
+Alt solution 2 - make it so that the front end validates, then send the backend "all day" or something similar that auto sets it, thus wont have to deal with end shenanigans
+Could make extra END or the next hour after the last slot?? - okay what if I have a task data stored in csv do you want me to have it say end or 11 which doesnt exist?? (if have user interface and system for editing sotred data not a problem)
+#NOTE problem will have this issue for windowed timeslots aswell bc also exclusive ending
+
+-------------------------------------------------------
+
+
+Modularization Steps
+Isolate the Core Logic: Separate all your business rules and algorithms from any input/output code. This core module will handle tasks, scheduling algorithms, and any other logic.
+Create a Data Access Layer: This layer will handle all database interactions or file manipulations. It acts as an intermediary between the core logic and the actual data storage.
+Develop the Terminal Interface: This module will handle user input from the command line and display outputs. It will make calls to the core logic but manage user interactions independently.
+Develop the Web Interface: Similar to the terminal interface, this will handle HTTP requests and responses. It will use frameworks like Flask or Django to manage web routes and sessions.
+Configuration and Bootstrap: Implement a configuration system that can read settings (possibly from a file) to decide which front-end to launch. This part of the system will also handle the initialization and setup of dependencies.
+Dependency Injection: Utilize dependency injection for flexibility in swapping out components, such as replacing a mock database with a real one or changing the user interface.
+
+# TODO put overview of fiel structures
+
+task_manager.py and scheduler.py would contain your business logic.
+database.py and file_manager.py handle all data storage and retrieval.
+terminal_ui.py manages the command line user interface.
+web_server.py sets up the web routes and handlers.
+settings.py manages configurations, such as which UI to use or database settings.
+main.py would be the entry point of the application, reading the configuration, initializing the appropriate UI, and starting the application.
+
+Core Logic (Backend Services)
+Handles all business logic, such as task management, scheduling, and data manipulation.
+Provides API-like functions that the different front-ends can call.
+
+Data Access Layer
+Manages all interactions with persistent storage (e.g., databases, files).
+Provides abstracted functions to retrieve and store data, ensuring the core logic is not dependent on the storage mechanism.
+
+Terminal Interface
+Handles all input/output in the terminal environment.
+Calls services from the core logic to perform operations.
+
+Web Interface
+A web server (e.g., using Flask) that provides endpoints for web-based interactions.
+Converts HTTP requests into service calls to the core logic.
+
+Configuration/System Initialization
+Manages configuration settings that determine which front-end to use and other system behaviors.
+Initializes the system based on the selected configuration.
+
+
+#Problem i overcame
+I was facing a challenge with scheduling tasks in an application, particularly how to handle the inclusivity of task start and end times clearly. The terms originally used, caused a bug in the program because they caysed confusion about whether the start and end times included the exact boundary times. To resolve this, I switched to using starts_from and due_by as the new terminology and updated the application and its documentation to explicitly state that these boundaries are inclusive. This change made the scheduling parameters clearer and more intuitive for users and programmers, aligning better with common expectations.
+
+TODOLIST bc my dumbass has 1mb of working memory ----------------------------------------------------------------------------------------------------------------
+
+#DONE Redo defaultInfo csv file, storage, retrevial, and interpetation system. Now need to ad gender column too
+#TODO Create save system for preferential stuff that you dont want to type in repeatedly but cant be in defaultInfo, will have to maeke csv readers & converters tho
+#TODO Finish getting all the time and special events listed
+#DONE Create master task list (just add some stuff some like 80% there)
+#IN PROGRESS Preferences system
+#DONE Time system, how work? its input blocks or time date, or give options. also make smart function to calc distance btwn two numbers to get duration, will have to maeke csv readers & converters too tho
+
+#TODO Importance system - will determine how stuff i grouped initally 
+
+#DONE Multi-timeblock system
+#DONE Merge all input data into master roster for algorithm
+#REDESIGN NEEDED settings and multi type data imports (csv and JSON)
+#TODO write automatic tier determining system
+#TODO village schedule, and smart offweek system and associated tasks
+#TODO Sweetings
+#IN PROGRESS Actually devlop algorithm - will be a pain in the ass week long affair probbably
+    #IN PROGRESS assignment ordering system
+    #IN PROGRESS anti cert use up system
+    #IN PROGRESS Everyone must have task atleast once feature (Playtime / Off)
+    #IN PROGRESS anti CoCounsler scheduling both unavailable feature 
+    #IN PROGRESS no double-consecutive assignment system (no 2 KWSATS in a row)
+    #DONE Sort system and arrange data for selection
+    #DONE Anti Overlap System
+    #DONE Multi-time windowed tasks
+    #DONE Unavailability displayer
+#SCRAPPED Format Console Output
+#IN PROGRESS Format CSV / Excel Output --> Core Feature
+#PUNTED Decide if format for google sheets or app plugin (Somewhat likely), or at least be able to ouptut to google sheets
+#IN PROGRESS Decide if format for web application deployment (either display in browser) and maybe later via Flask and Google Cloud (Highly Likely)
+#DRAFTING GUI
+#TODO Final review of entire system for user friendly-ness changes and bugs
+#TODO Review to ensure scalability
+#TODO Documentation
+#TODO Bug Reporting and Diagnostic Mechanism - maybe make an internal log that saves each time you use and had a toon of data so if there is a glitch, or at the end fo the program it asks the user any glitches, if yess then saves to log which i can look at later and user can also make comments on messsup.
+#TODO Clean up comments and consolidate learning experience and examples maybe at the end to show what learned?
+#TODO Cry
+#TODO Get user feedback, incoperate feedback & iterate
+#TODO Finalize & Deploy
+
+
+--------- Aditional TODOS during development:
+
+#NOTE can add functionality later, keep it simple
+#DONE #should Nightchores be own dict? how would that work????????, review how assignment work. maybe need mater dict idk, then before algo merge all together after sort??????? idk idk idk 
+#DONE look at algorithm need to figure out if A: What happens if don't fill the Freq column? does it default to 1? What about the duration, should i look at this for class and algo?, what about gender req and min_num_of_people. Think about errors and exceptions
+#TODO BIGGER PICTURE should night chroe be defined by tie or by after sweeting, etc. How should i define stuff like this??
+#This question is part of the problem of getting tasks to spawn inbetween stuff.
+
+#PROGRAM OVERVIEW --------------------------------------------------
+#load in default info, employee gender info & nickname, basic tasks & stand duration, timeslots, & nightchore
+#Ask for special tasks for the day and relevant info, also determine based on date user inputs what are some routinly occuring speical events that need to be accounted for.
+#Generate Total Tasks
+#People Avialable for day (Check for exceptions), *also find out partial avialibilites*
+#Timeslot
+#Tasks due in timeslot & number of people per task
+#Rank tasks in importance
+#See how many ppl avail in timeslot, then check if enough people  to complete tasks for that timeslot -> throw exception if isnt list shortage amount, 
+#then base on importance list find how many task you can fill and then state what tasks cannot be filled, maybe in final log
+#then take that list and save it in new variable to be used in the assignment loop for that slot???? idk, that way dont have to re calc in loop. (Could hurt multi timeslot assignments maybe??)
+#(Req people task preferences???)
+# MAKE THIS A LOOP, Assign tasks  until all needed tasks are assigned or no room / people to complete all task in slot (make sure (idk when in program) to define when task need done by / deadlines  
+    #How to implement the assignment loop? 
+    #Take list of tasks that we determined earlier can be filled, then start with most important task, but first check if it is a mulit hour / timeslot task if it is then (Nested loop?) take the pool of avialible employees and randomly select one, 
+    #this probbaility can be modifyied by a pref variable which can make it more liely for certain employees to get certain tasks if they prefer them, this information would be stored somewhere in the program and could be modified by the user.
+    #See if the selected employee is avialiable for next time slots or as long as needed for the long task, if not then cycle to next until find one? If it is not a long task then just randomly select from the available employee pool and employee, 
+    #Also some tasks are gender dependent: but really only matters for specific special events that happen at a routine time every week: men-womans sessions & nightchores such as clenaing men or womens bathroom etc.
+    #Randomly select person (Based on "people power" (lol) pool calc probbability of person recieving each task) #loop by person or task? does it matter??? -Person bc assigning it to a person
+    #Then if can't assign all tasks in timeslot give error and add to final report what couldnt be assigned what was moved and why, and if able to fit into the schudle someowhere else maybe dont notify in final report?
+#Print final scheudle output and error logs in console, also write resutls to CSV so can be the formatted or manually modified in excel or google sheets. Maybe if adapated as a google workspace add in it could directly output the information into the sheet then user made final adjsutments.
+

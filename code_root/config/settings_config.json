@@ -1,0 +1,150 @@
+{
+    "metadata": {
+      "__author__": "Andrew Dybala",
+      "__copyright__": "Copyright Restricted",
+      "__credits__": ["Andrew Dybala", "GPT4 as assistant"],
+      "__license__": "License Name and Info",
+      "__version__": "1.3.5",
+      "__maintainer__": "Andrew Dybala",
+      "__email__": "drtechtainium@gmail.com",
+      "__status__": "In development",
+      "__compiler__": "Python 3.12.5"
+    },
+    "settings": {
+      "scheduler_mode": "SWAT",
+      "interface_type": "terminal",
+      "max_entry_attempts": 3,
+      "get_next_day": false,
+      "get_date_auto": true,
+      "week_count_start_ref_day": "5/20",
+      "unavailability_task": "Unavailable",
+      "output_file_ext": ".xlsx"
+    },
+    "paths": {
+      "project_root": "code_root",
+      "core_folder":"core",
+      "backend_folder": "backend",
+      "data_folder": "data",
+      "interface_folder": "interface",
+      "csv_data_folder": "CSV Data Folder",
+      "config_folder": "config",
+      "files": {
+        "swat_night_chores_info_csv": "SWATNightChoresInfo.csv",
+        "swat_scheduler_special_tasks_list_csv": "SWATSchedulerSpecialTasksList.csv",
+        "swat_employee_info_csv": "SWATEmployeeInfo.csv",
+        "swat_basic_tasks_list_for_scheduler_csv": "SWATBasicTasksListForScheduler.csv"
+      }
+    },
+    "responses": {
+      "yes_answers": ["Y", "Yes", "yes", "y", "YES", "ye", "Ye", "YE"],
+      "no_answers": ["N", "No", "no", "n", "NO"],
+      "male_answers": ["Male", "male", "men", "Men", "boys", "Boys", "Man", "man", "Boy", "boy", "Males", "males"],
+      "female_answers": ["Female", "female", "Women", "women", "woman", "Woman", "Females", "females", "Girl", "girl", "Girls", "girls"]
+    },
+    "days": {
+      "monday": 1,
+      "tuesday": 2,
+      "wednesday": 3,
+      "thursday": 4,
+      "friday": 5,
+      "saturday": 6,
+      "sunday": 7,
+      "mon": 1,
+      "tues": 2,
+      "tue": 2,
+      "wed": 3,
+      "thurs": 4,
+      "thur": 4,
+      "fri": 5,
+      "sat": 6,
+      "sun": 7,
+      "m": 1,
+      "w": 3,
+      "f": 5,
+      "s": 6,
+      "su": 7
+    },
+    "days_key_value_inverse": {
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday",
+      "7": "Sunday"
+    },
+    "time_slots": {
+      "normal_day_time_slots": [
+        {
+          "7:00am": true,
+          "7:45am": true,
+          "9:15am": true,
+          "9:50am": true,
+          "10:00am": true,
+          "11:00am": true,
+          "11:45am": true,
+          "1:45pm": true,
+          "2:45pm": true,
+          "3:45pm": true,
+          "4:45pm": true,
+          "5:30pm": true,
+          "6:30pm": true,
+          "7:00pm": false,
+          "8:00pm": false,
+          "9:00pm": false
+        }
+      ],
+      "wen_special_timeslots": [
+        "7:00",
+        "7:45",
+        "9:15",
+        "9:50",
+        "10:00",
+        "11:00",
+        "11:45",
+        "1:45",
+        "2:45",
+        "3:45",
+        "4:45",
+        "5:20",
+        "TIME DOES NOT EXIST",
+        "TIME DOES NOT EXIST",
+        "TIME DOES NOT EXIST",
+        "9ish MAYBE"
+      ],
+      "tues_special_timeslots": [
+        "7:00",
+        "7:45",
+        "9:15",
+        "9:50",
+        "10:00",
+        "11:00",
+        "11:45",
+        "1:45",
+        "2:45",
+        "3:45",
+        "4:45",
+        "5:30",
+        "6:30",
+        "7:15",
+        "8ish",
+        "9:00"
+      ],
+      "fri_special_timeslots": [],
+      "sat_special_timeslots": [],
+      "sun_special_timeslots": []
+    },
+    "time_slots_by_day": {
+      "1": "normal_day_time_slots",
+      "2": "normal_day_time_slots",
+      "3": "normal_day_time_slots",
+      "4": "normal_day_time_slots",
+      "5": "normal_day_time_slots",
+      "6": "normal_day_time_slots",
+      "7": "normal_day_time_slots"
+    },
+    "misc": {
+      "dumb_meme_1": "Here dem lyrics!\nOoohh\nLa da da da la da da la la da da\nI was gonna clean my room until I got high\nI was gonna get up and find the broom but then I got high\nMy room is still messed up and I know why (why man?)\n'Cause I got high\nBecause I got high\nBecause I got high\nI was gonna go to class before I got high\nI could'a cheated and I could'a\nPassed but I got high (uh uh la la da da)\nI'm takin' it next semester and I know why (why man?) (hey hey)\n'Cause I got high\nBecause I got high\nBecause I got high\nI was gonna go to work but then I got high (ohh, ohh)\nI just got a new promotion but I got high (la da da da da)\nNow I'm selling dope and I know why (why man?)\n'Cause I got high\nBecause I got high\nBecause I got high\nI was gonna go to court before I got high\nI was gonna pay my child support but then I got high (no you wasn't)\nThey took my whole paycheck and I know why (why man?)(yeah eh eh)\n'Cause I got high\nBecause I got high\nBecause I got high\nI wasn't gonna run from the cops but I was high (uh, I'm serious man)\nI was gonna pull right over and stop but I was high (uh)\nNow I'm a paraplegic (ha ha ha) and I know why (why man?)\n'Cause I got high\nBecause I got high\nBecause I got high\nI was gonna pay my car and note until I got high (say what say what?)\nI wasn't gonna gamble on the boat but then I got high (uh uh)\nNow the tow truck is pullin' away and I know why (why man)\n'Cause I got high\nBecause I got high\nBecause I got high\nI was gonna make love to you but then I got high\nI was gonna eat your **** too (ohhh) but then I got high\nNow I'm ****** off (ahh) and I\nKnow why (turn this shit off, ha ha ha)\n'Cause I got high\nBecause I got high\nBecause I got high\nI messed up my entire life because I got high (go go go)\nI lost my kids and wife because I\nGot high (say what say what say what?)\nNow I'm sleepin' on the side walk and I know why (why man?)\n(Yeah yeah)\n'Cause I got high\nBecause I got high\nBecause I got high\nI'ma stop singing this song because\nI'm high (raise the ceiling... baby)\nI'm singing this whole thing wrong because I'm high (bring it back)\nAnd if I don't sell one copy, I'll know why (why man?) (yeah eh eh)\nCause I'm high\nCause I'm high\nCause I'm high\nLa la da da da da la da da da\nShoobe do be do wa skibitty do da da da la\nGet jiggy with it scubbydooby wa 'cause\nI'm high, 'cause I'm high, 'cause I'm high\nYo my name is Afroman and I'm from East Palmdale (east Palmdale)\nAnd all this jail weed I be smokin'\nIs bomb as hell (excellent delivery)\nI don't believe in hittin' that's what I said. Yes! (oh my goodness)\nSo all of you skins please give me more head... muhwahahaha muh fuck,\nA E I O U (a e i o u) and sometimes W (hahahahaha)"
+    }
+  }
+
