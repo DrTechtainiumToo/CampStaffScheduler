@@ -6,22 +6,9 @@ from typing import Any
 import json
 from pathlib import Path
 
-#TODO MEDIUM - PRIORITY !! make system which able to input week, or starting week and will put what week it is, also let it choose between week or formal date         
-#TODO HARD - FOR FUTURE make formate setting system # FOURTH PRIORITY, for now just code into csv value - could do a bunch of pre made styles and have choose from them - hmm, but include a system that allows to make new styles easily
-#TODO MEDIUM HARD - figure out how to do up down stuff and diff style things SECOND PRIORITY
-#DONE make a standard font size and style for all tasks, make auto size and fit #THIRD PRIORITY
-#TODO make times_slot cubes a lil bigger, find out how sheets print and let that determine
-#TODO make standard color fill for the borders and stuff, #can use settings sutf esle #TODO make defaults for reset and stuff.
-#TODO MEDIUM - HARD (2-3horus) figure out prinitng paramteres and let it adjust box size based on that FIRST PRORITY
-#TODO for employee format make it shrink the text to auto fit
-#TODO put these in settings file, no magic shit   
-#TODO need to implement chart size right so it can print, might have to make all textsizes settingized / dynamic to do this
-#TODO adjs height, find way to make consistent for all cells, read docs
-#TODO make the date adn time abv and the logger option in the json settings file too
 #NOTE colors are specified using a Html style #RRGGBB value.
 #NOTE CASE text is set to capital by .upper() at the write function
 #NOTE #Debuging REMEMBER to print it has to be assigned to each period and have the proper duration
-
 
 
 class OutputSchedule(): 

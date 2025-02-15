@@ -158,3 +158,43 @@ Potentially, add functionality to automatically update or remove references in t
 Preferences and Assignments:
 Implement a system to read and interpret preferences stored in a key:value format.
 Ensure that the task assignment process respects these preferences when possible.
+
+
+
+
+Overview of the Task Loop
+Your loop iterates over each task in the queue and attempts to assign it to available employees. The loop logic can be summarized as follows:
+
+Check for Available Employees:
+For each task, you first check if there are available employees in the current time slot.
+Determine How Many People Are Needed:
+The task’s min_num_people_needed is checked (and converted to an integer if it's a digit).
+If enough employees are available (compared to the requirement), you move on to the next step.
+Task Assignment Based on Task Type:
+Non-windowed Tasks:
+If the task is not flagged as “windowed,” you call _assign_single_task() to assign employees.
+Windowed Tasks with Sufficient Time:
+If the task is windowed and its duration is within the remaining available time (as determined by a deadline calculation), you also call _assign_single_task().
+Insufficient Time or Other Conditions:
+If a task cannot be scheduled because its duration would exceed the deadline, you log a warning and add the task to the list of failed tasks.
+Roll-over for Windowed or Unschedulable Tasks:
+If the task requires a rollover (for instance, if it's windowed and can’t be scheduled in the current time slot), you call _roll_over_tasks().
+In some cases (or if there are no available employees), the loop uses break to stop processing further tasks. This means any tasks later in the queue will not be processed during that iteration.
+Break Statements:
+The break statement is used in two main situations:
+When a task can’t be scheduled due to insufficient resources or time:
+The loop stops processing further tasks, and the rollover logic handles the remaining tasks.
+When there are no available employees:
+The loop calls _roll_over_tasks() for the current task and then breaks out of the loop.
+Return Values:
+At the end of the loop, the method returns the next time slot key, along with lists of failed tasks and any tasks that remain to be processed.
+Key Considerations and Trade-offs
+Early Termination with break:
+Using break means that once a task is found that can’t be scheduled (or if no employees are available), the loop stops. This is intentional if you want to delay processing the remaining tasks until after the rollover, but it might also leave some tasks unattempted if not handled carefully.
+Rollover Handling:
+The _roll_over_tasks() method is designed to capture and return the remaining windowed tasks that couldn’t be scheduled in the current slot. The schedule then needs to process these tasks in a subsequent time slot.
+Potential Improvements:
+Decoupling Roll-over Logic:
+Consider returning rollover data from _roll_over_tasks() instead of directly modifying the schedule. This separation makes your code easier to test and maintain.
+Loop Continuation vs. Break:
+Decide whether you want to break the loop immediately when a task fails or if you’d prefer to continue processing other tasks. This decision should be driven by your business rules.

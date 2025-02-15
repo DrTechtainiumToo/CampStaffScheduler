@@ -1,13 +1,15 @@
-#https://medium.com/@joshuale/a-practical-guide-to-python-project-structure-and-packaging-90c7f7a04f95
-#https://docs.python-guide.org/writing/structure/
-
 from code_root.config.settings import INTERFACE_TYPE
+from code_root.config.utility import clear_log_file, log_to_file
+
+#python -m cProfile code_root.main
 
 def main(INTERFACE_TYPE):
-    #comment
-    #interface_type = os.getenv('INTERFACE_TYPE', 'terminal')  # Default to terminal if not set #TODO fix later
+    
+    
+    clear_log_file()
+    
     import sys
-    print(sys.path)
+    log_to_file(sys.path[0])
 
     if INTERFACE_TYPE.lower() == 'web':
         from code_root.interface.website import create_app

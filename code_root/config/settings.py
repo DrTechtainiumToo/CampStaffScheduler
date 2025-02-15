@@ -64,7 +64,10 @@ FEMALE_ANSWERS: list[str] = responses_data.get("female_answers", [])
 days_data = config.get("days", {})
 
 DAYS: dict[str, int] = config.get("days", {})
+
+#NOTE WHY - THIS IS KINDA FUCKED BUT I NEED IT TO IMPORT INTEGERS and not strings #{int(k): v for k, v in v
 DAYS_KEY_VALUE_INVERSE: dict[Union[str, int], str] = config.get("days_key_value_inverse", {})
+
 
 # Time slot configurations
 time_slots_data: dict[str,list[dict[str,bool]]] = config.get("time_slots", {})

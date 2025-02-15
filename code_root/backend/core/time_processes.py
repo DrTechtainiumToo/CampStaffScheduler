@@ -1,4 +1,3 @@
-import logging
 import time
 import datetime
 from datetime import timezone, timedelta
@@ -10,10 +9,28 @@ from code_root.config.settings import (
     time_slots_by_day
     )
 from code_root.config.utility import timer
-import re
 from colorama import Fore, Style
 from typing import Dict, List, Any
 import math
+import bisect
+
+#NOTE EXPERIIMENTAL CLASS for maybe later usage to simplify some clacs
+class military_time:
+    """returns values to the min"""
+    
+    def __init__ (self):
+        
+        def string_to_military(days_time_slots, dayTimeSlotsKeysList, numbers_to_strings, strings_to_numbers):
+            numbers_to_strings
+        def military_to_string(days_time_slots, dayTimeSlotsKeysList, numbers_to_strings, strings_to_numbers):
+            return
+        def military_time_subtract(time1, time2):
+            return
+        def military_time_between(time1, time2):
+            """returns value in min"""
+            return
+        def military_time_add(time1, time2):
+            return
 
 def program_auto_get_date_value(get_next_day = False):
     """Returns a string with a full weekday's name. Dependecies: Uses datetime and timezone modules"""
@@ -28,19 +45,25 @@ def program_auto_get_date_value(get_next_day = False):
 def validate_user_date_input(dateUserEntered):
     """Checks if user input is acceptable
     Returns: int : date value"""
-    if dateUserEntered.lower() in DAYS: #account for non-numeric input
-        dateUserEntered = DAYS[dateUserEntered] #convert any string input into int
-        return dateUserEntered
-    else:
-        try: 
+    try:
+        
+        if isinstance(dateUserEntered, str) and dateUserEntered.lower() in DAYS: #account for non-numeric input
+            dateUserEntered = DAYS[dateUserEntered.lower()] #convert any string input into int
+            return dateUserEntered   
+        else:
             date_value = int(dateUserEntered) #int bc keys are int, but user input is not
+            
             if date_value in DAYS_KEY_VALUE_INVERSE.keys(): #if numeric input, check if valid
                 return date_value
+            
+            elif date_value in {int(k): v for k, v in DAYS_KEY_VALUE_INVERSE.items()}: #if numeric input, check if valid
+                return date_value
+            
             else:
                 return False
-        except ValueError: 
-            # If conversion to integer fails, return False
-            return False
+    except ValueError: 
+        #if conversion to integer fails, return False
+        return False
 
 def play_joke_on_user():
         import webbrowser
@@ -138,59 +161,36 @@ def timeSlotStandardizer(dayTimeSlotsKeysList: list[str]) -> tuple[dict[int, str
     # put numbers as values, and times as key (StN)- Strings to Numbers
     strings_to_numbers: dict[str, int] = {time: num for num, time in enumerate(dayTimeSlotsKeysList)}
     
+    
+    #experimental faster listslicerversion
     return numbers_to_strings, strings_to_numbers 
 
 def fill_time_slots_inbetween_A_and_B(timeA,timeB,dayTimeSlotsStandardizedStN,dayTimeSlotsStandardizedNtS):
-    #assumes already all valid time slots
-                    #1, take input times, find corresponding standardized number for position in the master ref times list. 
-                    timeAPeriod = dayTimeSlotsStandardizedStN[timeA]
-                    timeBPeriod = dayTimeSlotsStandardizedStN[timeB]
-                    #2, Calculate the positional difference between inputs within the master reference times list. This difference reveals the count of time periods separating Time A and Time B. Each timeslot in this master list is uniquely identified by an ascending whole number, indicating its sequence
-                    #number_of_slots_between_times = timeBPeriod - timeAPeriod #Assumes Time B is later than Time A (e.g., 8am to 12pm). This ensures a positive duration/range, as Time B must be greater than Time A.
-                    #3 Find the times that are between A and B and add to a list, includes A and B in the list
-                    
-                    times = []
-                    for number in range (timeAPeriod,timeBPeriod+1): #WHY +1? #LEARING CONCEPT - range (timeAPeriod,timeBPeriod+1) why +1, because the range funciton is sort of like a list where it starts at 0, so to have it include the end digit you have to give it+1
-                        times.append(dayTimeSlotsStandardizedNtS[number])
-                    return times
-                
-def seek_valid_time_slot(input_time_str: str, times_list: list[str]) -> str: #WHY thing to help only compile list once in function, and then just ref it after that. Rather than recompile every time subfunction runs. Efficency thing
-    #NOTE if broken: removed these from parameter: time_list_minutes, time_list_minutes_compiled = False
+    #assumes args already all have valid time slots
     
-    time_list_minutes_compiled = False #WHY thing to help only compile list once in function, and then just ref it after that. Rather than recompile every time subfunction runs. Efficency thing
-    time_list_minutes = [] #WUT TODO investigate 
-    #NOTE BUG check this inner outer scope, thing prob will cause problems
-                      
-    @timer
-    def compile_time_list_minutes():
-        nonlocal time_list_minutes  # Indicate that we're using the outer function's variable
-        nonlocal time_list_minutes_compiled
+    #1. take input times, find corresponding standardized number for position in the master ref times list. 
+    timeAPeriod = dayTimeSlotsStandardizedStN[timeA]
+    timeBPeriod = dayTimeSlotsStandardizedStN[timeB]
+    
+    #2. Make a list
+    times = list(dayTimeSlotsStandardizedStN.keys())
+    
+    #3. Slice from start to end, including both endpoints (add 1 to end)
+    return times[timeAPeriod:timeBPeriod+1]
 
-        # Compile the list only if it hasn't been compiled yet
-        if not time_list_minutes_compiled:
-            time_list_minutes = sorted([time_to_minutes(time_str) for time_str in times_list])
-            time_list_minutes_compiled = True  # Update the flag to prevent re-compilation
+
+#TODO fix       
+def seek_valid_time_slot(input_time_str: str, times_list: list[str]) -> str: #WHY thing to help only compile list once in function, and then just ref it after that. Rather than recompile every time subfunction runs. Efficency thing
+    """Finds the next valid time slot in a list of time slots after a given input time."""      
+    
 
     @timer
     def time_to_minutes(time_str): #for intial conversion into min for comparison
         
         """Convert a hh:mm AM/PM time string to minutes since midnight."""
-        time_str = time_str.upper() #makes AM/PM upper just incase
+        time_str = time_str.upper() #WHY - makes AM/PM upper just incase, bc datetime modules functions to work
         
-        #time_pattern = r'^\d{1,2}(:\d{2})?$' # This pattern matches a string that looks like a time (one or two digits for hour, optionally followed by ":" and one or two digits for minutes)
-        """
-        #TODO reasses and figure if still needed and a workaround later, prob use for front end
-        if re.match(time_pattern, time_str) and not re.search(r'AM|PM', time_str, re.IGNORECASE): #Returns true if valid time, but no AM/PM, returns false if am/pm in it
-            while True:
-                    #print(f"\n{Fore.RED}{Style.BRIGHT}WARNING: {time_str} is missing an am/pm designator.{Style.RESET_ALL}")
-                    #am_pm = input(f"Please enter if {time_str} is am or pm: ").strip().upper() #WHY - for datetime module functions to work am/pm must be uppercase: Am/PM
-                    
-                    if am_pm  == 'AM' or am_pm == 'PM':
-                        time_str = time_str+" "+am_pm
-                        break # Exit loop on successful parse
-                    else: 
-                        
-                        print("Invalid input, try again.")"""  
+        #time_pattern = r'^\d{1,2}(:\d{2})?$' # This pattern matches a string that looks like a time (one or two digits for hour, optionally followed by ":" and one or two digits for minutes) 
                         
         time_formats = [
             "%I:%M %p", # Format 1: 08:25 PM # Note the use of %I for hour and %p for AM/PM
@@ -201,16 +201,17 @@ def seek_valid_time_slot(input_time_str: str, times_list: list[str]) -> str: #WH
         
         for fmt in time_formats:
             try:
-                time_val = datetime.datetime.strptime(time_str, fmt) #ref datetime twice, once for the module, once for the class
+                time_val = datetime.datetime.strptime(time_str, fmt) #WHY - ref datetime twice, once for the module, once for the class
                 successful_parse = True 
                 break # Parsing succeeded; exit the loop
             except:
+                successful_parse = False
                 continue #Try the next format
         
         # If no format matched, handle the failure: #IDK #TODO figure how to integrate into front end
         if not successful_parse:
-            error_message =  f"\n\n{Fore.RED}{Style.BRIGHT}Your time input:'{time_str}', does not match any known format.{Style.RESET_ALL}\n\n"
-            return error_message
+            error_message =  f"\n\n{Fore.RED}{Style.BRIGHT}[ERROR]: Your time input:'{time_str}', does not match any known time format. \n Formats: 08:25 PM, 7 PM, 08:25AM, 7PM. \n ADIVCE: Prehaps you are missing an am/pm designator?.{Style.RESET_ALL}\n\n"
+            raise ValueError(error_message)
         return time_val.hour * 60 + time_val.minute
     
     @timer
@@ -221,24 +222,30 @@ def seek_valid_time_slot(input_time_str: str, times_list: list[str]) -> str: #WH
         time_val = datetime.datetime(year=1, month=1, day=1, hour=hours, minute=minutes)
         # Note the use of %I for hour, %M for minutes, and %p for AM/PM
         return time_val.strftime("%-I:%M%-p").lower() # WHY Format the time without leading zeros, spaces between time and am/pm, and lowercase am/pm, bc in master ref list its "9:25am" not "09:25 AM" and the time will later be checked against it at some point, plus good to keep uniformity.
-
-    # Converts both the input time and the master ref list of times to minutes since midnight
+    
+    #ROUNDS UP? 
+    def find_next_time(input_time_minutes, time_list_minutes):
+        left, right = 0, len(time_list_minutes)-1
+        while left < right:
+            middle = (left + right) // 2
+            if time_list_minutes[middle] < input_time_minutes:
+                left = middle + 1
+            else:
+                right = middle - 1
+        return left
+    
+    # Convert input time and master list times to minutes
     input_time_minutes = time_to_minutes(input_time_str)
-    compile_time_list_minutes()
+    time_list_minutes = sorted([time_to_minutes(time_str) for time_str in times_list])
+    
+    # Use binary search to find the insertion point
+    index = find_next_time(input_time_minutes, time_list_minutes)
 
-    # Binary search for the next time greater than or equal to the input time
-    left, right = 0, len(time_list_minutes) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if time_list_minutes[mid] < input_time_minutes:
-            left = mid + 1
-        else:
-            right = mid - 1        
     # Check if we found a match
-    if left < len(time_list_minutes):
-        return minutes_to_time(time_list_minutes[left])
+    if index < len(time_list_minutes):
+        return minutes_to_time(time_list_minutes[index])
     else:
-        error_message = "ERROR | multi time converter, finding valid time slot to calc diff | No matching timeslot found. Check input, or timeSlots list, see if AM/PM issue or formatting"
+        error_message: str = "ERROR | multi time converter, finding valid time slot to calc diff | No matching timeslot found. Check input, or timeSlots list, see if AM/PM issue or formatting"
         return error_message
     
 def get_current_week(m_d_ref_date: str, GET_NEXT_DAY: bool) -> str:

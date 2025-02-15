@@ -9,7 +9,7 @@ from code_root.config.settings import (
     UNAVAILABILITY_TASK,
 )
 from code_root.config.utility import (
-    end_time_log_cap, 
+    log_conclusion_text, 
     timer
 )
 from code_root.backend.core.time_processes import (
@@ -108,7 +108,7 @@ if user_decide_modify_times_ui(day_time_slots):
 else:
     print("Times confirmed.")
 
-# -------- standardize the timeslots
+# -------- standardize the timeslots #TODO MOVE TO BACKEND TIME PROCESSES # -------- standardize the timeslots
 time_slot_labels = list(
     day_time_slots[0].keys()
 )
@@ -183,7 +183,7 @@ output_schedule.excel(
 
 end_excel = time.perf_counter()
 
-end_time_log_cap()
+log_conclusion_text()
 excel_res = end_excel-start_excel
 print("Algo:", (algo_run_time))
 print("Excel:", (excel_res))
@@ -191,5 +191,5 @@ print("Program finished")
 
 profiler.disable()
 stats = pstats.Stats(profiler)
-#profiler.print_stats(sort='cumtime')
+profiler.print_stats(sort='cumtime')
 stats.dump_stats('profile.prof')

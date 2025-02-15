@@ -79,25 +79,33 @@ class EmployeeManager:
 
 class Employee:
     """For operations that involve manipulating an employee's attributes
-    BTW need dayTimeSlotsKeysList to be predefined, bc in class method and can't pass argument if makes any sense"""
+    BTW need dayTimeSlotsKeysList to be predefined, bc in class method and can't pass argument if makes any sense, WUT???"""
     
-    #default times for taks assigned to - based on previous user input. #rename var later???? idk
+    """#default times for taks assigned to - based on previous user input. #rename var later???? idk
     default_assigned_to_times = None
 
     @classmethod
     def define_default_assigned_to_times(cls, dayTimeSlotsKeysList):
-        """Define default times for tasks assigned to."""
         cls.default_assigned_to_times = {time_slot: None for time_slot in dayTimeSlotsKeysList}
+        
+    if Employee.default_assigned_to_times is None:
+        raise ValueError("Default assigned times not defined. Call Employee.define_default_assigned_to_times() first.")
+        self.name = name
+        
+    Employee.default_assigned_to_times.copy() # Pre-populate each employee's assigned times with defaults (copied) so that:
+    #   - Every timeslot is represented (even if no task is assigned, ensuring consistent Excel output).
+    #   - Changes to the defaults later don't affect already instantiated employees.
+    # Future work: streamline default assignment, possibly sourcing defaults externally.
 
-    def __init__(self, name, gender, preferences=None, certifications=None, position=None, off_week=None):
+    """
+
+    def __init__(self, name, gender, default_assigned_to_times, preferences=None, certifications=None, position=None, off_week=None):
         #TODO LOAD IN LISTS N STUFF FOR ALL EMPLOYEE DETAILS
         self.name = name
         self.gender = gender
         self.preferences = preferences if preferences else []
         self.availability = {}
-        self.assigned_to = Employee.default_assigned_to_times.copy() #Time: Task. #WHY set times ahead of time, timeslots for day are already set at this point, so if a employee doesn't get assgined a task for a slot it will report as none, that way it doesn't mess up the output order (by having a gap) when printed to excel or such. Tasks can still be assigned as needed.
-
-        #will have to make a way to easily insert these from other sources
+        self.assigned_to = default_assigned_to_times
         self.certifications = None
         
         # All for counsler version
@@ -216,6 +224,8 @@ class EmployeeAvailabilityLogic:
         # maybe then iterates thru and finds the cloest one. Could at :00 to 8am then iterate until match see which takes list iteraiton. then find lengths idk
         """
 
+
+#WHY FIGURE OUT WHAT TO DO WITH and why no return
 def add_employees_from_csv(self, file_name=SWAT_EMPLOYEE_INFO_CSV, file_dialect = 'excel', new_line_value = '', encoding_value = 'utf-8-sig'):
     """Converts a CSV file of standard tasks into a dictionary where keys are task identifiers and values are Task objects.
     Args:
@@ -241,16 +251,23 @@ def add_employees_from_csv(self, file_name=SWAT_EMPLOYEE_INFO_CSV, file_dialect 
                     'importance': row.get('Importance', None),  
                 }
 
+def define_default_assigned_to_times(time_slot_labels: list) -> dict[Any, None]:
+        """Define default times for tasks assigned to. 
+        All times start start with None / Blank assigned because the algo hasnt assigned anything yet. 
+        #NOTE may be a prob in future depending if and how i do preassigned tasks"""
+        
+        default_assigned_to_times = {time_slot: None for time_slot in time_slot_labels}
+        return default_assigned_to_times
 
 @timer        
-def instantiate_employees(employee_manager, time_slot_labels, employee_names, employee_genders) -> EmployeeManager:
-    Employee.define_default_assigned_to_times(time_slot_labels)
+def instantiate_employees(employee_manager, time_slot_labels: list, employee_names, employee_genders) -> EmployeeManager:
+    default_assigned_to_times = define_default_assigned_to_times(time_slot_labels)
     for name, gender in zip(employee_names, employee_genders): #can add any number of args, returns results as a tuple 
         employee_instance = Employee(
             name,
-            gender
+            gender,
+            default_assigned_to_times
             )
-            
         
         employee_manager.add_employee(name, employee_instance,time_slot_labels)
     return employee_manager

@@ -1,22 +1,49 @@
 Completed Tasks List:
 
-
-#DONE create nightchore list and data structures
+GENERAL / OTHER-----------------
 #DONE via editior / complete incomplete tasks take remaining slots and ones that require user input off the diplay / desribe list and edit list???? idk how to deal with them. atleast take cusotm ones off, can ask what they want spare slots to be.
-#DONE, aslo make (column values to tasks csv to parameter var names for task class) them keyword for crying out loud so dont have to deal with this shit
-#DONE to break down function more, and have better single responsibility may I should split
 #DONE wonder if i can sort obj and durations together via dict, then just get the keys and make list and it would be faster?
 #DONE, originally was problem bc check against windowed and windowed wansnt getting updated unless queue prematurely full, so have add to that list here
 #DONE LEARNING CONCEPT - SOLVED (looked at another csv without \ufeff) Its because I needed to give a encoding parameter to the open() func. why is \ufeff a thing.
             employee_names.append(name) #add names to list
 #Unavailbility handle
-#DONE need to be able to handle indv unavailbilities
-#DONE need to be able to handle all day unavaibility, prob need to rework system to just make it attr based
 #DONE currently can't handle edge cases
-#DONE Need a way to tell if task req are empty, otherwise cant tell if no eligible ppl able for the task
-#DONE make it so it get employees with traits, but only the ones that are available
 #DONE consider privatizing all nested functions
 #DONE Convert these 'None' dicts into sets
 #DONE use sets for membership tests instead of lists. DEF DO THIS
 
+
+ALGO --------
+#DONE Multi-timeblock system
+#DONE Merge all input data into master roster for algorithm
+    #DONE Sort system and arrange data for selection
+    #DONE Anti Overlap System
+    #DONE Multi-time windowed tasks
+    #DONE Unavailability displayer
+#SCRAPPED Format Console Output
+#DONE look at algorithm need to figure out if A: What happens if don't fill the Freq column? does it default to 1? What about the duration, should i look at this for class and algo?, what about gender req and min_num_of_people. Think about errors and exceptions
+
+EXCEL OUPUT -----
+
+
+SETTINGS -----
+### Settings Improvements:
+- DONE: For settings, create a dictionary for all variables (including Excel-related ones) and unpack them in the function.
+
+GUI -------
+
+
+BACKEND -------
+#DONE make it so it get employees with traits, but only the ones that are available
+#DONE Time system, how work? its input blocks or time date, or give options. also make smart function to calc distance btwn two numbers to get duration, will have to maeke csv readers & converters too tho
+#DONE Need a way to tell if task req are empty, otherwise cant tell if no eligible ppl able for the task
+#DONE need to be able to handle indv unavailbilities
+#DONE need to be able to handle all day unavaibility, prob need to rework system to just make it attr based
+#DONE Create master task list (just add some stuff some like 80% there)
+
+
+DATA -----------
+#DONE create nightchore list and data structures
+#DONE, aslo make (column values to tasks csv to parameter var names for task class) them keyword for crying out loud so dont have to deal with this shit
+#DONE #should Nightchores be own dict? how would that work????????, review how assignment work. maybe need mater dict idk, then before algo merge all together after sort??????? idk idk idk 
 

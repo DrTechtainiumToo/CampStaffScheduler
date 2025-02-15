@@ -5,6 +5,8 @@
 
 #https://docs.python.org/3/c-api/intro.html
 
+#https://medium.com/@joshuale/a-practical-guide-to-python-project-structure-and-packaging-90c7f7a04f95
+#https://docs.python-guide.org/writing/structure/
 
 #TODO When developing, leave all gui stuff for after complete main program. Bc might have app take care ofall of that and the program just take the final type and ver of data and use it.
 #So keep in mind when making inputs or conversion sequences that it has a clear final form and document it. That way can plug into api requests easy and stuff.

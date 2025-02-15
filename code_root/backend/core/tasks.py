@@ -5,7 +5,6 @@ from typing import Any, ParamSpec, Concatenate #LEARN
 from collections.abc import Callable
 import re
 
-
 def try_convert_to_int(value): #TODO figure out try/excpet and how to deal with none args
     """Use when have csv values that ur assigning to function attr but need them to be ints, instead of the standard string.
     If unconvertable, None for instances, sets value = 0"""
