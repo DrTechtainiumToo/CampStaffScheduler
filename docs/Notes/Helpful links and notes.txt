@@ -3,6 +3,26 @@
 
 #region--------------------------- FILE HEADER COMMENTS
 
+
+
+For me: 
+textual docs: https://textual.textualize.io
+Additonally im using Black for formatting so: 
+# for formatting, black {source_file_or_directory}
+
+To run mypy:
+mypy .
+
+python -m cProfile -s time your_script.py
+This runs your script with Python’s built-in profiler, cProfile, sorting the output by execution time (the -s time option). It shows you which functions take the most time, so you can identify bottlenecks.
+
+snakeviz profile.prof
+After saving your profiling results (for example, by redirecting cProfile output to profile.prof), you can run this command to launch Snakeviz—a graphical, web-based viewer that makes it easier to explore the profiling data visually.
+
+
+
+
+
 #https://docs.python.org/3/c-api/intro.html
 
 #https://medium.com/@joshuale/a-practical-guide-to-python-project-structure-and-packaging-90c7f7a04f95

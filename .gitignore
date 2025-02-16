@@ -1,0 +1,37 @@
+# Ignore log folder
+logs/
+
+#ignore my scratch work folder
+scratch/
+
+# Ignore output and temp files
+*.xlsx
+
+# Ignore IDE configurations
+.vscode/
+.idea/
+.mypy_cache
+.pytest_cache
+.pytype
+.specstory
+*.iml
+.code-workspace
+
+# Ignore system-specific files
+.DS_Store
+
+# Ignore build artifacts
+build/
+dist/
+*.egg-info/
+
+# Ignore virtual environments
+venv/
+.env/
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore compiled Cython files
+*.so

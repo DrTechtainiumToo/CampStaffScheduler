@@ -78,6 +78,7 @@ colorama = "^0.4.6"
 xlsxwriter = "^3.2.2"
 pytest = "^8.3.4"
 snakeviz = "^2.2.2"
+radon = "^5.1"
 
 
 [tool.poetry.group.dev.dependencies]

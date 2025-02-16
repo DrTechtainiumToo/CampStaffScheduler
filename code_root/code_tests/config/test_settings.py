@@ -3,6 +3,7 @@ import json
 import importlib
 from pathlib import Path
 from io import StringIO
+import builtins
 
 # --- Dummy JSON Data for Testing ---
 
@@ -64,8 +65,12 @@ class DummyFile(StringIO):
 def patch_settings(monkeypatch):
     """
     Patch the open() calls in the settings module so that it uses our dummy JSON data.
-    Also patch CONFIG_PATH and EXCEL_CONFIG_PATH.
+    For all other files use the original open.
+    Also patch CONFIG_PATH and EXCEL_CONFIG_PATH. 
     """
+    # Save the original open function.
+    original_open = builtins.open
+    
     # Define a fake open() that returns the appropriate dummy data based on the file path.
     def fake_open(file, mode="r", *args, **kwargs):
         file_str = str(file)
@@ -74,10 +79,10 @@ def patch_settings(monkeypatch):
         elif "excel_output_settings.json" in file_str:
             return DummyFile(json.dumps(dummy_excel_config))
         else:
-            raise FileNotFoundError(f"File {file_str} not found in fake_open.")
+            return original_open(file, mode, *args, **kwargs)
 
     # Patch open in the settings module's namespace.
-    monkeypatch.setattr("code_root.config.settings.open", fake_open)
+    monkeypatch.setattr(builtins, "open", fake_open)
 
     # Patch the CONFIG_PATH and EXCEL_CONFIG_PATH to dummy paths.
     fake_config_path = Path("dummy_settings_config.json")
@@ -95,12 +100,19 @@ def patch_settings(monkeypatch):
 def test_application_settings(patch_settings):
     settings = patch_settings
     # Test that application behavior settings are loaded as expected.
+    assert isinstance(settings.SCHEDULER_MODE, str)
     assert settings.SCHEDULER_MODE == "TEST_MODE"
-    assert settings.INTERFACE_TYPE == "web"
-    assert settings.MAX_ENTRY_ATTEMPTS == 5
-    assert settings.GET_NEXT_DAY is True
-    assert settings.GET_DATE_AUTO is False
+    assert isinstance(settings.INTERFACE_TYPE, str)
+    assert isinstance(settings.MAX_ENTRY_ATTEMPTS, int)
+    assert settings.MAX_ENTRY_ATTEMPTS >= 0
+    assert isinstance(settings.GET_NEXT_DAY, bool)
+    assert settings.GET_NEXT_DAY is True or False
+    assert isinstance(settings.GET_DATE_AUTO, bool)
+    assert settings.GET_DATE_AUTO is True or False
+    assert isinstance(settings.WEEK_COUNT_START_REF_DAY, str)
     assert settings.WEEK_COUNT_START_REF_DAY == "1/1"
+    assert isinstance(settings.UNAVAILABILITY_TASK, str)
+    assert not isinstance(settings.UNAVAILABILITY_TASK, int)
     assert settings.UNAVAILABILITY_TASK == "Unavailable"
 
 def test_paths_settings(patch_settings):

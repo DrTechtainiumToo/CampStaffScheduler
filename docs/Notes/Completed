@@ -29,6 +29,7 @@ EXCEL OUPUT -----
 SETTINGS -----
 ### Settings Improvements:
 - DONE: For settings, create a dictionary for all variables (including Excel-related ones) and unpack them in the function.
+- DONE Output config settings
 
 GUI -------
 

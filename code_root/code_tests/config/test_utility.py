@@ -6,7 +6,6 @@ import pytest
 # Import the functions and variables to test.
 from code_root.config.utility import (
     time_block,
-    testOutput,
     timer,
     log_to_file,
     xyz_input_auto_completer,
