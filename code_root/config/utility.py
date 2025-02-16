@@ -1,42 +1,41 @@
-from colorama import Fore, Style
 import time
 from contextlib import contextmanager
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 import os
+from code_root.config.settings import program_time_log
 
-#Time any block of code with time_block()
-
-@contextmanager #NOTE allow to time ANY block of code, not just functions. I was learning about ocntext managers, still need to learn more.
-def time_block(label):
+@contextmanager
+def time_block(label, log_file_path = None):
+    """with time_block("Example Task"): Code to be timed"""
     start = time.perf_counter()
     try:
         yield
     finally:
         end = time.perf_counter()
         message = f"{label}: {end - start} seconds"
-        with open("code_root/logs/program_times_log.txt", "a") as log_file:  # "a" opens the file in append mode
+        log_file_path = log_file_path if log_file_path else program_time_log
+        with open(log_file_path, "a") as log_file:  # "a" opens the file in append mode
             log_file.write(message + "\n")    
 
 
 #can disable in production enviroment
 def timer(func):
-    def time_analysis_wrapper(*args, **kwargs):  #IDK kinda get it, still confused
+    def time_analysis_wrapper(*args, **kwargs):
+        
         start_time = time.time()
-        result = func(*args, **kwargs) #IDK kinda get it
+        result = func(*args, **kwargs)
         end_time = time.time()
-        
-        #TODO make it only print if in terminal, else save to file or something
-        #NOTE might really slow things down tho
+
         message = f"{func.__name__} run time length: {end_time - start_time} seconds."
-        with open("code_root/logs/program_times_log.txt", "a") as log_file:  # "a" opens the file in append mode
+        with open(program_time_log, "a") as log_file:  # "a" opens the file in append mode
             log_file.write(message + "\n")
-        
-        return result #IDK kinda get it
+        return result
     return time_analysis_wrapper
 
-def log_to_file(message: str, file_path: str = "code_root/logs/program_times_log.txt"):
-    with open(file_path, "a") as log_file:  # "a" opens the file in append mode
+def log_to_file(message: str, log_file_path = None):
+    log_file_path = log_file_path if log_file_path else program_time_log
+    with open(log_file_path, "a") as log_file: 
             log_file.write(message + "\n")
             
 def xyz_input_auto_completer(promptstring, refList): #TODO this might mess up multi-time input 
@@ -53,16 +52,17 @@ def xyz_input_auto_completer(promptstring, refList): #TODO this might mess up mu
     except Exception as e:
         print("Error during prompt:", e)
 
-#DONE rename this sometime
-def log_conclusion_text():
+#DONE rename this sometime -> log_conclusion_text()
+def log_conclusion_text(log_file_path = None):
+    log_file_path = log_file_path if log_file_path else program_time_log
     arg = str(time.time())
-    with open("code_root/logs/program_times_log.txt", "a") as log_file:  # "a" opens the file in append mode
+    with open(log_file_path, "a") as log_file:  # "a" opens the file in append mode
         log_file.write("\n\n" + arg + "-------End of UPDATED Program-------" + "\n\n")
 
-def clear_log_file(file_path: str = "code_root/logs/program_times_log.txt"):
+def clear_log_file(log_file_path = None):
     """"# Check if the file exists and clear its contents."""
-    log_file_path = "code_root/logs/program_times_log.txt"
     # Check if the file exists and clear its contents.
-    if os.path.exists(log_file_path):
-        with open(log_file_path, "w", encoding="utf-8") as f:
+    log_file = log_file_path if log_file_path else program_time_log
+    if os.path.exists(log_file):
+        with open(log_file, "w", encoding="utf-8") as f:
             f.truncate(0)  # This step is optional since "w" already clears the file.

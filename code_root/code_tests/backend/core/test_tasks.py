@@ -4,6 +4,7 @@ import csv
 import re
 import pytest
 from pathlib import Path
+import builtins
 
 # Import functions and classes from your module.
 # (Adjust the import path if your file is named differently.)
@@ -13,7 +14,7 @@ from code_root.backend.core.tasks  import (
     TaskDataConverter,
     user_adds_additonal_tasks,
     TaskRecommender,
-    instantiate_tasks,
+    instantiate_tasks
 )
 
 #############################
@@ -106,9 +107,8 @@ def fake_open_csv(monkeypatch):
     # Fake open() so that when TaskDataConverter calls open() for a given file,
     # it returns a StringIO with our dummy CSV content.
     def fake_open(filename, mode='r', newline=None, encoding=None):
-        # You can check filename if needed.
         return io.StringIO(DUMMY_CSV_CONTENT)
-    monkeypatch.setattr("task.open", fake_open)
+    monkeypatch.setattr(builtins, "open", fake_open)
     return fake_open
 
 def test_add_tasks_from_csv(fake_open_csv):

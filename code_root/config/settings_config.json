@@ -28,6 +28,7 @@
       "interface_folder": "interface",
       "csv_data_folder": "CSV Data Folder",
       "config_folder": "config",
+      "logs_folder": "logs",
       "files": {
         "swat_night_chores_info_csv": "SWATNightChoresInfo.csv",
         "swat_scheduler_special_tasks_list_csv": "SWATSchedulerSpecialTasksList.csv",

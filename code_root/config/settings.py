@@ -2,8 +2,6 @@ from typing import Union
 import json
 from pathlib import Path
 
-
-
 # Load configuration data from JSON, file should be structured with keys like "settings", "paths".
 CONFIG_PATH = Path(__file__).parent / "settings_config.json"
 with open(CONFIG_PATH, "r") as f:
@@ -30,7 +28,7 @@ WEEK_COUNT_START_REF_DAY: str = settings_data.get("week_count_start_ref_day", "5
 # Settings for internal behavior
 UNAVAILABILITY_TASK: str = settings_data.get("unavailability_task", "Unavailable")
 """The value of the 'unavailable task"""
-# NOTE WHAT DOES THIS MEAN? -> #BUG the unavailability value cant be int, gets changed in the program for some reason
+# NOTE WHAT DOES THIS MEAN? -> #WHY #BUG the unavailability value cant be int, gets changed in the program for some reason
 
 
 # ================================
@@ -45,8 +43,10 @@ data_folder: str = paths_data.get("data_folder")
 interface_folder: str = paths_data.get("interface_folder")
 config_folder: str = paths_data.get("config_folder")
 csv_data_folder = paths_data.get("csv_data_folder", "CSV Data Folder")
+logs_folder = paths_data.get("logs_folder", "logs")
 files: dict = paths_data.get("files", {})
 
+program_time_log: str = project_root / logs_folder / "program_times_log.txt"
 SWAT_NIGHT_CHORES_INFO_CSV: str = project_root / backend_folder / data_folder / csv_data_folder / files.get("swat_night_chores_info_csv")
 SWAT_SCHEDULER_SPECIAL_TASKS_LIST_CSV: str = project_root / backend_folder / data_folder / csv_data_folder / files.get("swat_scheduler_special_tasks_list_csv")
 SWAT_EMPLOYEE_INFO_CSV: str = project_root / backend_folder / data_folder / csv_data_folder / files.get("swat_employee_info_csv")

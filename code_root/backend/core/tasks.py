@@ -94,21 +94,8 @@ class TaskManager:
             cls.dayTimeSlotsKeysList = dayTimeSlotsKeysList
         
         def __init__(self, task_name, task_frequency, start_time, duration, min_num_people_needed, importance, pre_assigned_to, certs_required, gender_required, task_tier = None, **kwargs):
-            #WHY **args, was gettign confused abotu KWARGS and assignment with csv converter rows, bc this one kwarg wasnt working, and was consulting GPT4
-            #GPT4 reccomended that i use kwargs for optional ones to simplify the func call and i thought it was a good idea.
-            
-            #WUT????? - maybe so can have master converter so that no matter what in csv can assign it to that value and funct arent depenet on specific words???
-            #ALL NEGATIVES IN CSV NEED TO CHANGE
-            #1.1 = userInput
-            #1.21 = allMales
-            #1.22 = allFemales
-            #1.6 for playtime: sum of timeslots btwn breakfast and lunch or lunch and dinner
-            #1.7 number of employees / (num sum of timeslots btwn breakfast and lunch or lunch and dinner) (unless a counsler, then include night off, but more complicated cus vilbo and other stuff)
-            #1.8 remainder_of_unassigned_slots
-            #1.9 unassigned_employeess
-            #4 Last
-            #5 Very last
-            #NOTE DONT USE FLOATS, ints are faster
+            #WHY **args, was gettign confused abotu KWARGS and assignment with csv converter rows
+
                         
             def safe_int_conversion(value):
                 """WHY - Use when have csv values that ur assigning to function attr but need them to be ints, instead of the standard string. Returns 1, if error"""
@@ -131,7 +118,7 @@ class TaskManager:
                     return {}
     
                 segments = input_text.split(', ')
-                result = {}
+                result: dict = {}
         
                 # Regex to extract key and value
                 pattern = re.compile(r"(male|female)(\d+|only|all)")
@@ -150,12 +137,12 @@ class TaskManager:
                             result[key] = value
                 return result
                     
-            def process_pre_assigned(name_string, delimiter=',') -> tuple[str]:
+            def process_pre_assigned(name_string, delimiter=',') -> tuple[str]: #TODO look at type assignment and where fit in and fix
                 #Mock: "Alice, Bob, Charlie, Diana"
                 
                 # Split the string by the specified delimiter and strip whitespace from each name
                 if not name_string: #removed the strip
-                    return ()
+                    return()
                 names = [name.strip() for name in name_string.split(delimiter)]
                 return names
                 
@@ -168,7 +155,7 @@ class TaskManager:
                 # Regex to extract certification name and the number
                 pattern = re.compile(r"(\w+)(\d+)")
 
-                result = {}
+                result: dict = {}
                 segments = input_text.split(',')
                 
                 for segment in segments:
@@ -317,7 +304,7 @@ class TaskDataConverter:
             self.add_tasks_from_csv(file_name=file_name)
         return self.tasks_dict, self.task_variable_names
 
-    def determine_eligible_task_types(defaultTasksDictionary, dateValue): #- UNESSECARY - finish the MVP - what if someone just puts in into one giant file, might need backup system to sort them into categories so have same funcitonality 
+    def determine_eligible_task_types(defaultTasksDictionary, dateValue):  #FUTURE - UNESSECARY - finish the MVP - what if someone just puts in into one giant file, might need backup system to sort them into categories so have same funcitonality 
         #region--------------------------- Special Task System #TODO MAKE THIS
             
         #TODO create special task system

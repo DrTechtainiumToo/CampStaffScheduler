@@ -6,7 +6,6 @@ from io import StringIO
 import builtins
 
 # --- Dummy JSON Data for Testing ---
-
 dummy_settings_config = {
     "settings": {
         "scheduler_mode": "TEST_MODE",
@@ -52,6 +51,7 @@ dummy_excel_config = {
     "excel_formatting_settings": {"format": "TestFormat"},
     "task_format": {"task": "TestTaskFormat"}
 }
+
 
 # --- Dummy File-Like Object ---
 class DummyFile(StringIO):
@@ -106,9 +106,7 @@ def test_application_settings(patch_settings):
     assert isinstance(settings.MAX_ENTRY_ATTEMPTS, int)
     assert settings.MAX_ENTRY_ATTEMPTS >= 0
     assert isinstance(settings.GET_NEXT_DAY, bool)
-    assert settings.GET_NEXT_DAY is True or False
     assert isinstance(settings.GET_DATE_AUTO, bool)
-    assert settings.GET_DATE_AUTO is True or False
     assert isinstance(settings.WEEK_COUNT_START_REF_DAY, str)
     assert settings.WEEK_COUNT_START_REF_DAY == "1/1"
     assert isinstance(settings.UNAVAILABILITY_TASK, str)
