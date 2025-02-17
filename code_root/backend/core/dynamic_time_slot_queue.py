@@ -6,28 +6,35 @@ from code_root.backend.core.employees import EmployeeManager
 from code_root.backend.core.dynamic_time_slot_queue import TaskManager
 from typing import Any, Union
 
-""""
-THINGS TO CONSIDER:
-If you want really tight decoupling, avoid passing the entire Schedule into DynamicTimeSlotQueue. Instead:
-Return any data (failed_tasks, rolled_over_tasks, etc.) from assign_tasks_in_period(...).
-Let the Schedule instance integrate those results at a higher level.
-If you frequently need references to other queues, you can pass in the dict of all queues to DynamicTimeSlotQueue. 
-Or you can keep the queue ignorant of others and let the Schedule handle any cross-queue interactions. 
-Which you choose depends on how you want to structure the logic."""
 
 class DynamicTimeSlotQueue:
     
     """
-    decided to just pass stuff as parameters
-    task_dict: dict = {}
+    # A queue representing tasks assigned to a specific time slot.
     
-    @classmethod
-    def initialize_class(cls, value):
-        cls.class_attribute = value
-        return cls()"""
-    static_task_count_total = 0
+    The `DynamicTimeSlotQueue` class manages the assignment of tasks to employees based on various
+    criteria such as duration, availability, and task requirements, with the ability to roll over
+    unassigned tasks to the next time slot for scheduling.
+    """
+    
+    static_task_count_total = 0 # TODO review if needed Tracks total assigned tasks across instances
     
     def __init__(self, time_slot_name: str, days_tasks: list[dict], time_slot_to_index_map: dict[str, int]) -> None:
+        """
+        Initializes a dynamic time slot queue.
+
+        Attributes:
+        - queue: List of task names assigned to this time slot.
+        - days_tasks: Tasks distributed across different days.
+        - time_slot: The string identifier for this time slot.
+        - time_slot_num: Integer representation of the time slot index.
+        - length: Number of tasks in the queue (updated during population).
+        - windowed_tasks_list: List of tasks with flexible scheduling.
+        - remaining_tasks: List of tasks that need to be rescheduled.
+        - failed_to_schedule: List of tasks that could not be assigned.
+        - next_time_slot_key: The next time slot key for rolling over tasks.
+        """
+        
         self.queue: list[str] = []
         self.days_tasks: list[dict] = days_tasks
         self.time_slot: str = time_slot_name
@@ -39,7 +46,7 @@ class DynamicTimeSlotQueue:
         self.next_time_slot_key: Union[str, None] = None
     
     def _find_tasks_in_time_slot(self, days_tasks: list[dict], searchVal: str) -> list[str]:
-        """Only dicts inside the input list!"""
+        """Identifies tasks that fall within the current time slot. Only dicts inside the input list!"""
         tasks_with_start_time: list[str] = []
         for iterable in days_tasks:  # takes care of facts that the days_tasks is a list and tasks are in [0], aka days_tasks = [tasks to acess]
             for key, instance in iterable.items(): #NOTE why is key constant? 
@@ -55,10 +62,12 @@ class DynamicTimeSlotQueue:
         return tasks_with_start_time
     
     def _sort_tasks_by_duration(self, tasks: list[str], tasks_dict: dict[str, TaskManager.Task]) -> list[str]:
+        """Sorts tasks by their duration, prioritizing longer tasks."""
         tasks.sort(key=lambda task: tasks_dict[task].duration, reverse=True)
         return tasks
     
     def _sort_tasks_by_tier(self, tasks: list[str], tasks_dict: dict[str, TaskManager.Task]) -> list[str]:
+        """Sorts tasks by their tier, prioritizing higher-importance tasks."""
         tasks.sort(key=lambda task: tasks_dict[task].tier)
         return tasks
     
@@ -87,11 +96,11 @@ class DynamicTimeSlotQueue:
         current: int = DynamicTimeSlotQueue.static_task_count_total
         DynamicTimeSlotQueue.static_task_count_total = current + len(list(queue - windowed_tasks))
         
-                  
+
     def _calc_time_slots_for_duration(self, task_name: str, task_manager, index_to_time_slot_map: dict[int, str]) -> list[str]:
         """Returns a list of time slot identifiers based on the duration of a task"""
         duration = int(task_manager.tasks[task_name].duration)
-        #Convert to int so can use in range() in list comprehension, also so can compare to integers
+        # WHY - Convert to int so can use in range() in list comprehension, also so can compare to integers
         
         if duration > 1:
 
@@ -107,7 +116,7 @@ class DynamicTimeSlotQueue:
 
             return duration_slots_strings
         else:
-            # If duration is 1, return the current time slot in a list
+            # If duration is 1, return the current time slot in a list. Assumes duration is 1
             
             #TODO update why a list? bc converter only takes lists?
             return [self.time_slot]      
@@ -179,7 +188,9 @@ class DynamicTimeSlotQueue:
         task_manager: TaskManager,
         employee_manager: EmployeeManager,
         task_name: str
-        ) -> set[str]:  #Uses and returns sets for fast membership checks during assignment.
+        ) -> set[str]:  
+        """Generates a list of employees eligible for task assignment."""
+        #Uses and returns sets for fast membership checks during assignment.
         #Gets the ppl with right certs, right availbilites etc, gets the eligible ppl for the task
         #NOTE wouldn't it jsut be faster, besides duration maybe. it would be faster to determine all the combinable reqs and then all() that way we only use one for loop. Plus the all() is in c so very fast
         #TODO for future optimization, first figure out how to get all the different constraints indvidually then can figure out how to optimize and package most effectivley from there
@@ -243,7 +254,7 @@ class DynamicTimeSlotQueue:
         #FILTER 2 - by certs 
         #TODO add certs req datapoint in database, then modify the task processing funcitons (while at it get new database and make it so that one for each day?)
         #then modify the get task reqs thing
-        task_cert_reqs = task_manager.get_task_cert_reqs
+        task_cert_reqs = task_manasldkffldsf;lkl;k;kger.get_task_cert_reqs
         #Mock: "{'Ropes': 1, 'Lifeguard' : 3, 'Target': 2}
         if task_cert_reqs:
             certs_names = list(task_cert_reqs.keys())
@@ -302,6 +313,7 @@ class DynamicTimeSlotQueue:
         employees_with_req_traits: set[str],
         assigned_people: set[str]
         ) -> None:
+        """Updates task and employee data after assignment"""
         
         assigned_people.add(employee_name)
         

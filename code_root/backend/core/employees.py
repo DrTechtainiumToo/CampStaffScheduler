@@ -1,13 +1,18 @@
 from code_root.config.settings import UNAVAILABILITY_TASK, SWAT_EMPLOYEE_INFO_CSV
 from code_root.config.utility import timer
 from code_root.backend.core.time_processes import fill_time_slots_inbetween_A_and_B, seek_valid_time_slot
-from typing import Any
+from typing import Any, Union
 import csv
 
+#Rethink about and document why and how i have an employee manager
+
 class EmployeeManager:
-    """"For operations that involve multiple employees or require knowledge about the entire collection of employees"""
+    """"For operations that involve multiple employees or require knowledge about the entire collection of employees
+    Initializes the EmployeeManager with an empty employee dictionary
+    self.employees: dict[str, Employee] = {}"""
+    
     def __init__(self):
-        self.employees = {} #stores name & instances of employee class
+        self.employees: dict[str, Employee] = {}
 
     #setsup everythign else, thing of as instantiator for employee objs
 
@@ -23,7 +28,7 @@ class EmployeeManager:
         self.employees[employee_name].set_default_availability(dayTimeSlotsKeysList)
         
     def set_employee_availability(self, employee_name, unavailable_time_slots: list[str]):
-        """Sets employee availbility
+        """Goes into employee class and sets employee availbility using internal method
         Args:
             unavailable_time_slots (list): List of unavailable timeslots, they must be valid timeslots in the timeslots for the day tho...
         """
@@ -33,7 +38,7 @@ class EmployeeManager:
             #For output, just directly assigns an employee a task defined by unavaibility constant, thus not have to go thru algo. (not a task obj, just puts a str named unavailable into assigned tasks)
 
     def set_and_assign_employee_availability(self, employee_name, unavailable_time_slots: list[str]):
-        """Sets employee availbility, plus adds the unavailability task to assigned tasks for schedule ouput.
+        """Sets employee availbility, plus adds the 'unavailable' task to to their assigned tasks, neded for schedule ouput. Think of it as they are scheduled to be unavialable.
         Args:
             unavailable_time_slots (list): List of unavailable timeslots, they must be valid timeslots in the timeslots for the day tho...
         """
@@ -44,9 +49,11 @@ class EmployeeManager:
             employee.assign_task(unavailable_time_slots, UNAVAILABILITY_TASK)
 
     def get_employee_by_name(self, name):
+        """Returns an employee instance by name."""
         return self.employees.get(name)
 
     def total_available_time_slots(self):
+        """Returns the total available time slots for all employees."""
         return sum(employee.sum_available_time_slots() for employee in self.employees) 
 
     def get_available_employees(self, time_slot: str) -> set[str]:
@@ -57,7 +64,7 @@ class EmployeeManager:
         return available_at_time #NOTE changed from dict to set
     
     def get_employees_with_traits(self, **traits: dict) -> set[str]: #TODO need to write unit tests for all of these, very important
-        """Currently get employees from pool of all registered employees"""
+        """Returns employees that match specific traits. Currently get employees from pool of all registered employees"""
         #is a set, not a dictionary 
         eligible_employees = {
             employee for employee in self.employees
@@ -66,7 +73,8 @@ class EmployeeManager:
         return eligible_employees
     
     def get_employees_in_pool_with_traits(self, pre_filtered_employees: dict, **traits: dict) -> set[str]: #TODO need to write unit tests for all of these, very important
-        """Currently get searches master list to get only prespecified employees list, who also have the traits"""
+        """Filters a specified pool of employees by given traits.
+        Currently get searches master list to get only prespecified employees list, who also have the traits"""""
         #is a set, not a dictionary
         eligible_employees = {
             employee for employee in pre_filtered_employees.keys()
@@ -75,13 +83,22 @@ class EmployeeManager:
         return eligible_employees
     
     def assign_task_to_employee(self,employee_name, task, time_slot: list[str]): 
+        """Assigns a task to an employee at the specified time slot."""
         self.employees[employee_name].assign_task(time_slot, task)           
 
 class Employee:
-    """For operations that involve manipulating an employee's attributes
-    BTW need dayTimeSlotsKeysList to be predefined, bc in class method and can't pass argument if makes any sense, WUT???"""
-    
-    """#default times for taks assigned to - based on previous user input. #rename var later???? idk
+    """
+    Represents an individual employee with attributes and task assignments. For operations that involve manipulating an employee's attributes
+
+    Attributes:
+        name (str): Employee's name.
+        gender (str): Employee's gender.
+        preferences (list[str]): Task preferences.
+        availability (dict[str, bool]): Availability of the employee for each time slot.
+        assigned_to (dict[str, str | None]): Task assignments per time slot.
+        certifications (list[str] | None): Employee's certifications.
+    """
+    """#REFACTOR #REVIEW #default times for taks assigned to - based on previous user input. #rename var later???? idk
     default_assigned_to_times = None
 
     @classmethod
@@ -114,12 +131,18 @@ class Employee:
         self.personal_time_schedule = None #for later
         self.co = None #for later
 
+
+    #TODO #REVIEW isnt #REFACTOR isnt it more efficent to simply copy a class attr with the list since everyone has the same amount of time in a day.
+    #TODO make settings so that can be available or unavialable by default, would have to understand how fit into larger system of like do u only make avaiable if have specified specific times (think shifts) or everyone is avail by default and u subtract out who isnt - #FUTURE
     def set_default_availability(self, time_slots: list[str]) -> None:
+        """Marks all time slots as available by default."""
         for time_slot in time_slots:
             self.availability[time_slot] = True
-            
+        self.availability = {slot: True for slot in time_slots}
+    
+    #REVIEW
     def set_unavailability(self, unavailable_times: list[str]) -> None:
-        #modifies availability list, and 
+        """Marks specific time slots as unavailable."""
         for time_slot in unavailable_times:
             if time_slot in self.availability:
                 self.availability[time_slot] = False
@@ -127,17 +150,21 @@ class Employee:
                 response = f"Time slot {time_slot} not recognized."
 
     def is_available(self, time_slot: str) -> str:
-        """Defaults to false"""
+        """Checks if the employee is available at a given time slot"""
+        #REFACTOR ALO CHECK RETURN TYPE??? #REVIEW wouldnt this throw a key error if false goes in???????? 
         return self.availability.get(time_slot, False)
 
     def sum_available_time_slots(self):
+        """Checks if the employee is available at a given time slot."""
         return sum(1 for available in self.availability.values() if available)
     
     def get_available_time_slots(self):
+        """Returns the count of available time slots."""
         return list(self.availability.keys())
     
     def assign_task(self, time_slot: Any, task: str) -> None:
-        """adds the task to the employees dict of times and tasks assigned at time
+        """Assigns a task to one or multiple time slots.
+        Adds the task to the employees dict of times and tasks assigned for time timeslot
         Args:
             time_slot (str): 7:00am etc
             task (str): TaskVarName
@@ -151,15 +178,24 @@ class Employee:
             self.assigned_to[time_slot] = task
 
 class EmployeeAvailabilityLogic:
+    """
+    Handles logic for setting employee availability based on time slots.
+    """
     def __init__(self, employee_manager):
         self.employee_manager = employee_manager
-
     def set_employee_availability(self, employee_name, unavailable_times, time_slot_to_index_map, index_to_time_slot_map):
-        """Sets the unavailability times for a specified employee."""
+        """Signals employee manager to set the unavailability times or range for a specified employee."""
         self.employee_manager.set_and_assign_employee_availability(employee_name, unavailable_times)
-
-                      
+    
+    
+    #REFACTOR? #REVIEW move to time processes?????
     def multi_time_input_detector_and_converter_employee_unavailability(self, input_str: list[str], times_list: list[str], time_slot_to_index_map, index_to_time_slot_map) -> list[str]: #dayTimeSlotsKeysList
+                """
+        #make handle inputs such as 7am-9:15am, 7-9:15am, give an error if 7am-AnyNumberWithout AM/PM, raise and exception if impossible calc such as TimeB starts before A, make cycle if invalid time. Make a exit emergency statement to exit the loop?????
+        #TODO do that calcs gap or goes to nearest one, then calcs difference and inputs it.
+        #iterates up and down until it reaches closest value. well checks if has :, and not 00, or
+        # maybe then iterates thru and finds the cloest one. Could at :00 to 8am then iterate until match see which takes list iteraiton. then find lengths idk
+        """
         # Why did i have it called before???
         # seek_valid_time_slot(time_list_minutes, time_list_minutes_compiled = time_list_minutes_compiled)
         
@@ -181,48 +217,43 @@ class EmployeeAvailabilityLogic:
             inbetween_slots_list_inclusive = fill_time_slots_inbetween_A_and_B(timePair[0],timePair[1], time_slot_to_index_map, index_to_time_slot_map)
             return inbetween_slots_list_inclusive
         
-        #Actual logic process --------------------
-        SecondListExpandedValues = [] #BEWARE this is to prevent runaway loops, bc im paranoid that ill wind up with a loop if it goes through and keeps expanding as it append in a for loop
-        
-        #Parser
-        
-        #TODO figure out how to incorperate this error: ['9:15am-1:45pm,']
-        if any("," in item for item in input_str): #generator so can check inside each string value for character, and stop as soon as evaluates to True
-            #so can input stuff as 6am, 7pm, 4:45am then split into indvs in list
+            #REFACTOR what is going on here?????
+            #Actual logic process --------------------
+            SecondListExpandedValues = [] #BEWARE this is to prevent runaway loops, bc im paranoid that ill wind up with a loop if it goes through and keeps expanding as it append in a for loop
             
-            try: #prevent split() error for '9:15am-1:45pm,'
-                split_times_list = input_str.split(",") #string.split(separator, maxsplit) default = -1 is as many as occur
-            except:
-                split_times_list = input_str #just goes as 9:15am-1:45pm and processed like normal
+            #Parser
+            
+        #TODO figure out how to incorperate this error: ['9:15am-1:45pm,']
+            if any("," in item for item in input_str): #generator so can check inside each string value for character, and stop as soon as evaluates to True
+                #so can input stuff as 6am, 7pm, 4:45am then split into indvs in list
                 
-            for item in split_times_list:
-                item.strip().lower() #Remove trailing whitespace
-                if "-" in item:
-                    SecondListExpandedValues.extend(time_range_handler(item, times_list, time_slot_to_index_map, index_to_time_slot_map))
-                else: #Incase value isnt "-" but ","
-                    if not item in times_list: #incase not a valid time.
-                        SecondListExpandedValues.append(seek_valid_time_slot(item, times_list))
-                        #problematic_time_input_warning(item,dayTimeSlotsKeysList) #NOTE REMOVE I/O make detaches
-                    else: 
-                        SecondListExpandedValues.append(item)
-                #put "-" in here so can make multiple multi values if put in list form
-        elif any("-" in item for item in input_str):
-            #WUT - #WHY - bc maybe user input 7-8am, 10-11am. if put "-" then would trigger, but wouldnt realize is part of larger list
-                #assuming just one 7:00am-8:00pm type
-                SecondListExpandedValues.extend(time_range_handler(input_str, times_list, time_slot_to_index_map, index_to_time_slot_map))
-        #TODO what about single times??????
-        else:
-            SecondListExpandedValues.extend(input_str) #3:45pm extend() so doesn't double list [[]] the single time, bc the variable is a list
-        return SecondListExpandedValues
+                try: #prevent split() error for '9:15am-1:45pm,'
+                    split_times_list = input_str.split(",") #string.split(separator, maxsplit) default = -1 is as many as occur
+                except:
+                    split_times_list = input_str #just goes as 9:15am-1:45pm and processed like normal
+                    
+                for item in split_times_list:
+                    item.strip().lower() #Remove trailing whitespace
+                    if "-" in item:
+                        SecondListExpandedValues.extend(time_range_handler(item, times_list, time_slot_to_index_map, index_to_time_slot_map))
+                    else: #Incase value isnt "-" but ","
+                        if not item in times_list: #incase not a valid time.
+                            SecondListExpandedValues.append(seek_valid_time_slot(item, times_list))
+                            #problematic_time_input_warning(item,dayTimeSlotsKeysList) #NOTE REMOVE I/O make detaches
+                        else: 
+                            SecondListExpandedValues.append(item)
+                    #put "-" in here so can make multiple multi values if put in list form
+            elif any("-" in item for item in input_str):
+                #WUT - #WHY - bc maybe user input 7-8am, 10-11am. if put "-" then would trigger, but wouldnt realize is part of larger list
+                    #assuming just one 7:00am-8:00pm type
+                    SecondListExpandedValues.extend(time_range_handler(input_str, times_list, time_slot_to_index_map, index_to_time_slot_map))
+            #TODO what about single times??????
+            else:
+                SecondListExpandedValues.extend(input_str) #3:45pm extend() so doesn't double list [[]] the single time, bc the variable is a list
+            return SecondListExpandedValues
         #WHY should return a list, then at the place called i can decide how it will be joined / added to other vars based on circumstance.
         
         #TODO this one def need a unit test
-        """
-        #make handle inputs such as 7am-9:15am, 7-9:15am, give an error if 7am-AnyNumberWithout AM/PM, raise and exception if impossible calc such as TimeB starts before A, make cycle if invalid time. Make a exit emergency statement to exit the loop?????
-        #TODO do that calcs gap or goes to nearest one, then calcs difference and inputs it.
-        #iterates up and down until it reaches closest value. well checks if has :, and not 00, or
-        # maybe then iterates thru and finds the cloest one. Could at :00 to 8am then iterate until match see which takes list iteraiton. then find lengths idk
-        """
 
 
 #WHY FIGURE OUT WHAT TO DO WITH and why no return
@@ -252,14 +283,20 @@ def add_employees_from_csv(self, file_name=SWAT_EMPLOYEE_INFO_CSV, file_dialect 
                 }
 
 def define_default_assigned_to_times(time_slot_labels: list) -> dict[Any, None]:
-        """Define default times for tasks assigned to. 
-        All times start start with None / Blank assigned because the algo hasnt assigned anything yet. 
-        #NOTE may be a prob in future depending if and how i do preassigned tasks"""
-        
-        default_assigned_to_times = {time_slot: None for time_slot in time_slot_labels}
-        return default_assigned_to_times
+    """Creates a dictionary of time slots with None as the default value.
+    
+    All time slots for employees start with None/Blank assigned because the algorithm hasn't assigned anything yet.
+    Note: This may be problematic in the future depending on how preassigned tasks are handled.
+    
+    Args:
+        time_slot_labels (list): A list of time slot labels.
+    Returns:
+        dict: A dictionary with time slot labels as keys and None as default values."""
+    
+    default_assigned_to_times = {time_slot: None for time_slot in time_slot_labels}
+    return default_assigned_to_times
 
-@timer        
+@timer       
 def instantiate_employees(employee_manager, time_slot_labels: list, employee_names, employee_genders) -> EmployeeManager:
     default_assigned_to_times = define_default_assigned_to_times(time_slot_labels)
     for name, gender in zip(employee_names, employee_genders): #can add any number of args, returns results as a tuple 
@@ -268,6 +305,7 @@ def instantiate_employees(employee_manager, time_slot_labels: list, employee_nam
             gender,
             default_assigned_to_times
             )
-        
+        """Creates Employee instances and adds them to the EmployeeManager."""
+        #REVIEW confused wait review this im confused is it importing shit twice??
         employee_manager.add_employee(name, employee_instance,time_slot_labels)
     return employee_manager
