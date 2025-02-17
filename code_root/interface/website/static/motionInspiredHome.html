@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camp Activity Scheduler</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+    .menu-bar {
+        background-color: #333;
+        color: white;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .menu-bar a {
+        color: white;
+        padding: 10px 15px;
+        text-decoration: none;
+        text-transform: uppercase;
+        font-size: 16px;
+    }
+    .menu-bar a:hover {
+        background-color: #555;
+    }
+    .menu-bar .logo {
+        font-weight: bold;
+        font-size: 20px;
+    }
+    .dark-mode {
+        background-color: #282c34;
+        color: white;
+    }
+    .light-mode {
+        background-color: #f0f0f0;
+        color: black;
+    }
+</style>
+</head>
+<body class="light-mode">
+<div class="menu-bar">
+    <a href="/" class="logo">Camp Scheduler</a>
+    <a href="/calendar">Calendar</a>
+    <a href="/tasks">Tasks</a>
+    <a href="/employees">Employees</a>
+    <a href="/settings">Settings</a>
+    <a href="/help">Help</a>
+</div>
+
+<script>
+    function toggleMode() {
+        var body = document.body;
+        if (body.classList.contains('light-mode')) {
+            body.classList.replace('light-mode', 'dark-mode');
+        } else {
+            body.classList.replace('dark-mode', 'light-mode');
+        }
+    }
+
+    // Example to switch mode based on system preferences or user toggling
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+        const newColorScheme = event.matches ? "dark-mode" : "light-mode";
+        document.body.className = newColorScheme;
+    });
+</script>
+</body>
+</html>

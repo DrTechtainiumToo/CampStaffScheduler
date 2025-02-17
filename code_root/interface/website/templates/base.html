@@ -1,0 +1,72 @@
+
+<!-- #theme of website
+    #and basic stuff
+    
+    https://fonts.google.com/specimen/Inter
+    https://fonts.google.com/specimen/Albert+Sans
+    https://github.com/rsms/inter
+
+    
+    #base templates
+    #override base teplate with mroe sepcific templates
+
+    //https://github.com/techwithtim/Flask-Web-App-Tutorial
+    // https://www.youtube.com/watch?v=dam0GPOAvVI
+    // Use Jninja templates
+
+    https://getbootstrap.com/
+
+
+    Javascript related to boot strap
+      Write own java script (or css or images) all in static folder, then can load in html
+      Script to load index. 
+      <script
+        type = 'text/javascript'
+        static = name of folder
+        url for (python) loads the url for static folder
+        {}} = means python exspression
+        src = "{ urlfor('static', filename = 'index.js') }}"
+        ></script>
+
+
+
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset = "utf-8" />
+        <meta name="viewport" content="width=device-width, inital-scale=1" />
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+            integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+            crossorigin="anonymous"
+        /> 
+        <!-- //Content delivery network - custom content from bootstrap --> 
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+            crossorigin="anonymous"
+        />
+    <title>{% block title %}Home{% endblock %}</title> 
+    <!-- //Templating engine, //children template can overwrite it -->
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-toggle="collapse"
+      data-target="#navbar"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar">
+      <div class="navbar-nav">
+        <a class="nav-item nav-link" id="home" href="/">Home</a>
+        <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
+        <a class="nav-item nav-link" id="login" href="/login">Login</a>
+        <a class="nav-item nav-link" id="signUp" href="/sign-up">Sign Up</a>
+      </div>
+    </div>
+  </nav>
