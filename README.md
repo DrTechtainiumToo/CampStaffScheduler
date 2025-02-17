@@ -1,27 +1,3 @@
-### **Is the Mac Quick Start Installing Dev Dependencies?**  
-**No, the current Mac quick start installs only the runtime version.**  
-
-🔍 The command in the **Quick Start (Mac Users)** section is:  
-```sh
-poetry install  # Install runtime dependencies only
-```
-This **does not include** dev dependencies. If a user wants dev tools, they need to explicitly install them using:  
-```sh
-poetry install --with dev
-```
-
----
-
-### **✅ Corrections & Clarifications**
-1. **Clarify that the default Mac setup is for the runtime version.**
-2. **Provide an explicit option for dev setup in the Quick Start section.**
-3. **Fix `poetry init` in Step 2** (it’s **not** needed unless creating a new project).
-4. **Fix `poetry install --no-root`** → `poetry install --no-dev` is clearer for removing dev dependencies.
-
----
-
-### **🚀 Updated & Corrected Instructions**
-
 # **📚 Project Documentation**
 
 ## **📌 Important Links - _Please Read_**
@@ -39,39 +15,34 @@ Want to understand **why** this project exists and the journey behind it? Check 
 
 ---
 
-### **Quick Start (Mac Users)**
-This project was developed on **macOS**, so all instructions assume you're using a Mac.
+## **⚡ Quick Start**
+This project was developed on **macOS**, but it should work on **Windows** and **Linux** with Poetry.
 
-1. **Clone the repository**  
-   ```sh
-   git clone <your-repo-url>
-   cd SomeDeviousProject
-   ```
-2. **Install dependencies**  
-   - **To install the standard runtime version (no dev tools):**  
-     ```sh
-     poetry install --no-dev
-     ```
-   - **To install the development version (includes dev tools):**  
-     ```sh
-     poetry install --with dev
-     ```
-3. **Run the program**  
-   ```sh
-   poetry run python main.py
-   ```
+### **1️⃣ Clone the Repository**
+```sh
+git clone <your-repo-url>
+cd SomeDeviousProject
+```
+
+### **2️⃣ Install Dependencies**
+Choose the appropriate installation:
+
+| **Use Case** | **Command** |
+|-------------|------------|
+| **Just run the program** (minimal install) | `poetry install` |
+| **Full development setup** (testing, debugging) | `poetry install --with dev` |
+
+### **3️⃣ Run the Program**
+```sh
+poetry run python main.py
+```
 
 ---
 
-### **🖥️ Quick Start (Windows Users)**
+## **🖥️ Windows-Specific Instructions**
 > 🚨 *Windows users may need to adapt some steps (e.g., installing Poetry manually and handling path differences).*  
 
-1. **Clone the repository**  
-   ```sh
-   git clone <your-repo-url>
-   cd SomeDeviousProject
-   ```
-2. **Ensure Python & pip are installed**  
+1. **Ensure Python & pip are Installed**  
    - Check your Python version:  
      ```sh
      python --version
@@ -81,20 +52,23 @@ This project was developed on **macOS**, so all instructions assume you're using
      ```sh
      python -m ensurepip --default-pip
      ```
-3. **Install Poetry** (If not already installed)  
+
+2. **Install Poetry** (If not already installed)  
    ```sh
    pip install poetry
    ```
-4. **Install dependencies**  
+
+3. **Install Dependencies**  
    - **For runtime only:**  
      ```sh
-     poetry install --no-dev
+     poetry install
      ```
    - **For full development setup:**  
      ```sh
      poetry install --with dev
      ```
-5. **Run the program**  
+
+4. **Run the Program**  
    ```sh
    poetry run python main.py
    ```
@@ -117,41 +91,31 @@ pip install poetry
 ```
 
 ### **2️⃣ Initialize Poetry (Only If Needed)**
-Navigate to the project folder:
-
-- **For the development version (includes dev tools):**  
-  ```sh
-  poetry install --with dev
-  ```
-
-- **For the standard runtime version:**  
-  ```sh
-  poetry install --no-dev
-  ```
+If the project does not already have a `pyproject.toml` file:
+```sh
+poetry init  # First-time setup (not needed if cloning a repo)
+```
 
 ---
 
-### **🛠 Additional Notes On Using Poetry**
+## **🛠 Additional Notes On Using Poetry**
 - **To update all dependencies (including dev tools if installed):**  
   ```sh
   poetry update
   ```
-- **To remove unnecessary dependencies after cleanup:**  
+- **To reset dependencies (e.g., switching between runtime and dev mode):**  
   ```sh
-  poetry install --no-dev
-  ```
-- **If switching between dev and runtime environments, reset dependencies:**  
-  ```sh
-  poetry install --no-dev  # Standard install
-  poetry install --with dev  # Dev install
+  poetry install  # Standard install (runtime only)  
+  poetry install --with dev  # Full dev install
   ```
 
 ---
 
-### **💡 Summary of Installation Options**
-| Installation Type | Command |
-|------------------|---------|
-| Standard runtime install | `poetry install --no-dev` |
+## **💡 Summary of Installation Options**
+| **Installation Type** | **Command** |
+|----------------------|-------------|
+| Standard install (runtime only) | `poetry install` |
 | Full development setup | `poetry install --with dev` |
 | Run program | `poetry run python main.py` |
 
+---
