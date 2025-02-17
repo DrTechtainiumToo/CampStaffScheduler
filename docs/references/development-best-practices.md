@@ -1,17 +1,9 @@
 
 # Programming Notes / Best practices 
 
-## Notes for running helpful dev packages / modules
-- for formatting, black {source_file_or_directory}
-- for static checking, mypy {program.py}
-- Run code tracker in terminal
-cd $HOME/.vscode/extensions/hangxingliu.vscode-coding-tracker-0.6.0; npm start -- -t CodeTracker
-
-
-To get reports:
-http://127.0.0.1:10345/report/?token=CodeTracker
 
 ## Naming Vars
+- For more details and general info on naming see: [Python Naming Conventions](/docs/references/python-naming-conventions.md)
 - The length of a variable name should correspond to its scope. 
 - Use prefixes like is, has, can, or should for boolean variables
 - Names should be easily pronounceable and searchable through the codebase.
@@ -26,17 +18,6 @@ Isolated: Tests should not depend on external systems or the results of other te
 Repeatable: Tests should provide the same results every time you run them.
 Comprehensive: They should cover all cases, including typical use cases, edge cases, and potential error conditions.
 
-## Keys() vs list()
-Keys() vs list() so for non printing cases where I need the keys .keys() is slightly more efficenty. But if I need it to print out i need to use list() on the keys so i dont get that weird dict_keys thing at the beginning. But overall doesn't really matter. The .keys() in pyhton 3x is a veiw object which is slightly more memory efficent. But unless bottleneck then prioritize readability. But if need .keys a bunch, easier just to create a list.
-
-## == vs is
-You use == when comparing values and is when comparing identities.
-is compares two objects in memory, == compares their values.
-
-## IN
-in is a memebership operator, but also part of the for loop syntax for iteration
-or combines conditional statments, and returns True if at least one of the conditions evaluates to True, and false otherwise. Returns true on first operand that is Truthy and does not eval the rest. Use to see if something in a list for example is true. DONT CONFUSE WITH AND
-
 ## When fixing nested control statments and or figuring out if should make something a function
 - Don't repeat myself
 - Find common conditions - no need to check for extra (integrate into one logic)
@@ -47,30 +28,28 @@ or combines conditional statments, and returns True if at least one of the condi
 - Single responsibility
 - Dont try to pre optimize to much, run a profiler and optimize based on the results from there
 
-## When to use constants??
+## Building out new features
+#Good approach on how to build out new features
+Detail Out Each Function: Outline what each function should do, its inputs, outputs, and how it fits into the larger task assignment process.
+Start Implementing in Stages: Begin with the foundational elements like data handling and move up to more complex logic like the probabilistic assignments.
+Iterate Based on Feedback: Test each component as you build it and refine your approach based on the results.
+
 
 ## When to use pass data as arguments vs make it a class attribute
 
-
-## Documentation
-Documentation: Provide detailed comments and documentation explaining the purpose of the code, how to use it, and describing the parameters and return values of functions.
-
-## Modularization
-
-When to modularize, diff between packages and modules etc.
-
-### Organization
+## Organization
     - """Use clear, descriptive names for modules and functions to indicate what they do.
     Keep related functions within the same module to maintain coherence in your codebase.
     Avoid circular imports, where two modules import each other as this can lead to problems in execution. You can often resolve circular imports by reorganizing your functions into different modules or creating a new module for shared functions.
     Use a __init__.py file in each directory that should be treated as a package. This isn’t necessary in Python 3.3 and above, but it can still be useful for clarifying package structure.
     Limit the use of global variables between modules. Instead, pass data to functions as parameters."""
 
-## Errrors
-try else
+### File Naming
+Kebab-case (-) is more common for documentation and web-based URLs.
+Snake_case (_) is better for Python and scripts.
 
-# Code Notes and Style ---------
-
+## Documentation
+Documentation: Provide detailed comments and documentation explaining the purpose of the code, how to use it, and describing the parameters and return values of functions.
 
 # Optimization ---------------
 

@@ -1,25 +1,52 @@
-# Ignore log folder
+# Ignore log files
 logs/
 program_times_log.txt
 
-#ignore my scratch work folder
+# Ignore scratch work
 scratch/
 
-
-# Ignore output and temp files
+# Ignore temp & output files
 *.xlsx
 
-# Ignore IDE configurations
+# Ignore IDE configurations and Extensions
+./cons
 .vscode/
+.vscode/launch.json
+.vscode/extensions.json
+.vscode/debug_launch.json
 .idea/
-.mypy_cache
-.pytest_cache
-.pytype
-.specstory
+.mypy_cache/
+.pytest_cache/
+.pytype/
+.specstory/
 *.iml
 .code-workspace
 .qodo/
 .VScodeCounter
+
+# Ignore Python snd CPython cache
+__pycache__/
+.__pycache__
+*.pyc
+*.so
+*.pyc
+*.pyo
+*.pyd
+.pyc
+.cpython-312.pyc
+*.cpython-312.pyc
+*.cpython-312-pytest-8.3.4.pyc
+
+# Ignore Python caches & compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+
+# Ignore virtual environments
+venv/
+.env/
 
 # Ignore system-specific files
 .DS_Store
@@ -29,14 +56,5 @@ build/
 dist/
 *.egg-info/
 
-# Ignore virtual environments
-venv/
-.env/
 
-# Ignore Python snd CPython cache
-__pycache__/
-*.pyc
-*.so
-*.cpython-312.pyc
-*__pycache__/
-*.cpython-312-pytest-8.3.4.pyc
+

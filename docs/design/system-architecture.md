@@ -1,8 +1,4 @@
-
-
-PROJECT EXPLINATION:
-
-## 5. Program Overview
+## Program Overview
 
 ### Data Loading:
 - Load default info, employee gender & nickname, basic tasks & durations, timeslots, and night chore details.
@@ -30,7 +26,7 @@ PROJECT EXPLINATION:
 - Print final schedule and error logs to the console.
 - Write results to CSV for manual modification or Excel/Google Sheets processing.
 
-## 6. Modularization Steps
+## Modularization Steps
 
 ### Core Logic:
 - Isolate business rules and scheduling algorithms from I/O code.
@@ -64,6 +60,3 @@ PROJECT EXPLINATION:
 - Issue: Confusing start/end time inclusivity led to bugs.
 - Solution: Changed terminology to `starts_from` and `due_by` (both inclusive).
 - Result: Clarified scheduling parameters, making the system more intuitive for both users and developers.
-
-PROJECT HISTORY:
-for when i merge with mian that has an updated readme

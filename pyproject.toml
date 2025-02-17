@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "SomeDeviousProject"
+name = "code_root"
 version = "1.4.2"
 description = "A camp scheduling program"
 authors = ["DrTechtainium <82414214+DrTechtainiumToo@users.noreply.github.com>"]

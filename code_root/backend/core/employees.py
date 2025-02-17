@@ -190,7 +190,7 @@ class EmployeeAvailabilityLogic:
     
     #REFACTOR? #REVIEW move to time processes?????
     def multi_time_input_detector_and_converter_employee_unavailability(self, input_str: list[str], times_list: list[str], time_slot_to_index_map, index_to_time_slot_map) -> list[str]: #dayTimeSlotsKeysList
-                """
+        """
         #make handle inputs such as 7am-9:15am, 7-9:15am, give an error if 7am-AnyNumberWithout AM/PM, raise and exception if impossible calc such as TimeB starts before A, make cycle if invalid time. Make a exit emergency statement to exit the loop?????
         #TODO do that calcs gap or goes to nearest one, then calcs difference and inputs it.
         #iterates up and down until it reaches closest value. well checks if has :, and not 00, or
